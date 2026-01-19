@@ -23,6 +23,11 @@ dist/
 backend/uploads/*
 !backend/uploads/.gitkeep
 
+# Database exports (jangan commit data production!)
+*.sql
+!backend/config/init-db.sql
+!backend/config/reset-admin.sql
+
 # Logs
 *.log
 npm-debug.log*

@@ -1,5 +1,116 @@
 # Changelog - Aplikasi Perizinan IWARE
 
+## [2.0.0] - 2026-01-19
+
+### 🔄 MAJOR UPDATE: Migration to MongoDB
+
+#### Breaking Changes
+- ⚠️ **Database migrated from MySQL to MongoDB**
+- ⚠️ **All SQL queries converted to MongoDB queries**
+- ⚠️ **ID field changed from integer to ObjectId**
+
+#### New Features
+- ✅ MongoDB integration with Mongoose ODM
+- ✅ Flexible schema with automatic timestamps
+- ✅ Better scalability and performance
+- ✅ Cloud-ready with MongoDB Atlas support
+- ✅ Auto-initialization of database and admin user
+
+#### Tech Stack Updates
+- **Database:** MySQL → **MongoDB**
+- **ORM/ODM:** None → **Mongoose**
+- **Connection:** mysql2 → **mongoose**
+
+#### New Files
+- `backend/config/mongodb.js` - MongoDB connection configuration
+- `backend/models/User.js` - User model with Mongoose
+- `backend/models/Pengajuan.js` - Pengajuan model with Mongoose
+- `backend/test-mongodb-connection.js` - Connection test script
+- `backend/MIGRATION_MONGODB.md` - Migration documentation
+- `backend/INSTALL_MONGODB.md` - MongoDB installation guide
+- `QUICK_START_MONGODB.md` - Quick start guide
+- `install-mongodb.bat` - Auto-install script (Windows)
+- `cleanup-mysql.bat` - Cleanup MySQL dependencies
+
+#### Updated Files
+- `backend/package.json` - Replaced mysql2 with mongoose
+- `backend/server.js` - MongoDB connection and initialization
+- `backend/routes/auth.js` - Converted to MongoDB queries
+- `backend/routes/pengajuan.js` - Converted to MongoDB queries
+- `backend/.env` - Updated for MongoDB configuration
+- `backend/.env.example` - MongoDB configuration template
+- `README.md` - Updated with MongoDB information
+
+#### Deprecated Files
+- `backend/config/database.js` - MySQL configuration (not used)
+- `backend/config/init-db.sql` - SQL initialization (not used)
+- `backend/config/reset-admin.sql` - SQL reset script (not used)
+
+#### Default Credentials (Updated)
+- **Username:** admin
+- **Password:** password (changed from admin123)
+- ⚠️ **IMPORTANT:** Change password after first login!
+
+#### Migration Benefits
+1. **Flexibility** - No need for ALTER TABLE, just add fields
+2. **Performance** - Faster for read-heavy operations
+3. **Scalability** - Easy horizontal scaling
+4. **Cloud Native** - MongoDB Atlas free tier available
+5. **JSON Native** - Data stored in JSON-like format (BSON)
+6. **Developer Friendly** - JavaScript-like queries
+
+#### Installation (MongoDB)
+
+**Quick Start:**
+```bash
+# 1. Install MongoDB
+# Windows: Download from mongodb.com
+# Linux: sudo apt-get install mongodb
+# macOS: brew install mongodb-community
+
+# 2. Install dependencies
+cd backend
+npm install
+
+# 3. Run server (auto-creates database & admin)
+npm start
+```
+
+**Or use MongoDB Atlas (Cloud - Free):**
+```bash
+# 1. Sign up at mongodb.com/cloud/atlas
+# 2. Create free cluster (M0)
+# 3. Get connection string
+# 4. Update .env:
+MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/iware_perizinan
+```
+
+#### Testing
+```bash
+# Test MongoDB connection
+cd backend
+npm run test-db
+
+# Test API
+curl http://localhost:5000/api/health
+```
+
+#### Documentation
+- 📚 [MIGRATION_MONGODB.md](./backend/MIGRATION_MONGODB.md) - Complete migration guide
+- 📚 [INSTALL_MONGODB.md](./backend/INSTALL_MONGODB.md) - MongoDB installation
+- 📚 [QUICK_START_MONGODB.md](./QUICK_START_MONGODB.md) - 5-minute quick start
+
+#### Known Issues
+- None
+
+#### TODO / Future Enhancements
+- [ ] Data migration script from MySQL to MongoDB
+- [ ] MongoDB backup automation
+- [ ] Performance optimization with indexes
+- [ ] Aggregation pipeline for complex reports
+
+---
+
 ## [1.0.0] - 2024-01-12
 
 ### ✨ Initial Release
