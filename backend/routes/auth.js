@@ -5,6 +5,29 @@ const jwt = require('jsonwebtoken');
 const db = require('../config/database');
 const { auth, isAdmin } = require('../middleware/auth');
 
+// Test database connection
+router.get('/test-db', async (req, res) => {
+  try {
+    const [result] = await db.query('SELECT 1 as test');
+    const [tables] = await db.query('SHOW TABLES');
+    const [userCount] = await db.query('SELECT COUNT(*) as count FROM users');
+    
+    res.json({
+      status: 'OK',
+      message: 'Database connection successful',
+      test_query: result[0],
+      tables: tables.map(t => Object.values(t)[0]),
+      user_count: userCount[0].count
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'ERROR',
+      message: 'Database connection failed',
+      error: error.message
+    });
+  }
+});
+
 // Login - Masuk ke sistem
 router.post('/login', async (req, res) => {
   try {

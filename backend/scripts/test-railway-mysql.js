@@ -9,7 +9,29 @@
  */
 
 const mysql = require('mysql2/promise');
-require('dotenv').config({ path: require('path').join(__dirname, '../.env.railway.local') });
+const path = require('path');
+const fs = require('fs');
+
+// Coba baca dari beberapa lokasi .env
+const envPaths = [
+  path.join(__dirname, '../.env.railway.local'),
+  path.join(__dirname, '../.env'),
+  path.join(__dirname, '../../.env')
+];
+
+let envLoaded = false;
+for (const envPath of envPaths) {
+  if (fs.existsSync(envPath)) {
+    require('dotenv').config({ path: envPath });
+    console.log(`✅ Using env file: ${envPath}\n`);
+    envLoaded = true;
+    break;
+  }
+}
+
+if (!envLoaded) {
+  console.log('⚠️  No .env file found, using environment variables\n');
+}
 
 async function testConnection() {
   console.log('🔍 Testing Railway MySQL Connection...\n');
