@@ -473,9 +473,10 @@ const UserManagement = () => {
   const fetchUsers = async () => {
     try {
       const response = await authAPI.getUsers();
-      setUsers(response.data);
+      setUsers(response.data.users || response.data);
     } catch (error) {
-      toast.error('Gagal memuat data user');
+      console.error('Error fetching users:', error);
+      toast.error(error.response?.data?.message || 'Gagal memuat data user');
     } finally {
       setLoading(false);
     }
@@ -513,34 +514,42 @@ const UserManagement = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {users.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">{user.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{user.username}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{user.nama}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 rounded-full text-sm ${
-                      user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
-                    }`}>
-                      {user.role}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    {new Date(user.created_at).toLocaleDateString('id-ID')}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {user.role !== 'admin' && (
-                      <button
-                        onClick={() => handleDelete(user.id)}
-                        className="flex items-center space-x-1 px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
-                      >
-                        <FiTrash2 />
-                        <span>Hapus</span>
-                      </button>
-                    )}
+              {users && users.length > 0 ? (
+                users.map((user) => (
+                  <tr key={user.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">{user.id}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{user.username}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{user.nama}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 rounded-full text-sm ${
+                        user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {user.role}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      {new Date(user.created_at).toLocaleDateString('id-ID')}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {user.role !== 'admin' && (
+                        <button
+                          onClick={() => handleDelete(user.id)}
+                          className="flex items-center space-x-1 px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+                        >
+                          <FiTrash2 />
+                          <span>Hapus</span>
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
+                    Tidak ada data user
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
