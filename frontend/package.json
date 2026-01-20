@@ -20,7 +20,9 @@
     "build": "react-scripts build",
     "serve": "serve -s build -l $PORT",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "validate-railway": "node validate-railway-config.js",
+    "predeploy": "npm run validate-railway"
   },
   "eslintConfig": {
     "extends": [

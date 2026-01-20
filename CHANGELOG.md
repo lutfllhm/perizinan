@@ -1,5 +1,133 @@
 # Changelog - Aplikasi Perizinan IWARE
 
+## [3.0.0] - 2026-01-20
+
+### 🚀 RAILWAY DEPLOYMENT READY
+
+#### Major Updates
+- ✅ **Railway deployment configuration complete**
+- ✅ **MySQL optimized for Railway**
+- ✅ **Production-ready environment setup**
+- ✅ **Comprehensive deployment documentation**
+
+#### New Features
+- ✅ Railway-specific configuration files
+- ✅ Automatic database initialization for Railway
+- ✅ Enhanced CORS handling for Railway domains
+- ✅ Environment variable templates for Railway
+- ✅ Deployment readiness checker
+- ✅ Nixpacks configuration
+- ✅ Docker ignore files
+
+#### New Files
+- `RAILWAY_DEPLOY_GUIDE.md` - Complete Railway deployment guide
+- `QUICK_START.md` - Local development quick start
+- `backend/.env.railway` - Railway environment template
+- `frontend/.env.railway` - Railway environment template
+- `backend/scripts/init-railway-db.js` - Railway database initialization
+- `backend/nixpacks.toml` - Nixpacks build configuration
+- `frontend/nixpacks.toml` - Nixpacks build configuration
+- `backend/Procfile` - Railway process file
+- `frontend/Procfile` - Railway process file
+- `.railwayignore` - Railway ignore patterns
+- `deploy-check.js` - Deployment readiness checker
+
+#### Updated Files
+- `backend/config/mysql.js` - Railway MySQL variables support
+- `backend/server.js` - Enhanced CORS for Railway domains
+- `frontend/src/utils/api.js` - Fixed API endpoint
+- `frontend/.env.production` - Railway production config
+- `backend/package.json` - Added init-railway-db script
+- `package.json` - Removed mongoose dependency, added deploy-check
+- `README.md` - Updated with Railway deployment info
+
+#### Configuration Improvements
+1. **MySQL Connection**
+   - Support for Railway MySQL variables (MYSQLHOST, MYSQLPORT, etc.)
+   - Fallback to standard variables (DB_HOST, DB_PORT, etc.)
+   - Increased connection timeout for Railway
+   - Better error logging
+
+2. **CORS Configuration**
+   - Support for Railway preview URLs (*.up.railway.app)
+   - Regex pattern matching for dynamic domains
+   - Better origin logging for debugging
+
+3. **Environment Variables**
+   - Separate templates for local and Railway
+   - Clear documentation for each variable
+   - Auto-injection support for Railway services
+
+#### Deployment Features
+- **Backend**: Node.js 18, MySQL connection, JWT auth
+- **Frontend**: React build, static serving with serve
+- **Database**: MySQL with auto-initialization
+- **Monitoring**: Health check endpoint
+- **Security**: Environment-based CORS, JWT secrets
+
+#### Scripts
+```bash
+# Check deployment readiness
+npm run deploy-check
+
+# Initialize Railway database
+npm run init-railway-db
+
+# Test local database
+npm run test-db
+```
+
+#### Railway Services Structure
+```
+Project
+├── MySQL Service (Database)
+├── Backend Service (API)
+│   ├── Linked to MySQL
+│   ├── Environment variables
+│   └── Domain: backend.up.railway.app
+└── Frontend Service (React)
+    ├── Environment variables
+    └── Domain: frontend.up.railway.app
+```
+
+#### Environment Variables
+
+**Backend (Railway):**
+- `NODE_ENV=production`
+- `PORT=5000`
+- `JWT_SECRET=<generated>`
+- `FRONTEND_URL=<frontend-domain>`
+- MySQL variables (auto-injected)
+
+**Frontend (Railway):**
+- `REACT_APP_API_URL=<backend-domain>`
+
+#### Documentation
+- 📚 [RAILWAY_DEPLOY_GUIDE.md](./RAILWAY_DEPLOY_GUIDE.md) - Complete deployment guide
+- 📚 [QUICK_START.md](./QUICK_START.md) - Local development guide
+- 📚 [README.md](./README.md) - Project overview
+
+#### Deployment Checklist
+- ✅ MySQL configuration for Railway
+- ✅ Backend Railway configuration
+- ✅ Frontend Railway configuration
+- ✅ Environment variable templates
+- ✅ Database initialization script
+- ✅ CORS configuration
+- ✅ Build configurations
+- ✅ Process files
+- ✅ Documentation
+
+#### Known Issues
+- None
+
+#### Migration from v2.0.0
+- Removed MongoDB dependencies
+- Back to MySQL (Railway MySQL service)
+- All configurations updated for Railway
+
+---
+
 ## [2.0.0] - 2026-01-19
 
 ### 🔄 MAJOR UPDATE: Migration to MongoDB
@@ -8,6 +136,21 @@
 - ⚠️ **Database migrated from MySQL to MongoDB**
 - ⚠️ **All SQL queries converted to MongoDB queries**
 - ⚠️ **ID field changed from integer to ObjectId**
+
+[Previous changelog content preserved...]
+
+---
+
+## [1.0.0] - 2024-01-12
+
+### ✨ Initial Release
+
+[Previous changelog content preserved...]
+
+---
+
+**Maintained by:** IWARE IT Team  
+**License:** © 2026 IWARE. All rights reserved.
 
 #### New Features
 - ✅ MongoDB integration with Mongoose ODM

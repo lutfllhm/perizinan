@@ -27,7 +27,7 @@ export const authAPI = {
 };
 
 export const pengajuanAPI = {
-  submit: (formData) => api.post('/pengajuan/submit', formData, {
+  submit: (formData) => api.post('/pengajuan', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
   getAll: () => api.get('/pengajuan'),

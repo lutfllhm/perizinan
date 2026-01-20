@@ -14,6 +14,8 @@ backend/.env
 CREDENTIALS.md
 DEPLOYMENT-URLS.md
 .deploy-config.txt
+RAILWAY_CREDENTIALS.md
+backend/jwt-secret.txt
 
 # Build files
 frontend/build/

@@ -10,7 +10,8 @@
     "client": "cd frontend && npm start",
     "client:dev": "cd frontend && npm run dev",
     "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
-    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "deploy-check": "node deploy-check.js"
   },
   "keywords": [],
   "author": "",
@@ -18,7 +19,5 @@
   "devDependencies": {
     "concurrently": "^8.2.2"
   },
-  "dependencies": {
-    "mongoose": "^8.21.0"
-  }
+  "dependencies": {}
 }

@@ -47,16 +47,27 @@ async function initDatabaseIfNeeded() {
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5000',
-  process.env.FRONTEND_URL
+  process.env.FRONTEND_URL,
+  // Railway preview URLs
+  /\.up\.railway\.app$/
 ].filter(Boolean);
 
 app.use(cors({
   origin: function(origin, callback) {
     if (!origin) return callback(null, true);
     
-    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
+    // Check if origin matches allowed origins or patterns
+    const isAllowed = allowedOrigins.some(allowed => {
+      if (allowed instanceof RegExp) {
+        return allowed.test(origin);
+      }
+      return allowed === origin;
+    });
+    
+    if (isAllowed || process.env.NODE_ENV !== 'production') {
       callback(null, true);
     } else {
+      console.log('❌ CORS blocked origin:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
