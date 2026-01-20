@@ -163,4 +163,83 @@ router.get('/me', async (req, res) => {
   }
 });
 
+// Get all users (untuk admin)
+router.get('/users', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({ message: 'Token tidak ditemukan' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Cek apakah user adalah admin
+    if (decoded.role !== 'admin') {
+      return res.status(403).json({ message: 'Akses ditolak. Hanya admin yang dapat melihat daftar user' });
+    }
+
+    const [rows] = await db.query(
+      'SELECT id, username, nama, role, created_at FROM users ORDER BY created_at DESC'
+    );
+
+    console.log('✅ Get users successful, count:', rows.length);
+
+    res.json({ users: rows });
+
+  } catch (error) {
+    console.error('❌ Get users error:', error);
+    res.status(500).json({ 
+      message: 'Terjadi kesalahan saat mengambil data user',
+      error: error.message 
+    });
+  }
+});
+
+// Delete user (untuk admin)
+router.delete('/users/:id', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({ message: 'Token tidak ditemukan' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Cek apakah user adalah admin
+    if (decoded.role !== 'admin') {
+      return res.status(403).json({ message: 'Akses ditolak. Hanya admin yang dapat menghapus user' });
+    }
+
+    const userId = req.params.id;
+
+    // Cek apakah user yang akan dihapus adalah diri sendiri
+    if (decoded.id === parseInt(userId)) {
+      return res.status(400).json({ message: 'Tidak dapat menghapus akun sendiri' });
+    }
+
+    // Cek apakah user ada
+    const [users] = await db.query('SELECT * FROM users WHERE id = ?', [userId]);
+    
+    if (users.length === 0) {
+      return res.status(404).json({ message: 'User tidak ditemukan' });
+    }
+
+    // Hapus user
+    await db.query('DELETE FROM users WHERE id = ?', [userId]);
+
+    console.log('✅ User deleted successfully:', userId);
+
+    res.json({ message: 'User berhasil dihapus' });
+
+  } catch (error) {
+    console.error('❌ Delete user error:', error);
+    res.status(500).json({ 
+      message: 'Terjadi kesalahan saat menghapus user',
+      error: error.message 
+    });
+  }
+});
+
 module.exports = router;
