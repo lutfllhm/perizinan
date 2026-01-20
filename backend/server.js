@@ -97,6 +97,7 @@ async function initDatabaseIfNeeded() {
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5000',
+  'https://licensing-hx-production.up.railway.app',
   process.env.FRONTEND_URL,
   // Railway preview URLs
   /\.up\.railway\.app$/
