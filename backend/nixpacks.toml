@@ -5,7 +5,7 @@ nixPkgs = ['nodejs-18_x']
 cmds = ['npm ci --legacy-peer-deps --prefer-offline']
 
 [phases.build]
-cmds = ['node scripts/init-railway-db.js']
+cmds = []
 
 [start]
 cmd = 'node server.js'

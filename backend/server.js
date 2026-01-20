@@ -14,63 +14,81 @@ console.log('📍 Port:', process.env.PORT || 5000);
 
 // Auto-initialize database on startup
 async function initDatabaseIfNeeded() {
-  try {
-    console.log('🔄 Checking database tables...');
-    
-    // Buat tabel users jika belum ada
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS users (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        username VARCHAR(50) NOT NULL UNIQUE,
-        password VARCHAR(255) NOT NULL,
-        nama VARCHAR(100) NOT NULL,
-        role ENUM('admin', 'hrd') NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-    console.log('✅ Table users ready');
+  let retries = 5;
+  let delay = 2000;
+  
+  while (retries > 0) {
+    try {
+      console.log('🔄 Checking database tables...');
+      
+      // Buat tabel users jika belum ada
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS users (
+          id INT PRIMARY KEY AUTO_INCREMENT,
+          username VARCHAR(50) NOT NULL UNIQUE,
+          password VARCHAR(255) NOT NULL,
+          nama VARCHAR(100) NOT NULL,
+          role ENUM('admin', 'hrd') NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+      `);
+      console.log('✅ Table users ready');
 
-    // Buat tabel pengajuan jika belum ada
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS pengajuan (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        nama VARCHAR(100) NOT NULL,
-        no_telp VARCHAR(20) NOT NULL,
-        jenis_perizinan VARCHAR(50) NOT NULL,
-        tanggal_mulai DATETIME NOT NULL,
-        tanggal_selesai DATETIME NOT NULL,
-        bukti_foto VARCHAR(255),
-        status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
-        catatan TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-      )
-    `);
-    console.log('✅ Table pengajuan ready');
-    
-    // Cek apakah sudah ada user admin
-    const [rows] = await db.query('SELECT * FROM users WHERE username = ?', ['admin']);
-    
-    if (rows.length === 0) {
-      console.log('🔄 Creating default admin user...');
+      // Buat tabel pengajuan jika belum ada
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS pengajuan (
+          id INT PRIMARY KEY AUTO_INCREMENT,
+          nama VARCHAR(100) NOT NULL,
+          no_telp VARCHAR(20) NOT NULL,
+          jenis_perizinan VARCHAR(50) NOT NULL,
+          tanggal_mulai DATETIME NOT NULL,
+          tanggal_selesai DATETIME NOT NULL,
+          bukti_foto VARCHAR(255),
+          status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+          catatan TEXT,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+      `);
+      console.log('✅ Table pengajuan ready');
       
-      // Hash password default: "admin123"
-      const hashedPassword = await bcrypt.hash('admin123', 10);
+      // Cek apakah sudah ada user admin
+      const [rows] = await db.query('SELECT * FROM users WHERE username = ?', ['admin']);
       
-      await db.query(
-        'INSERT INTO users (username, password, nama, role) VALUES (?, ?, ?, ?)',
-        ['admin', hashedPassword, 'Administrator', 'admin']
-      );
+      if (rows.length === 0) {
+        console.log('🔄 Creating default admin user...');
+        
+        // Hash password default: "admin123"
+        const hashedPassword = await bcrypt.hash('admin123', 10);
+        
+        await db.query(
+          'INSERT INTO users (username, password, nama, role) VALUES (?, ?, ?, ?)',
+          ['admin', hashedPassword, 'Administrator', 'admin']
+        );
+        
+        console.log('✅ Default admin user created!');
+        console.log('💡 Username: admin, Password: admin123');
+      } else {
+        console.log('✅ Database already initialized');
+        console.log('💡 Admin user exists');
+      }
       
-      console.log('✅ Default admin user created!');
-      console.log('💡 Username: admin, Password: admin123');
-    } else {
-      console.log('✅ Database already initialized');
-      console.log('💡 Admin user exists');
+      // Success, break the retry loop
+      break;
+      
+    } catch (error) {
+      retries--;
+      console.error(`❌ Error saat init database (${5 - retries}/5):`, error.message);
+      
+      if (retries > 0) {
+        console.log(`⏳ Retrying in ${delay/1000} seconds...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        delay *= 1.5; // Exponential backoff
+      } else {
+        console.error('💡 Pastikan MySQL service sudah running dan database sudah dibuat');
+        throw error; // Rethrow to prevent server from starting
+      }
     }
-  } catch (error) {
-    console.error('❌ Error saat init database:', error.message);
-    console.error('💡 Pastikan MySQL service sudah running dan database sudah dibuat');
   }
 }
 
