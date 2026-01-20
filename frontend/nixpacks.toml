@@ -2,10 +2,14 @@
 nixPkgs = ['nodejs-18_x']
 
 [phases.install]
-cmds = ['npm ci --legacy-peer-deps']
+cmds = [
+  'npm cache clean --force',
+  'rm -rf node_modules',
+  'npm install --legacy-peer-deps'
+]
 
 [phases.build]
 cmds = ['npm run build']
 
 [start]
-cmd = 'npm run serve'
+cmd = 'npx serve -s build -l $PORT'
