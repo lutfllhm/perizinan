@@ -242,4 +242,109 @@ router.delete('/users/:id', async (req, res) => {
   }
 });
 
+// Update profile
+router.put('/profile', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({ message: 'Token tidak ditemukan' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { nama } = req.body;
+
+    if (!nama) {
+      return res.status(400).json({ message: 'Nama harus diisi' });
+    }
+
+    await db.query(
+      'UPDATE users SET nama = ? WHERE id = ?',
+      [nama, decoded.id]
+    );
+
+    console.log('✅ Profile updated successfully for user:', decoded.id);
+
+    res.json({ message: 'Profil berhasil diperbarui' });
+
+  } catch (error) {
+    console.error('❌ Update profile error:', error);
+    res.status(500).json({ 
+      message: 'Terjadi kesalahan saat memperbarui profil',
+      error: error.message 
+    });
+  }
+});
+
+// Change password
+router.put('/change-password', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({ message: 'Token tidak ditemukan' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { passwordLama, passwordBaru } = req.body;
+
+    console.log('🔐 Change password attempt for user:', decoded.id);
+
+    // Validasi input
+    if (!passwordLama || !passwordBaru) {
+      return res.status(400).json({ 
+        message: 'Password lama dan password baru harus diisi' 
+      });
+    }
+
+    if (passwordBaru.length < 6) {
+      return res.status(400).json({ 
+        message: 'Password baru minimal 6 karakter' 
+      });
+    }
+
+    // Ambil data user
+    const [rows] = await db.query(
+      'SELECT * FROM users WHERE id = ?',
+      [decoded.id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'User tidak ditemukan' });
+    }
+
+    const user = rows[0];
+
+    // Verifikasi password lama
+    const isValidPassword = await bcrypt.compare(passwordLama, user.password);
+
+    if (!isValidPassword) {
+      console.log('❌ Invalid old password for user:', decoded.id);
+      return res.status(401).json({ 
+        message: 'Password lama tidak sesuai' 
+      });
+    }
+
+    // Hash password baru
+    const hashedPassword = await bcrypt.hash(passwordBaru, 10);
+
+    // Update password
+    await db.query(
+      'UPDATE users SET password = ? WHERE id = ?',
+      [hashedPassword, decoded.id]
+    );
+
+    console.log('✅ Password changed successfully for user:', decoded.id);
+
+    res.json({ message: 'Password berhasil diubah' });
+
+  } catch (error) {
+    console.error('❌ Change password error:', error);
+    res.status(500).json({ 
+      message: 'Terjadi kesalahan saat mengubah password',
+      error: error.message 
+    });
+  }
+});
+
 module.exports = router;
