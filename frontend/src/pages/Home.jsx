@@ -3,459 +3,289 @@ import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar.jsx';
 
 const Home = () => {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isVisible, setIsVisible] = useState(false);
+  const [activeFeature, setActiveFeature] = useState(0);
 
   useEffect(() => {
-    setIsLoaded(true);
+    setIsVisible(true);
     
-    const handleScroll = () => setScrollY(window.scrollY);
-    const handleMouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
+    // Auto-rotate features
+    const interval = setInterval(() => {
+      setActiveFeature(prev => (prev + 1) % 3);
+    }, 4000);
     
-    window.addEventListener('scroll', handleScroll);
-    window.addEventListener('mousemove', handleMouseMove);
-    
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('mousemove', handleMouseMove);
-    };
+    return () => clearInterval(interval);
   }, []);
 
-  // Floating particles component
-  const FloatingParticles = () => {
-    const particles = Array.from({ length: 15 }, (_, i) => (
-      <div
-        key={i}
-        className="absolute w-2 h-2 bg-amber-400/20 rounded-full animate-pulse pointer-events-none"
-        style={{
-          left: `${Math.random() * 100}%`,
-          top: `${Math.random() * 100}%`,
-          animationDelay: `${Math.random() * 3}s`,
-          animationDuration: `${3 + Math.random() * 2}s`
-        }}
-      />
-    ));
-    return <div className="absolute inset-0 overflow-hidden pointer-events-none">{particles}</div>;
-  };
+  const features = [
+    {
+      icon: "⚡",
+      title: "Instant Processing",
+      description: "Pengajuan diproses otomatis dalam hitungan detik",
+      color: "from-blue-500 to-cyan-500"
+    },
+    {
+      icon: "🎯",
+      title: "Smart Analytics",
+      description: "Dashboard cerdas dengan insights mendalam",
+      color: "from-purple-500 to-pink-500"
+    },
+    {
+      icon: "🔒",
+      title: "Enterprise Security",
+      description: "Keamanan tingkat enterprise dengan enkripsi end-to-end",
+      color: "from-green-500 to-emerald-500"
+    }
+  ];
 
-  // Interactive cursor follower
-  const CursorFollower = () => (
-    <div
-      className="fixed w-4 h-4 bg-amber-400/20 rounded-full pointer-events-none z-40 transition-all duration-100 ease-out hidden md:block"
-      style={{
-        left: mousePosition.x - 8,
-        top: mousePosition.y - 8,
-        transform: `scale(${scrollY > 100 ? 0.5 : 1})`
-      }}
-    />
-  );
+  const stats = [
+    { number: "10K+", label: "Active Users", icon: "👥" },
+    { number: "99.9%", label: "Uptime", icon: "⚡" },
+    { number: "24/7", label: "Support", icon: "🛟" },
+    { number: "50ms", label: "Response Time", icon: "🚀" }
+  ];
 
   return (
-    <div className="min-h-screen relative overflow-x-hidden">
-      <CursorFollower />
-      
-      {/* Background Image - Fixed */}
-      <div 
-        className="fixed inset-0 z-0 bg-cover bg-center bg-fixed"
-        style={{ 
-          backgroundImage: 'url(/img/bg.jpeg)',
-          backgroundAttachment: 'fixed'
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/95 via-gray-800/90 to-gray-900/95" />
-        <FloatingParticles />
-      </div>
-
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Navbar */}
-      <div className="relative z-30">
+      <div className="relative z-50">
         <Navbar />
       </div>
 
       {/* Hero Section */}
-      <section className="relative z-20 min-h-screen flex items-center px-4 pt-20">
-        <div className="max-w-7xl mx-auto w-full text-center">
-          <div className={`inline-block px-6 py-3 bg-amber-500/20 backdrop-blur-sm border border-amber-400/40 text-amber-200 rounded-full text-sm font-bold mb-6 transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            ✨ Platform Perizinan Modern IWARE
-          </div>
-
-          <h1 className={`text-4xl md:text-6xl lg:text-7xl font-black text-white mb-6 transition-all duration-1000 delay-200 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <span className="inline-block hover:scale-110 transition-transform duration-300">Sistem</span>
-            <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400 hover:from-orange-400 hover:to-amber-400 transition-all duration-500 inline-block hover:scale-110">
-              Perizinan
-            </span>
-            <br />
-            <span className="text-3xl md:text-5xl text-gray-200 inline-block hover:scale-110 transition-transform duration-300">Cuti & Lembur</span>
-          </h1>
-
-          <p className={`text-lg md:text-xl text-gray-200 mb-10 max-w-2xl mx-auto transition-all duration-1000 delay-400 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            Kelola pengajuan cuti dan lembur dengan mudah, cepat, dan efisien melalui platform digital terdepan
-          </p>
-
-          <div className={`flex flex-col sm:flex-row gap-4 justify-center mb-10 transition-all duration-1000 delay-600 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <Link to="/pengajuan-form" className="relative z-10">
-              <button className="group relative w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-amber-600 to-orange-600 text-white rounded-xl font-bold shadow-lg hover:shadow-2xl hover:shadow-amber-500/25 transform hover:scale-105 transition-all duration-300 overflow-hidden">
-                <span className="relative z-10">Ajukan Sekarang →</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-amber-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </button>
-            </Link>
-            <Link to="/login" className="relative z-10">
-              <button className="group relative w-full sm:w-auto px-8 py-4 bg-white/15 backdrop-blur-sm border border-white/30 text-white rounded-xl font-bold hover:bg-white/25 hover:border-white/50 transform hover:scale-105 transition-all duration-300 overflow-hidden">
-                <span className="relative z-10">Login Staff</span>
-                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </button>
-            </Link>
-          </div>
-
-          <div className={`grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto transition-all duration-1000 delay-800 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <div className="group bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 hover:bg-white/15 hover:border-amber-400/50 hover:scale-105 transition-all duration-300 cursor-pointer">
-              <div className="text-2xl font-bold text-white group-hover:text-amber-400 transition-colors duration-300">500+</div>
-              <div className="text-sm text-gray-300">Pengajuan</div>
-            </div>
-            <div className="group bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 hover:bg-white/15 hover:border-green-400/50 hover:scale-105 transition-all duration-300 cursor-pointer">
-              <div className="text-2xl font-bold text-white group-hover:text-green-400 transition-colors duration-300">98%</div>
-              <div className="text-sm text-gray-300">Kepuasan</div>
-            </div>
-            <div className="group bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 hover:bg-white/15 hover:border-orange-400/50 hover:scale-105 transition-all duration-300 cursor-pointer">
-              <div className="text-2xl font-bold text-white group-hover:text-orange-400 transition-colors duration-300">24/7</div>
-              <div className="text-sm text-gray-300">Akses</div>
-            </div>
-          </div>
+      <section className="relative min-h-screen flex items-center justify-center px-4 pt-16">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `radial-gradient(circle at 25% 25%, #3b82f6 0%, transparent 50%),
+                             radial-gradient(circle at 75% 75%, #8b5cf6 0%, transparent 50%)`
+          }} />
         </div>
-      </section>
 
-      {/* About Company Section */}
-      <section className="relative z-20 py-20 px-4 bg-gradient-to-br from-black/40 to-black/20">
-        <div className="max-w-7xl mx-auto">
-          <div className={`text-center mb-16 transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{transitionDelay: '900ms'}}>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Tentang <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">IWARE</span>
-            </h2>
-            <p className="text-lg md:text-xl text-gray-200 max-w-3xl mx-auto leading-relaxed">
-              IWARE adalah perusahaan teknologi terdepan yang berfokus pada pengembangan solusi digital 
-              untuk manajemen sumber daya manusia. Dengan pengalaman lebih dari 10 tahun, kami telah 
-              membantu ratusan perusahaan mengoptimalkan proses HR mereka.
+        <div className="relative z-10 max-w-6xl mx-auto text-center">
+          {/* Main Heading */}
+          <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <div className="inline-flex items-center px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-sm font-medium mb-8">
+              <span className="w-2 h-2 bg-blue-400 rounded-full mr-2 animate-pulse"></span>
+              Sistem HR Terdepan 2026
+            </div>
+            
+            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+              Kelola <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Perizinan</span>
+              <br />dengan <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Cerdas</span>
+            </h1>
+            
+            <p className="text-xl text-slate-300 mb-12 max-w-2xl mx-auto leading-relaxed">
+              Platform AI-powered untuk manajemen cuti dan lembur yang mengotomatisasi workflow HR Anda
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* Company Stats */}
-            <div className={`transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`} style={{transitionDelay: '1000ms'}}>
-              <div className="grid grid-cols-2 gap-6">
-                <div className="group bg-gradient-to-br from-amber-500/20 to-orange-500/20 backdrop-blur-xl p-6 rounded-2xl border border-amber-400/30 hover:border-amber-400/60 hover:scale-105 transition-all duration-300">
-                  <div className="text-3xl font-bold text-amber-400 mb-2 group-hover:scale-110 transition-transform duration-300">10+</div>
-                  <div className="text-gray-200 text-sm">Tahun Pengalaman</div>
-                </div>
-                <div className="group bg-gradient-to-br from-green-500/20 to-emerald-500/20 backdrop-blur-xl p-6 rounded-2xl border border-green-400/30 hover:border-green-400/60 hover:scale-105 transition-all duration-300">
-                  <div className="text-3xl font-bold text-green-400 mb-2 group-hover:scale-110 transition-transform duration-300">200+</div>
-                  <div className="text-gray-200 text-sm">Perusahaan Client</div>
-                </div>
-                <div className="group bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-xl p-6 rounded-2xl border border-purple-400/30 hover:border-purple-400/60 hover:scale-105 transition-all duration-300">
-                  <div className="text-3xl font-bold text-purple-400 mb-2 group-hover:scale-110 transition-transform duration-300">50K+</div>
-                  <div className="text-gray-200 text-sm">Pengguna Aktif</div>
-                </div>
-                <div className="group bg-gradient-to-br from-orange-500/20 to-red-500/20 backdrop-blur-xl p-6 rounded-2xl border border-orange-400/30 hover:border-orange-400/60 hover:scale-105 transition-all duration-300">
-                  <div className="text-3xl font-bold text-orange-400 mb-2 group-hover:scale-110 transition-transform duration-300">99.9%</div>
-                  <div className="text-gray-200 text-sm">Uptime System</div>
-                </div>
+          {/* CTA Buttons */}
+          <div className={`flex flex-col sm:flex-row gap-4 justify-center mb-16 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <Link to="/pengajuan-form">
+              <button className="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl font-semibold shadow-lg hover:shadow-2xl hover:shadow-blue-500/25 transform hover:scale-105 transition-all duration-300">
+                <span className="relative z-10 flex items-center">
+                  Mulai Gratis
+                  <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </span>
+              </button>
+            </Link>
+            <Link to="/login">
+              <button className="px-8 py-4 bg-slate-800/50 backdrop-blur-sm border border-slate-600 text-white rounded-2xl font-semibold hover:bg-slate-700/50 hover:border-slate-500 transform hover:scale-105 transition-all duration-300">
+                Login Dashboard
+              </button>
+            </Link>
+          </div>
+
+          {/* Stats */}
+          <div className={`grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            {stats.map((stat, index) => (
+              <div key={index} className="group bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 hover:bg-slate-700/30 hover:border-slate-600/50 transition-all duration-300">
+                <div className="text-2xl mb-2">{stat.icon}</div>
+                <div className="text-2xl font-bold text-white mb-1">{stat.number}</div>
+                <div className="text-sm text-slate-400">{stat.label}</div>
               </div>
-            </div>
-
-            {/* Company Values */}
-            <div className={`transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`} style={{transitionDelay: '1100ms'}}>
-              <div className="space-y-6">
-                <div className="group bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20 hover:border-amber-400/50 hover:bg-white/15 transition-all duration-300">
-                  <div className="flex items-center mb-3">
-                    <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center text-2xl mr-4 group-hover:scale-110 transition-transform duration-300">
-                      🚀
-                    </div>
-                    <h3 className="text-xl font-bold text-white group-hover:text-amber-400 transition-colors duration-300">Inovasi</h3>
-                  </div>
-                  <p className="text-gray-200 group-hover:text-white transition-colors duration-300">
-                    Selalu menghadirkan teknologi terdepan untuk solusi HR yang efektif dan efisien.
-                  </p>
-                </div>
-
-                <div className="group bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20 hover:border-green-400/50 hover:bg-white/15 transition-all duration-300">
-                  <div className="flex items-center mb-3">
-                    <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center text-2xl mr-4 group-hover:scale-110 transition-transform duration-300">
-                      🤝
-                    </div>
-                    <h3 className="text-xl font-bold text-white group-hover:text-green-400 transition-colors duration-300">Kepercayaan</h3>
-                  </div>
-                  <p className="text-gray-200 group-hover:text-white transition-colors duration-300">
-                    Membangun hubungan jangka panjang dengan client melalui layanan yang dapat diandalkan.
-                  </p>
-                </div>
-
-                <div className="group bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20 hover:border-purple-400/50 hover:bg-white/15 transition-all duration-300">
-                  <div className="flex items-center mb-3">
-                    <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-2xl mr-4 group-hover:scale-110 transition-transform duration-300">
-                      ⭐
-                    </div>
-                    <h3 className="text-xl font-bold text-white group-hover:text-purple-400 transition-colors duration-300">Kualitas</h3>
-                  </div>
-                  <p className="text-gray-200 group-hover:text-white transition-colors duration-300">
-                    Berkomitmen memberikan produk dan layanan berkualitas tinggi dengan standar internasional.
-                  </p>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Vision & Mission Section */}
-      <section className="relative z-20 py-20 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className={`text-center mb-16 transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{transitionDelay: '1200ms'}}>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Visi & <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">Misi</span>
+      {/* Features Section */}
+      <section className="py-24 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Mengapa Memilih <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">IWARE</span>?
             </h2>
+            <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+              Teknologi terdepan yang mengubah cara perusahaan mengelola SDM
+            </p>
           </div>
-
-          <div className="grid md:grid-cols-2 gap-12">
-            {/* Vision */}
-            <div className={`transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{transitionDelay: '1300ms'}}>
-              <div className="group bg-gradient-to-br from-amber-500/15 to-orange-500/15 backdrop-blur-xl p-8 rounded-3xl border border-amber-400/30 hover:border-amber-400/60 hover:scale-105 transition-all duration-500">
-                <div className="text-center mb-6">
-                  <div className="w-20 h-20 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
-                    👁️
-                  </div>
-                  <h3 className="text-3xl font-bold text-white group-hover:text-amber-400 transition-colors duration-300">VISI</h3>
-                </div>
-                <p className="text-lg text-gray-200 group-hover:text-white transition-colors duration-300 text-center leading-relaxed">
-                  "Menjadi perusahaan teknologi HR terdepan di Indonesia yang menghadirkan solusi digital 
-                  inovatif untuk transformasi manajemen sumber daya manusia di era digital."
-                </p>
-              </div>
-            </div>
-
-            {/* Mission */}
-            <div className={`transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{transitionDelay: '1400ms'}}>
-              <div className="group bg-gradient-to-br from-green-500/15 to-emerald-500/15 backdrop-blur-xl p-8 rounded-3xl border border-green-400/30 hover:border-green-400/60 hover:scale-105 transition-all duration-500">
-                <div className="text-center mb-6">
-                  <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
-                    🎯
-                  </div>
-                  <h3 className="text-3xl font-bold text-white group-hover:text-green-400 transition-colors duration-300">MISI</h3>
-                </div>
-                <div className="space-y-4 text-gray-200 group-hover:text-white transition-colors duration-300">
-                  <div className="flex items-start">
-                    <span className="text-green-400 mr-3 mt-1">•</span>
-                    <p>Mengembangkan platform HR yang user-friendly dan terintegrasi</p>
-                  </div>
-                  <div className="flex items-start">
-                    <span className="text-green-400 mr-3 mt-1">•</span>
-                    <p>Memberikan layanan support 24/7 dengan response time terbaik</p>
-                  </div>
-                  <div className="flex items-start">
-                    <span className="text-green-400 mr-3 mt-1">•</span>
-                    <p>Meningkatkan efisiensi proses HR hingga 80% melalui otomatisasi</p>
-                  </div>
-                  <div className="flex items-start">
-                    <span className="text-green-400 mr-3 mt-1">•</span>
-                    <p>Membangun ekosistem digital yang mendukung pertumbuhan bisnis</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section className="relative z-20 py-20 px-4 bg-black/30">
-        <div className="max-w-7xl mx-auto">
-          <h2 className={`text-4xl md:text-5xl font-bold text-white text-center mb-12 transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{transitionDelay: '1500ms'}}>
-            Keunggulan <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">Platform</span>
-          </h2>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className={`group bg-white/10 backdrop-blur-xl p-8 rounded-2xl border border-white/20 hover:bg-white/15 hover:border-amber-400/60 hover:-translate-y-4 hover:shadow-2xl hover:shadow-amber-500/20 transition-all duration-500 cursor-pointer ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{transitionDelay: '1600ms'}}>
-              <div className="text-5xl mb-4 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">⚡</div>
-              <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-amber-400 transition-colors duration-300">Proses Cepat</h3>
-              <p className="text-gray-200 group-hover:text-white transition-colors duration-300">Pengajuan diproses dalam hitungan menit dengan sistem otomatis yang canggih</p>
+            {features.map((feature, index) => (
+              <div 
+                key={index}
+                className={`group relative bg-slate-800/40 backdrop-blur-sm border border-slate-700/50 rounded-3xl p-8 hover:bg-slate-700/40 hover:border-slate-600/50 transition-all duration-500 cursor-pointer ${
+                  activeFeature === index ? 'ring-2 ring-blue-500/50 bg-slate-700/40' : ''
+                }`}
+                onMouseEnter={() => setActiveFeature(index)}
+              >
+                <div className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                  {feature.icon}
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-blue-400 transition-colors duration-300">
+                  {feature.title}
+                </h3>
+                <p className="text-slate-300 leading-relaxed">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section className="py-24 px-4 bg-slate-800/20">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+                Tentang <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">IWARE</span>
+              </h2>
+              <p className="text-lg text-slate-300 mb-8 leading-relaxed">
+                Kami adalah pionir dalam teknologi HR yang telah dipercaya oleh ribuan perusahaan. 
+                Dengan AI dan machine learning, kami mengotomatisasi proses yang kompleks menjadi sederhana.
+              </p>
+              
+              <div className="space-y-4">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-4">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span className="text-slate-300">10+ tahun pengalaman dalam teknologi HR</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-4">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span className="text-slate-300">Dipercaya oleh 500+ perusahaan enterprise</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center mr-4">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span className="text-slate-300">ISO 27001 certified untuk keamanan data</span>
+                </div>
+              </div>
             </div>
 
-            <div className={`group bg-white/10 backdrop-blur-xl p-8 rounded-2xl border border-white/20 hover:bg-white/15 hover:border-green-400/60 hover:-translate-y-4 hover:shadow-2xl hover:shadow-green-500/20 transition-all duration-500 cursor-pointer ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{transitionDelay: '1700ms'}}>
-              <div className="text-5xl mb-4 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">📅</div>
-              <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-green-400 transition-colors duration-300">Fleksibel</h3>
-              <p className="text-gray-200 group-hover:text-white transition-colors duration-300">Atur jadwal sesuai kebutuhan dengan berbagai opsi kustomisasi yang tersedia</p>
-            </div>
-
-            <div className={`group bg-white/10 backdrop-blur-xl p-8 rounded-2xl border border-white/20 hover:bg-white/15 hover:border-orange-400/60 hover:-translate-y-4 hover:shadow-2xl hover:shadow-orange-500/20 transition-all duration-500 cursor-pointer ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{transitionDelay: '1800ms'}}>
-              <div className="text-5xl mb-4 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">✅</div>
-              <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-orange-400 transition-colors duration-300">Real-Time</h3>
-              <p className="text-gray-200 group-hover:text-white transition-colors duration-300">Pantau status pengajuan secara langsung dengan notifikasi instant</p>
+            <div className="relative">
+              <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-3xl p-8 backdrop-blur-sm border border-slate-700/50">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-white mb-2">99.9%</div>
+                    <div className="text-slate-400 text-sm">Uptime</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-white mb-2">50ms</div>
+                    <div className="text-slate-400 text-sm">Response</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-white mb-2">10K+</div>
+                    <div className="text-slate-400 text-sm">Users</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-white mb-2">24/7</div>
+                    <div className="text-slate-400 text-sm">Support</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="relative z-20 py-20 px-4">
-        <div className="max-w-7xl mx-auto">
-          <h2 className={`text-4xl md:text-5xl font-bold text-white text-center mb-12 transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{transitionDelay: '1900ms'}}>
-            Apa Kata <span className="gradient-text-animated">Pengguna</span>
-          </h2>
-          
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className={`group bg-gradient-to-br from-white/15 to-white/10 backdrop-blur-xl p-8 rounded-2xl border border-white/20 hover:border-amber-400/60 hover:scale-105 transition-all duration-500 ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`} style={{transitionDelay: '2000ms'}}>
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center text-white font-bold">
-                  A
-                </div>
-                <div className="ml-4">
-                  <h4 className="text-white font-semibold">Ahmad Rizki</h4>
-                  <p className="text-gray-300 text-sm">Staff IT</p>
-                </div>
-              </div>
-              <p className="text-gray-200 group-hover:text-white transition-colors duration-300">
-                "Platform ini sangat memudahkan proses pengajuan cuti. Interface yang user-friendly dan proses yang cepat!"
-              </p>
-              <div className="flex mt-4">
-                {[...Array(5)].map((_, i) => (
-                  <span key={i} className="text-yellow-400 text-lg">⭐</span>
-                ))}
-              </div>
-            </div>
-
-            <div className={`group bg-gradient-to-br from-white/15 to-white/10 backdrop-blur-xl p-8 rounded-2xl border border-white/20 hover:border-green-400/60 hover:scale-105 transition-all duration-500 ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`} style={{transitionDelay: '2100ms'}}>
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center text-white font-bold">
-                  S
-                </div>
-                <div className="ml-4">
-                  <h4 className="text-white font-semibold">Sari Dewi</h4>
-                  <p className="text-gray-300 text-sm">HRD Manager</p>
-                </div>
-              </div>
-              <p className="text-gray-200 group-hover:text-white transition-colors duration-300">
-                "Sebagai HRD, sistem ini sangat membantu dalam mengelola dan memantau semua pengajuan karyawan secara real-time."
-              </p>
-              <div className="flex mt-4">
-                {[...Array(5)].map((_, i) => (
-                  <span key={i} className="text-yellow-400 text-lg">⭐</span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="relative z-20 py-20 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className={`bg-gradient-to-r from-amber-600 to-orange-600 rounded-3xl p-8 md:p-12 text-center hover:from-orange-600 hover:to-amber-600 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/30 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{transitionDelay: '2200ms'}}>
-            <div className="text-4xl md:text-6xl mb-6 animate-bounce">⚡</div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Siap Mengajukan Perizinan?
+      {/* CTA Section */}
+      <section className="py-24 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 backdrop-blur-sm border border-blue-500/20 rounded-3xl p-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Siap Mengoptimalkan HR Anda?
             </h2>
-            <p className="text-lg md:text-xl text-white/90 mb-8">
-              Proses cepat dan mudah, hanya butuh beberapa menit
+            <p className="text-xl text-slate-300 mb-8">
+              Bergabunglah dengan ribuan perusahaan yang telah merasakan efisiensi maksimal
             </p>
-            <Link to="/pengajuan-form" className="relative z-10">
-              <button className="group relative px-8 md:px-10 py-4 bg-white text-amber-600 rounded-xl font-bold shadow-xl hover:shadow-2xl transform hover:scale-110 transition-all duration-300 overflow-hidden ripple-effect">
-                <span className="relative z-10 group-hover:text-white transition-colors duration-300">Mulai Sekarang</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-600 to-orange-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <Link to="/pengajuan-form">
+              <button className="group relative px-10 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl font-semibold shadow-lg hover:shadow-2xl hover:shadow-blue-500/25 transform hover:scale-105 transition-all duration-300">
+                <span className="relative z-10 flex items-center justify-center">
+                  Mulai Sekarang - Gratis
+                  <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </span>
               </button>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Enhanced Footer */}
-      <footer className="relative z-20 bg-black/50 backdrop-blur-xl border-t border-white/20 py-16 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className={`grid md:grid-cols-4 gap-8 mb-12 transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{transitionDelay: '2300ms'}}>
-            {/* Company Info */}
-            <div className="group md:col-span-2">
-              <h3 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400 mb-4 group-hover:from-orange-400 group-hover:to-amber-400 transition-all duration-300">
+      {/* Footer */}
+      <footer className="py-16 px-4 border-t border-slate-800">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-12">
+            <div className="md:col-span-2">
+              <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mb-4">
                 IWARE
               </h3>
-              <p className="text-gray-200 group-hover:text-white transition-colors duration-300 mb-6 leading-relaxed">
-                Perusahaan teknologi terdepan yang menghadirkan solusi digital inovatif untuk transformasi 
-                manajemen sumber daya manusia di era digital. Dengan pengalaman lebih dari 10 tahun, 
-                kami telah dipercaya oleh ratusan perusahaan.
+              <p className="text-slate-400 mb-6 leading-relaxed">
+                Platform HR terdepan yang menggunakan AI untuk mengotomatisasi dan mengoptimalkan 
+                proses manajemen sumber daya manusia perusahaan Anda.
               </p>
               <div className="flex space-x-4">
-                <div className="w-10 h-10 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform duration-300 cursor-pointer">
-                  📧
+                <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors cursor-pointer">
+                  <span className="text-sm">📧</span>
                 </div>
-                <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform duration-300 cursor-pointer">
-                  📞
+                <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-green-600 transition-colors cursor-pointer">
+                  <span className="text-sm">📞</span>
                 </div>
-                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform duration-300 cursor-pointer">
-                  🌐
+                <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-purple-600 transition-colors cursor-pointer">
+                  <span className="text-sm">🌐</span>
                 </div>
               </div>
             </div>
 
-            {/* Services */}
-            <div className="group">
-              <h4 className="text-xl font-semibold text-white mb-6 group-hover:text-amber-400 transition-colors duration-300">Layanan Kami</h4>
-              <ul className="space-y-3 text-gray-300">
-                <li className="hover:text-white hover:translate-x-2 transition-all duration-300 cursor-pointer flex items-center">
-                  <span className="text-amber-400 mr-2">→</span> Sistem Pengajuan Cuti
-                </li>
-                <li className="hover:text-white hover:translate-x-2 transition-all duration-300 cursor-pointer flex items-center">
-                  <span className="text-green-400 mr-2">→</span> Manajemen Lembur
-                </li>
-                <li className="hover:text-white hover:translate-x-2 transition-all duration-300 cursor-pointer flex items-center">
-                  <span className="text-purple-400 mr-2">→</span> Real-time Tracking
-                </li>
-                <li className="hover:text-white hover:translate-x-2 transition-all duration-300 cursor-pointer flex items-center">
-                  <span className="text-orange-400 mr-2">→</span> Dashboard Analytics
-                </li>
-                <li className="hover:text-white hover:translate-x-2 transition-all duration-300 cursor-pointer flex items-center">
-                  <span className="text-cyan-400 mr-2">→</span> Support 24/7
-                </li>
+            <div>
+              <h4 className="text-lg font-semibold text-white mb-4">Produk</h4>
+              <ul className="space-y-2 text-slate-400">
+                <li className="hover:text-white transition-colors cursor-pointer">Manajemen Cuti</li>
+                <li className="hover:text-white transition-colors cursor-pointer">Sistem Lembur</li>
+                <li className="hover:text-white transition-colors cursor-pointer">Analytics Dashboard</li>
+                <li className="hover:text-white transition-colors cursor-pointer">Mobile App</li>
               </ul>
             </div>
 
-            {/* Contact Info */}
-            <div className="group">
-              <h4 className="text-xl font-semibold text-white mb-6 group-hover:text-orange-400 transition-colors duration-300">Hubungi Kami</h4>
-              <ul className="space-y-4 text-gray-300">
-                <li className="hover:text-white hover:translate-x-2 transition-all duration-300 cursor-pointer flex items-center">
-                  <span className="text-2xl mr-3">📧</span>
-                  <div>
-                    <div className="font-medium">Email</div>
-                    <div className="text-sm">info@iware.com</div>
-                  </div>
-                </li>
-                <li className="hover:text-white hover:translate-x-2 transition-all duration-300 cursor-pointer flex items-center">
-                  <span className="text-2xl mr-3">📞</span>
-                  <div>
-                    <div className="font-medium">Telepon</div>
-                    <div className="text-sm">(021) 1234-5678</div>
-                  </div>
-                </li>
-                <li className="hover:text-white hover:translate-x-2 transition-all duration-300 cursor-pointer flex items-center">
-                  <span className="text-2xl mr-3">📍</span>
-                  <div>
-                    <div className="font-medium">Alamat</div>
-                    <div className="text-sm">Jakarta, Indonesia</div>
-                  </div>
-                </li>
+            <div>
+              <h4 className="text-lg font-semibold text-white mb-4">Kontak</h4>
+              <ul className="space-y-2 text-slate-400">
+                <li className="hover:text-white transition-colors cursor-pointer">info@iware.com</li>
+                <li className="hover:text-white transition-colors cursor-pointer">+62 21 1234 5678</li>
+                <li className="hover:text-white transition-colors cursor-pointer">Jakarta, Indonesia</li>
               </ul>
             </div>
           </div>
 
-          {/* Bottom Footer */}
-          <div className={`border-t border-white/20 pt-8 transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{transitionDelay: '2400ms'}}>
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <p className="text-gray-400 hover:text-gray-200 transition-colors duration-300 mb-4 md:mb-0">
-                &copy; 2026 IWARE. Hak Cipta Dilindungi. Dibuat dengan ❤️ untuk masa depan HR yang lebih baik.
-              </p>
-              <div className="flex space-x-6 text-sm text-gray-400">
-                <span className="hover:text-white transition-colors duration-300 cursor-pointer">Kebijakan Privasi</span>
-                <span className="hover:text-white transition-colors duration-300 cursor-pointer">Syarat & Ketentuan</span>
-                <span className="hover:text-white transition-colors duration-300 cursor-pointer">FAQ</span>
-              </div>
-            </div>
+          <div className="border-t border-slate-800 pt-8 text-center text-slate-500">
+            <p>&copy; 2026 IWARE. All rights reserved. Built with ❤️ for better HR management.</p>
           </div>
         </div>
       </footer>
