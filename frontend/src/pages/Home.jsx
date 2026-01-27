@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
-import { FiClock, FiCalendar, FiCheckCircle, FiArrowRight, FiZap, FiShield, FiTrendingUp } from 'react-icons/fi';
+import { FiCalendar, FiCheckCircle, FiArrowRight, FiZap, FiShield, FiTrendingUp, FiUsers, FiAward } from 'react-icons/fi';
 
 const Home = () => {
   const [gambarSaatIni, setGambarSaatIni] = useState(1);
@@ -22,20 +22,23 @@ const Home = () => {
     {
       ikon: <FiZap className="text-5xl" />,
       judul: 'Cepat & Mudah',
-      deskripsi: 'Ajukan perizinan cuti atau lembur dengan cepat dan mudah',
-      gradient: 'from-blue-500 to-cyan-500'
+      deskripsi: 'Ajukan perizinan cuti atau lembur dengan cepat dan mudah dalam hitungan menit',
+      gradient: 'from-blue-500 to-cyan-500',
+      delay: 0
     },
     {
       ikon: <FiCalendar className="text-5xl" />,
       judul: 'Fleksibel',
-      deskripsi: 'Atur jadwal cuti atau lembur sesuai kebutuhan Anda',
-      gradient: 'from-purple-500 to-pink-500'
+      deskripsi: 'Atur jadwal cuti atau lembur sesuai kebutuhan Anda dengan sistem yang adaptif',
+      gradient: 'from-purple-500 to-pink-500',
+      delay: 0.15
     },
     {
       ikon: <FiCheckCircle className="text-5xl" />,
       judul: 'Transparan',
-      deskripsi: 'Pantau status pengajuan Anda secara real-time',
-      gradient: 'from-green-500 to-emerald-500'
+      deskripsi: 'Pantau status pengajuan Anda secara real-time dengan notifikasi otomatis',
+      gradient: 'from-green-500 to-emerald-500',
+      delay: 0.3
     }
   ];
 
@@ -46,16 +49,43 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 overflow-hidden">
-      <Navbar />
-      
-      {/* Floating Background Elements */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+    <div className="min-h-screen bg-gray-900 overflow-hidden relative">
+      {/* Background Image Slider with Overlay */}
+      <div className="fixed inset-0 z-0">
+        {gambar.map((num) => (
+          <motion.div
+            key={num}
+            initial={{ opacity: 0 }}
+            animate={{
+              opacity: gambarSaatIni === num ? 1 : 0,
+            }}
+            transition={{ duration: 2 }}
+            className="absolute inset-0"
+          >
+            <img
+              src={`/img/${num}.jpeg`}
+              alt={`Background ${num}`}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.style.display = 'none';
+              }}
+            />
+            {/* Dark Overlay for better text readability */}
+            <div className="absolute inset-0 bg-gradient-to-b from-gray-900/80 via-gray-900/70 to-gray-900/90" />
+            {/* Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 via-purple-900/30 to-indigo-900/40" />
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Floating Decorative Elements */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-10">
         <motion.div
           animate={{
             scale: [1, 1.2, 1],
             rotate: [0, 90, 0],
-            opacity: [0.1, 0.2, 0.1]
+            opacity: [0.05, 0.1, 0.05]
           }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
           className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full blur-3xl"
@@ -64,15 +94,19 @@ const Home = () => {
           animate={{
             scale: [1, 1.3, 1],
             rotate: [0, -90, 0],
-            opacity: [0.1, 0.15, 0.1]
+            opacity: [0.05, 0.1, 0.05]
           }}
           transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
           className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-tr from-cyan-400 to-blue-400 rounded-full blur-3xl"
         />
       </div>
 
+      <div className="relative z-20">
+        <Navbar />
+      </div>
+
       {/* Bagian Hero */}
-      <section className="relative pt-32 pb-20 px-4">
+      <section className="relative pt-32 pb-20 px-4 z-20">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -87,20 +121,20 @@ const Home = () => {
                 transition={{ delay: 0.2 }}
                 className="inline-block mb-4"
               >
-                <span className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm font-semibold rounded-full shadow-lg">
+                <span className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm font-semibold rounded-full shadow-lg backdrop-blur-sm">
                   ✨ Sistem Terpercaya & Modern
                 </span>
               </motion.div>
               
-              <h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 mb-6 leading-tight">
+              <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight drop-shadow-2xl">
                 Sistem Perizinan
                 <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
                   Cuti & Lembur
                 </span>
               </h1>
               
-              <p className="text-xl text-gray-700 mb-8 leading-relaxed">
+              <p className="text-xl text-gray-100 mb-8 leading-relaxed drop-shadow-lg">
                 Kelola pengajuan cuti dan lembur dengan mudah, cepat, dan efisien. 
                 Sistem terintegrasi untuk kemudahan manajemen SDM yang modern.
               </p>
@@ -108,7 +142,7 @@ const Home = () => {
               <div className="flex flex-wrap gap-4 mb-8">
                 <Link to="/ajukan">
                   <motion.button
-                    whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(59, 130, 246, 0.3)" }}
+                    whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(59, 130, 246, 0.5)" }}
                     whileTap={{ scale: 0.95 }}
                     className="group flex items-center space-x-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-300"
                   >
@@ -125,7 +159,7 @@ const Home = () => {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-8 py-4 bg-white border-2 border-gray-300 text-gray-800 rounded-xl text-lg font-bold hover:border-blue-500 hover:text-blue-600 transition-all duration-300 shadow-lg"
+                    className="px-8 py-4 bg-white/10 backdrop-blur-md border-2 border-white/30 text-white rounded-xl text-lg font-bold hover:bg-white/20 transition-all duration-300 shadow-lg"
                   >
                     Login Staff
                   </motion.button>
@@ -140,10 +174,10 @@ const Home = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 + idx * 0.1 }}
-                    className="text-center"
+                    className="text-center bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20"
                   >
-                    <div className="text-2xl font-bold text-blue-600 mb-1">{item.angka}</div>
-                    <div className="text-xs text-gray-600">{item.label}</div>
+                    <div className="text-2xl font-bold text-white mb-1">{item.angka}</div>
+                    <div className="text-xs text-gray-200">{item.label}</div>
                   </motion.div>
                 ))}
               </div>
@@ -153,17 +187,17 @@ const Home = () => {
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="relative"
+              className="relative hidden lg:block"
             >
               <motion.div
                 animate={{ y: [0, -20, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="relative h-[500px] rounded-3xl overflow-hidden shadow-2xl"
+                className="relative h-[500px] rounded-3xl overflow-hidden shadow-2xl border-4 border-white/20 backdrop-blur-sm"
               >
                 {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 to-purple-600/20 z-10" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/30 to-purple-600/30 z-10" />
                 
-                {/* Image Slider */}
+                {/* Image Preview */}
                 {gambar.map((num) => (
                   <motion.img
                     key={num}
@@ -202,7 +236,7 @@ const Home = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1 }}
                 whileHover={{ y: -5 }}
-                className="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-2xl max-w-xs"
+                className="absolute -bottom-6 -left-6 bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-2xl max-w-xs border border-white/50"
               >
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center">
@@ -220,7 +254,7 @@ const Home = () => {
       </section>
 
       {/* Bagian Fitur */}
-      <section className="relative py-24 px-4 bg-white">
+      <section className="relative py-24 px-4 bg-white/95 backdrop-blur-sm z-20">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -232,66 +266,130 @@ const Home = () => {
               initial={{ opacity: 0, scale: 0.5 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              className="inline-block px-4 py-2 bg-blue-100 text-blue-600 text-sm font-semibold rounded-full mb-4"
+              transition={{ type: "spring", stiffness: 200 }}
+              className="inline-block px-5 py-2 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 text-sm font-bold rounded-full mb-6 shadow-md"
             >
-              Keunggulan Kami
+              ⚡ Keunggulan Kami
             </motion.span>
-            <h2 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-blue-600 mb-4">
+            <h2 className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-blue-700 to-purple-700 mb-6">
               Mengapa Memilih Kami?
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Solusi terbaik untuk manajemen perizinan yang efisien dan modern
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Solusi terbaik untuk manajemen perizinan yang efisien, modern, dan terpercaya untuk perusahaan Anda
             </p>
           </motion.div>
           
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
             {fitur.map((item, indeks) => (
               <motion.div
                 key={indeks}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: indeks * 0.15, duration: 0.5 }}
-                whileHover={{ y: -15, scale: 1.02 }}
-                className="group relative bg-gradient-to-br from-white to-gray-50 p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 overflow-hidden"
+                transition={{ delay: item.delay, duration: 0.6, type: "spring" }}
+                whileHover={{ y: -15, scale: 1.03 }}
+                className="group relative bg-white p-10 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden"
               >
-                {/* Gradient Background on Hover */}
+                {/* Animated Gradient Background */}
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  whileHover={{ opacity: 1 }}
-                  className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}
+                  className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
+                />
+                
+                {/* Shine Effect */}
+                <motion.div
+                  initial={{ x: '-100%' }}
+                  whileHover={{ x: '100%' }}
+                  transition={{ duration: 0.6 }}
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
                 />
                 
                 {/* Icon Container */}
                 <motion.div
-                  whileHover={{ rotate: 360, scale: 1.1 }}
-                  transition={{ duration: 0.6 }}
-                  className={`relative inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br ${item.gradient} rounded-2xl mb-6 shadow-lg`}
+                  whileHover={{ rotate: [0, -10, 10, -10, 0], scale: 1.15 }}
+                  transition={{ duration: 0.5 }}
+                  className={`relative inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br ${item.gradient} rounded-3xl mb-6 shadow-xl group-hover:shadow-2xl`}
                 >
                   <div className="text-white">{item.ikon}</div>
+                  
+                  {/* Pulse Ring */}
+                  <motion.div
+                    animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className={`absolute inset-0 bg-gradient-to-br ${item.gradient} rounded-3xl`}
+                  />
                 </motion.div>
                 
-                <h3 className="text-2xl font-bold text-gray-800 mb-3 group-hover:text-blue-600 transition-colors">
+                <h3 className="text-2xl font-bold text-gray-800 mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 transition-all duration-300">
                   {item.judul}
                 </h3>
-                <p className="text-gray-600 leading-relaxed">{item.deskripsi}</p>
+                <p className="text-gray-600 leading-relaxed text-base">{item.deskripsi}</p>
                 
-                {/* Decorative Corner */}
+                {/* Decorative Elements */}
                 <motion.div
                   initial={{ scale: 0, rotate: 0 }}
                   whileInView={{ scale: 1, rotate: 45 }}
                   viewport={{ once: true }}
-                  transition={{ delay: indeks * 0.15 + 0.3 }}
-                  className="absolute -top-2 -right-2 w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full opacity-50"
+                  transition={{ delay: item.delay + 0.3, type: "spring" }}
+                  className="absolute -top-3 -right-3 w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full opacity-40 blur-xl"
+                />
+                <motion.div
+                  initial={{ scale: 0 }}
+                  whileInView={{ scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: item.delay + 0.4 }}
+                  className="absolute -bottom-2 -left-2 w-16 h-16 bg-gradient-to-tr from-cyan-100 to-blue-100 rounded-full opacity-30 blur-lg"
                 />
               </motion.div>
             ))}
           </div>
+
+          {/* Testimonial / Trust Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-20 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 rounded-3xl p-12 shadow-lg"
+          >
+            <div className="grid md:grid-cols-3 gap-8 text-center">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="flex flex-col items-center"
+              >
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                  <FiUsers className="text-3xl text-white" />
+                </div>
+                <h4 className="text-3xl font-bold text-gray-800 mb-2">1000+</h4>
+                <p className="text-gray-600">Pengguna Aktif</p>
+              </motion.div>
+              
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="flex flex-col items-center"
+              >
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                  <FiAward className="text-3xl text-white" />
+                </div>
+                <h4 className="text-3xl font-bold text-gray-800 mb-2">5 Tahun</h4>
+                <p className="text-gray-600">Pengalaman Terpercaya</p>
+              </motion.div>
+              
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="flex flex-col items-center"
+              >
+                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                  <FiShield className="text-3xl text-white" />
+                </div>
+                <h4 className="text-3xl font-bold text-gray-800 mb-2">100%</h4>
+                <p className="text-gray-600">Data Aman & Terenkripsi</p>
+              </motion.div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Bagian Ajakan */}
-      <section className="relative py-24 px-4 overflow-hidden">
+      <section className="relative py-24 px-4 overflow-hidden z-20">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -378,7 +476,7 @@ const Home = () => {
       </section>
 
       {/* Footer */}
-      <footer className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white py-12 px-4">
+      <footer className="relative bg-gray-900/95 backdrop-blur-sm text-white py-12 px-4 z-20">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8 mb-8">
             <motion.div
@@ -433,6 +531,7 @@ const Home = () => {
           </motion.div>
         </div>
       </footer>
+      </div>
     </div>
   );
 };
