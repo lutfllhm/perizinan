@@ -32,7 +32,7 @@ const Navbar = ({ isLoggedIn, onLogout }) => {
           <div className="hidden md:flex items-center space-x-4">
             {!isLoggedIn ? (
               <>
-                <Link to="/ajukan">
+                <Link to="/pengajuan-form">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -84,7 +84,7 @@ const Navbar = ({ isLoggedIn, onLogout }) => {
           <div className="px-4 pt-2 pb-4 space-y-2">
             {!isLoggedIn ? (
               <>
-                <Link to="/ajukan" onClick={() => setIsOpen(false)}>
+                <Link to="/pengajuan-form" onClick={() => setIsOpen(false)}>
                   <button className="w-full flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-lg">
                     <FiFileText />
                     <span>Ajukan Pengajuan</span>

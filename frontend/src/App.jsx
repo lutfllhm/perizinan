@@ -17,7 +17,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/ajukan" element={<PengajuanForm />} />
+          <Route path="/pengajuan-form" element={<PengajuanForm />} />
           <Route 
             path="/admin/*" 
             element={
