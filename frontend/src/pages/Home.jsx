@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
@@ -122,7 +122,7 @@ const Home = () => {
                 className="inline-block mb-4"
               >
                 <span className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm font-semibold rounded-full shadow-lg backdrop-blur-sm">
-                  ✨ Sistem Terpercaya & Modern
+                  âœ¨ Sistem Terpercaya & Modern
                 </span>
               </motion.div>
               
@@ -269,7 +269,7 @@ const Home = () => {
               transition={{ type: "spring", stiffness: 200 }}
               className="inline-block px-5 py-2 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 text-sm font-bold rounded-full mb-6 shadow-md"
             >
-              ⚡ Keunggulan Kami
+              âš¡ Keunggulan Kami
             </motion.span>
             <h2 className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-blue-700 to-purple-700 mb-6">
               Mengapa Memilih Kami?
@@ -527,11 +527,10 @@ const Home = () => {
             viewport={{ once: true }}
             className="border-t border-gray-700 pt-8 text-center text-gray-400"
           >
-            <p>&copy; 2026 IWARE. Hak Cipta Dilindungi. Dibuat dengan ❤️ untuk kemudahan Anda.</p>
+            <p>&copy; 2026 IWARE. Hak Cipta Dilindungi. Dibuat dengan â¤ï¸ untuk kemudahan Anda.</p>
           </motion.div>
         </div>
       </footer>
-      </div>
     </div>
   );
 };
