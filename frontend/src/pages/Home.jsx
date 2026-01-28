@@ -46,26 +46,35 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen relative">
+      {/* Background Image with Modern Overlay */}
+      <div 
+        className="fixed inset-0 z-0 bg-cover bg-center bg-fixed"
+        style={{ 
+          backgroundImage: 'url(/img/bg.jpeg)',
+          backgroundAttachment: 'fixed'
+        }}
+      >
+        {/* Modern gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/95 via-slate-800/90 to-slate-900/95" />
+        {/* Subtle pattern overlay */}
+        <div className="absolute inset-0 opacity-20" style={{
+          backgroundImage: `radial-gradient(circle at 25% 25%, #3b82f6 0%, transparent 50%),
+                           radial-gradient(circle at 75% 75%, #8b5cf6 0%, transparent 50%)`
+        }} />
+      </div>
+
       {/* Navbar */}
       <div className="relative z-50">
         <Navbar />
       </div>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center px-4 pt-16">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 25% 25%, #3b82f6 0%, transparent 50%),
-                             radial-gradient(circle at 75% 75%, #8b5cf6 0%, transparent 50%)`
-          }} />
-        </div>
-
-        <div className="relative z-10 max-w-6xl mx-auto text-center">
+      <section className="relative z-10 min-h-screen flex items-center justify-center px-4 pt-16">
+        <div className="relative max-w-6xl mx-auto text-center">
           {/* Main Heading */}
           <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <div className="inline-flex items-center px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-sm font-medium mb-8">
+            <div className="inline-flex items-center px-4 py-2 bg-blue-500/20 backdrop-blur-sm border border-blue-500/30 rounded-full text-blue-300 text-sm font-medium mb-8">
               <span className="w-2 h-2 bg-blue-400 rounded-full mr-2 animate-pulse"></span>
               Sistem HR Terdepan 2026
             </div>
@@ -75,7 +84,7 @@ const Home = () => {
               <br />dengan <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Cerdas</span>
             </h1>
             
-            <p className="text-xl text-slate-300 mb-12 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl text-slate-200 mb-12 max-w-2xl mx-auto leading-relaxed">
               Platform AI-powered untuk manajemen cuti dan lembur yang mengotomatisasi workflow HR Anda
             </p>
           </div>
@@ -93,7 +102,7 @@ const Home = () => {
               </button>
             </Link>
             <Link to="/login">
-              <button className="px-8 py-4 bg-slate-800/50 backdrop-blur-sm border border-slate-600 text-white rounded-2xl font-semibold hover:bg-slate-700/50 hover:border-slate-500 transform hover:scale-105 transition-all duration-300">
+              <button className="px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/30 text-white rounded-2xl font-semibold hover:bg-white/20 hover:border-white/40 transform hover:scale-105 transition-all duration-300">
                 Login Dashboard
               </button>
             </Link>
@@ -102,10 +111,10 @@ const Home = () => {
           {/* Stats */}
           <div className={`grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             {stats.map((stat, index) => (
-              <div key={index} className="group bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 hover:bg-slate-700/30 hover:border-slate-600/50 transition-all duration-300">
+              <div key={index} className="group bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
                 <div className="text-2xl mb-2">{stat.icon}</div>
                 <div className="text-2xl font-bold text-white mb-1">{stat.number}</div>
-                <div className="text-sm text-slate-400">{stat.label}</div>
+                <div className="text-sm text-slate-300">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -113,13 +122,13 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 px-4">
+      <section className="relative z-10 py-24 px-4 bg-black/20 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
               Mengapa Memilih <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">IWARE</span>?
             </h2>
-            <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+            <p className="text-xl text-slate-200 max-w-2xl mx-auto">
               Teknologi terdepan yang mengubah cara perusahaan mengelola SDM
             </p>
           </div>
@@ -128,8 +137,8 @@ const Home = () => {
             {features.map((feature, index) => (
               <div 
                 key={index}
-                className={`group relative bg-slate-800/40 backdrop-blur-sm border border-slate-700/50 rounded-3xl p-8 hover:bg-slate-700/40 hover:border-slate-600/50 transition-all duration-500 cursor-pointer ${
-                  activeFeature === index ? 'ring-2 ring-blue-500/50 bg-slate-700/40' : ''
+                className={`group relative bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-8 hover:bg-white/15 hover:border-white/30 transition-all duration-500 cursor-pointer ${
+                  activeFeature === index ? 'ring-2 ring-blue-500/50 bg-white/15' : ''
                 }`}
                 onMouseEnter={() => setActiveFeature(index)}
               >
@@ -139,7 +148,7 @@ const Home = () => {
                 <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-blue-400 transition-colors duration-300">
                   {feature.title}
                 </h3>
-                <p className="text-slate-300 leading-relaxed">
+                <p className="text-slate-200 leading-relaxed">
                   {feature.description}
                 </p>
               </div>
@@ -149,14 +158,14 @@ const Home = () => {
       </section>
 
       {/* About Section */}
-      <section className="py-24 px-4 bg-slate-800/20">
+      <section className="relative z-10 py-24 px-4 bg-black/30 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div>
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
                 Tentang <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">IWARE</span>
               </h2>
-              <p className="text-lg text-slate-300 mb-8 leading-relaxed">
+              <p className="text-lg text-slate-200 mb-8 leading-relaxed">
                 Kami adalah pionir dalam teknologi HR yang telah dipercaya oleh ribuan perusahaan. 
                 Dengan AI dan machine learning, kami mengotomatisasi proses yang kompleks menjadi sederhana.
               </p>
@@ -168,7 +177,7 @@ const Home = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="text-slate-300">10+ tahun pengalaman dalam teknologi HR</span>
+                  <span className="text-slate-200">10+ tahun pengalaman dalam teknologi HR</span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-4">
@@ -176,7 +185,7 @@ const Home = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="text-slate-300">Dipercaya oleh 500+ perusahaan enterprise</span>
+                  <span className="text-slate-200">Dipercaya oleh 500+ perusahaan enterprise</span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center mr-4">
@@ -184,29 +193,29 @@ const Home = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="text-slate-300">ISO 27001 certified untuk keamanan data</span>
+                  <span className="text-slate-200">ISO 27001 certified untuk keamanan data</span>
                 </div>
               </div>
             </div>
 
             <div className="relative">
-              <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-3xl p-8 backdrop-blur-sm border border-slate-700/50">
+              <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20">
                 <div className="grid grid-cols-2 gap-6">
                   <div className="text-center">
                     <div className="text-3xl font-bold text-white mb-2">99.9%</div>
-                    <div className="text-slate-400 text-sm">Uptime</div>
+                    <div className="text-slate-300 text-sm">Uptime</div>
                   </div>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-white mb-2">50ms</div>
-                    <div className="text-slate-400 text-sm">Response</div>
+                    <div className="text-slate-300 text-sm">Response</div>
                   </div>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-white mb-2">10K+</div>
-                    <div className="text-slate-400 text-sm">Users</div>
+                    <div className="text-slate-300 text-sm">Users</div>
                   </div>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-white mb-2">24/7</div>
-                    <div className="text-slate-400 text-sm">Support</div>
+                    <div className="text-slate-300 text-sm">Support</div>
                   </div>
                 </div>
               </div>
@@ -216,13 +225,13 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-4">
+      <section className="relative z-10 py-24 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 backdrop-blur-sm border border-blue-500/20 rounded-3xl p-12">
+          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-12">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
               Siap Mengoptimalkan HR Anda?
             </h2>
-            <p className="text-xl text-slate-300 mb-8">
+            <p className="text-xl text-slate-200 mb-8">
               Bergabunglah dengan ribuan perusahaan yang telah merasakan efisiensi maksimal
             </p>
             <Link to="/pengajuan-form">
@@ -240,25 +249,25 @@ const Home = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-16 px-4 border-t border-slate-800">
+      <footer className="relative z-10 py-16 px-4 bg-black/40 backdrop-blur-sm border-t border-white/20">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-12">
             <div className="md:col-span-2">
               <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mb-4">
                 IWARE
               </h3>
-              <p className="text-slate-400 mb-6 leading-relaxed">
+              <p className="text-slate-300 mb-6 leading-relaxed">
                 Platform HR terdepan yang menggunakan AI untuk mengotomatisasi dan mengoptimalkan 
                 proses manajemen sumber daya manusia perusahaan Anda.
               </p>
               <div className="flex space-x-4">
-                <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors cursor-pointer">
+                <div className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors cursor-pointer">
                   <span className="text-sm">📧</span>
                 </div>
-                <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-green-600 transition-colors cursor-pointer">
+                <div className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-green-600 transition-colors cursor-pointer">
                   <span className="text-sm">📞</span>
                 </div>
-                <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-purple-600 transition-colors cursor-pointer">
+                <div className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-purple-600 transition-colors cursor-pointer">
                   <span className="text-sm">🌐</span>
                 </div>
               </div>
@@ -266,7 +275,7 @@ const Home = () => {
 
             <div>
               <h4 className="text-lg font-semibold text-white mb-4">Produk</h4>
-              <ul className="space-y-2 text-slate-400">
+              <ul className="space-y-2 text-slate-300">
                 <li className="hover:text-white transition-colors cursor-pointer">Manajemen Cuti</li>
                 <li className="hover:text-white transition-colors cursor-pointer">Sistem Lembur</li>
                 <li className="hover:text-white transition-colors cursor-pointer">Analytics Dashboard</li>
@@ -276,7 +285,7 @@ const Home = () => {
 
             <div>
               <h4 className="text-lg font-semibold text-white mb-4">Kontak</h4>
-              <ul className="space-y-2 text-slate-400">
+              <ul className="space-y-2 text-slate-300">
                 <li className="hover:text-white transition-colors cursor-pointer">info@iware.com</li>
                 <li className="hover:text-white transition-colors cursor-pointer">+62 21 1234 5678</li>
                 <li className="hover:text-white transition-colors cursor-pointer">Jakarta, Indonesia</li>
@@ -284,7 +293,7 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="border-t border-slate-800 pt-8 text-center text-slate-500">
+          <div className="border-t border-white/20 pt-8 text-center text-slate-400">
             <p>&copy; 2026 IWARE. All rights reserved. Built with ❤️ for better HR management.</p>
           </div>
         </div>
