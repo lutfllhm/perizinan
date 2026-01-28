@@ -2,8 +2,10 @@ import axios from 'axios';
 
 // Gunakan environment variable untuk API URL
 // Development: http://localhost:5000
-// Production: https://your-backend.up.railway.app
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+// Production: https://perizinan-production.up.railway.app
+const API_URL = process.env.REACT_APP_API_URL || 'https://perizinan-production.up.railway.app';
+
+console.log('🔗 API URL:', API_URL); // Debug log
 
 const api = axios.create({
   baseURL: `${API_URL}/api`,
