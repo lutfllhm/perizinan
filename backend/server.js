@@ -148,6 +148,7 @@ app.get('/api/health', (req, res) => {
 try {
   app.use('/api/auth', require('./routes/auth'));
   app.use('/api/pengajuan', require('./routes/pengajuan'));
+  app.use('/api/admin-reset', require('./routes/reset-admin')); // TEMPORARY - Remove after use
   console.log('✅ Routes loaded successfully');
 } catch (error) {
   console.error('❌ Error loading routes:', error.message);
