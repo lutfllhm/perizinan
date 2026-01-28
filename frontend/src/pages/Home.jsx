@@ -20,29 +20,29 @@ const Home = () => {
   const features = [
     {
       icon: "⚡",
-      title: "Instant Processing",
-      description: "Pengajuan diproses otomatis dalam hitungan detik",
+      title: "Otomatisasi Cerdas",
+      description: "Proses persetujuan cuti dan lembur otomatis dengan workflow yang dapat dikustomisasi sesuai struktur organisasi",
       color: "from-blue-500 to-cyan-500"
     },
     {
-      icon: "🎯",
-      title: "Smart Analytics",
-      description: "Dashboard cerdas dengan insights mendalam",
+      icon: "📊",
+      title: "Dashboard Analytics",
+      description: "Laporan real-time dan insights mendalam tentang produktivitas, absensi, dan tren HR perusahaan Anda",
       color: "from-purple-500 to-pink-500"
     },
     {
       icon: "🔒",
-      title: "Enterprise Security",
-      description: "Keamanan tingkat enterprise dengan enkripsi end-to-end",
+      title: "Keamanan Enterprise",
+      description: "Perlindungan data karyawan dengan enkripsi end-to-end dan compliance terhadap regulasi Indonesia",
       color: "from-green-500 to-emerald-500"
     }
   ];
 
   const stats = [
-    { number: "10K+", label: "Active Users", icon: "👥" },
-    { number: "99.9%", label: "Uptime", icon: "⚡" },
-    { number: "24/7", label: "Support", icon: "🛟" },
-    { number: "50ms", label: "Response Time", icon: "🚀" }
+    { number: "500+", label: "Perusahaan Client", icon: "🏢" },
+    { number: "50K+", label: "Karyawan Aktif", icon: "👥" },
+    { number: "99.9%", label: "Uptime SLA", icon: "⚡" },
+    { number: "24/7", label: "Support", icon: "🛟" }
   ];
 
   return (
@@ -85,7 +85,8 @@ const Home = () => {
             </h1>
             
             <p className="text-xl text-slate-200 mb-12 max-w-2xl mx-auto leading-relaxed">
-              Platform AI-powered untuk manajemen cuti dan lembur yang mengotomatisasi workflow HR Anda
+              Platform HRMS berbasis cloud yang mengotomatisasi proses cuti, lembur, absensi, dan payroll 
+              untuk perusahaan Indonesia dengan kepatuhan terhadap regulasi ketenagakerjaan lokal
             </p>
           </div>
 
@@ -129,7 +130,7 @@ const Home = () => {
               Mengapa Memilih <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">IWARE</span>?
             </h2>
             <p className="text-xl text-slate-200 max-w-2xl mx-auto">
-              Teknologi terdepan yang mengubah cara perusahaan mengelola SDM
+              Solusi HRMS terintegrasi yang dirancang khusus untuk kebutuhan perusahaan Indonesia
             </p>
           </div>
 
@@ -166,8 +167,9 @@ const Home = () => {
                 Tentang <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">IWARE</span>
               </h2>
               <p className="text-lg text-slate-200 mb-8 leading-relaxed">
-                Kami adalah pionir dalam teknologi HR yang telah dipercaya oleh ribuan perusahaan. 
-                Dengan AI dan machine learning, kami mengotomatisasi proses yang kompleks menjadi sederhana.
+                IWARE adalah perusahaan teknologi Indonesia yang berdedikasi menghadirkan solusi Human Resource Management System (HRMS) 
+                terdepan. Sejak 2014, kami telah membantu lebih dari 500 perusahaan di Indonesia mengoptimalkan proses manajemen SDM 
+                dengan teknologi cloud-based yang aman dan efisien.
               </p>
               
               <div className="space-y-4">
@@ -177,7 +179,7 @@ const Home = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="text-slate-200">10+ tahun pengalaman dalam teknologi HR</span>
+                  <span className="text-slate-200">10+ tahun pengalaman dalam teknologi HRMS Indonesia</span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-4">
@@ -185,7 +187,7 @@ const Home = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="text-slate-200">Dipercaya oleh 500+ perusahaan enterprise</span>
+                  <span className="text-slate-200">Dipercaya oleh 500+ perusahaan dari startup hingga enterprise</span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center mr-4">
@@ -193,7 +195,7 @@ const Home = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="text-slate-200">ISO 27001 certified untuk keamanan data</span>
+                  <span className="text-slate-200">Sertifikasi ISO 27001 untuk keamanan data kelas enterprise</span>
                 </div>
               </div>
             </div>
@@ -202,21 +204,76 @@ const Home = () => {
               <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20">
                 <div className="grid grid-cols-2 gap-6">
                   <div className="text-center">
+                    <div className="text-3xl font-bold text-white mb-2">500+</div>
+                    <div className="text-slate-300 text-sm">Perusahaan Client</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-white mb-2">50K+</div>
+                    <div className="text-slate-300 text-sm">Karyawan Terkelola</div>
+                  </div>
+                  <div className="text-center">
                     <div className="text-3xl font-bold text-white mb-2">99.9%</div>
-                    <div className="text-slate-300 text-sm">Uptime</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-white mb-2">50ms</div>
-                    <div className="text-slate-300 text-sm">Response</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-white mb-2">10K+</div>
-                    <div className="text-slate-300 text-sm">Users</div>
+                    <div className="text-slate-300 text-sm">Uptime SLA</div>
                   </div>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-white mb-2">24/7</div>
                     <div className="text-slate-300 text-sm">Support</div>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Vision & Mission Section */}
+      <section className="relative z-10 py-24 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Visi & <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Misi</span>
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12">
+            {/* Vision */}
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-8 hover:bg-white/15 hover:border-white/30 transition-all duration-500">
+              <div className="text-center mb-6">
+                <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-4">
+                  👁️
+                </div>
+                <h3 className="text-3xl font-bold text-white mb-4">VISI</h3>
+              </div>
+              <p className="text-lg text-slate-200 text-center leading-relaxed">
+                "Menjadi platform HRMS terdepan di Indonesia yang memberdayakan perusahaan untuk mengelola 
+                sumber daya manusia secara efisien, transparan, dan berkelanjutan melalui inovasi teknologi digital."
+              </p>
+            </div>
+
+            {/* Mission */}
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-8 hover:bg-white/15 hover:border-white/30 transition-all duration-500">
+              <div className="text-center mb-6">
+                <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-4">
+                  🎯
+                </div>
+                <h3 className="text-3xl font-bold text-white mb-4">MISI</h3>
+              </div>
+              <div className="space-y-4 text-slate-200">
+                <div className="flex items-start">
+                  <span className="text-green-400 mr-3 mt-1 text-lg">•</span>
+                  <p>Mengembangkan solusi HRMS yang user-friendly dan terintegrasi dengan ekosistem bisnis Indonesia</p>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-blue-400 mr-3 mt-1 text-lg">•</span>
+                  <p>Memberikan layanan support 24/7 dengan response time terbaik di kelasnya</p>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-purple-400 mr-3 mt-1 text-lg">•</span>
+                  <p>Meningkatkan efisiensi proses HR hingga 80% melalui otomatisasi cerdas</p>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-pink-400 mr-3 mt-1 text-lg">•</span>
+                  <p>Membangun ekosistem digital yang mendukung pertumbuhan SDM Indonesia</p>
                 </div>
               </div>
             </div>
@@ -232,7 +289,7 @@ const Home = () => {
               Siap Mengoptimalkan HR Anda?
             </h2>
             <p className="text-xl text-slate-200 mb-8">
-              Bergabunglah dengan ribuan perusahaan yang telah merasakan efisiensi maksimal
+              Bergabunglah dengan 500+ perusahaan Indonesia yang telah merasakan efisiensi maksimal dalam pengelolaan SDM
             </p>
             <Link to="/pengajuan-form">
               <button className="group relative px-10 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl font-semibold shadow-lg hover:shadow-2xl hover:shadow-blue-500/25 transform hover:scale-105 transition-all duration-300">
@@ -257,8 +314,9 @@ const Home = () => {
                 IWARE
               </h3>
               <p className="text-slate-300 mb-6 leading-relaxed">
-                Platform HR terdepan yang menggunakan AI untuk mengotomatisasi dan mengoptimalkan 
-                proses manajemen sumber daya manusia perusahaan Anda.
+                Platform HRMS terdepan di Indonesia yang menggunakan teknologi cloud untuk mengotomatisasi 
+                dan mengoptimalkan proses manajemen sumber daya manusia. Dipercaya oleh 500+ perusahaan 
+                dari berbagai industri di seluruh Indonesia.
               </p>
               <div className="flex space-x-4">
                 <div className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors cursor-pointer">
@@ -274,27 +332,37 @@ const Home = () => {
             </div>
 
             <div>
-              <h4 className="text-lg font-semibold text-white mb-4">Produk</h4>
+              <h4 className="text-lg font-semibold text-white mb-4">Solusi HRMS</h4>
               <ul className="space-y-2 text-slate-300">
-                <li className="hover:text-white transition-colors cursor-pointer">Manajemen Cuti</li>
-                <li className="hover:text-white transition-colors cursor-pointer">Sistem Lembur</li>
-                <li className="hover:text-white transition-colors cursor-pointer">Analytics Dashboard</li>
-                <li className="hover:text-white transition-colors cursor-pointer">Mobile App</li>
+                <li className="hover:text-white transition-colors cursor-pointer">Manajemen Cuti & Izin</li>
+                <li className="hover:text-white transition-colors cursor-pointer">Sistem Absensi Digital</li>
+                <li className="hover:text-white transition-colors cursor-pointer">Payroll & Benefits</li>
+                <li className="hover:text-white transition-colors cursor-pointer">Performance Management</li>
+                <li className="hover:text-white transition-colors cursor-pointer">Employee Self Service</li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-lg font-semibold text-white mb-4">Kontak</h4>
+              <h4 className="text-lg font-semibold text-white mb-4">Hubungi Kami</h4>
               <ul className="space-y-2 text-slate-300">
-                <li className="hover:text-white transition-colors cursor-pointer">info@iware.com</li>
-                <li className="hover:text-white transition-colors cursor-pointer">+62 21 1234 5678</li>
-                <li className="hover:text-white transition-colors cursor-pointer">Jakarta, Indonesia</li>
+                <li className="hover:text-white transition-colors cursor-pointer">
+                  <span className="block font-medium">Email</span>
+                  <span className="text-sm">info@iware-hrms.co.id</span>
+                </li>
+                <li className="hover:text-white transition-colors cursor-pointer">
+                  <span className="block font-medium">Telepon</span>
+                  <span className="text-sm">+62 21 2922 1234</span>
+                </li>
+                <li className="hover:text-white transition-colors cursor-pointer">
+                  <span className="block font-medium">Alamat</span>
+                  <span className="text-sm">Jakarta Selatan, Indonesia</span>
+                </li>
               </ul>
             </div>
           </div>
 
           <div className="border-t border-white/20 pt-8 text-center text-slate-400">
-            <p>&copy; 2026 IWARE. All rights reserved. Built with ❤️ for better HR management.</p>
+            <p>&copy; 2026 IWARE HRMS Indonesia. All rights reserved. Solusi HR terpercaya untuk masa depan yang lebih baik.</p>
           </div>
         </div>
       </footer>
