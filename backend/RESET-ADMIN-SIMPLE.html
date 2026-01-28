@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Admin Reset</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            color: #856404;
+        }
+        .warning strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn-group {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(56, 239, 125, 0.4);
+        }
+        .btn-info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .btn-info:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(79, 172, 254, 0.4);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .result.success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+        }
+        .result.error {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+        }
+        .result.info {
+            background: #d1ecf1;
+            border: 2px solid #17a2b8;
+            color: #0c5460;
+        }
+        .credentials {
+            background: rgba(255,255,255,0.5);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+        }
+        .credentials div {
+            margin: 5px 0;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        .step {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+        .step-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Simple Admin Reset</h1>
+        <p class="subtitle">Reset admin password dengan mudah</p>
+
+        <div class="warning">
+            <strong>⚠️ PERINGATAN KEAMANAN</strong>
+            Endpoint ini tidak memerlukan autentikasi. Hapus setelah digunakan!
+        </div>
+
+        <div class="input-group">
+            <label for="apiUrl">🌐 Backend URL:</label>
+            <input type="text" id="apiUrl" value="https://perizinan-production.up.railway.app" placeholder="https://your-backend.railway.app">
+        </div>
+
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>Cek daftar user yang ada</strong>
+        </div>
+        <button class="btn-info" onclick="listUsers()">📋 List All Users</button>
+
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>Reset password admin ke "admin123"</strong>
+        </div>
+        <button class="btn-success" onclick="resetPassword()">🔄 Reset Admin Password</button>
+
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>Test login dengan password baru</strong>
+        </div>
+        <button class="btn-primary" onclick="testLogin()">🧪 Test Login</button>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        const getApiUrl = () => document.getElementById('apiUrl').value.replace(/\/$/, '');
+
+        async function listUsers() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result info';
+            resultDiv.innerHTML = '⏳ Loading users...';
+
+            try {
+                const response = await fetch(`${getApiUrl()}/api/simple-reset/list-users`);
+                const data = await response.json();
+
+                if (data.success) {
+                    let html = `✅ Found ${data.count} user(s):<br><br>`;
+                    data.users.forEach(user => {
+                        html += `<div class="credentials">
+                            <strong>ID:</strong> ${user.id}<br>
+                            <strong>Username:</strong> ${user.username}<br>
+                            <strong>Name:</strong> ${user.nama}<br>
+                            <strong>Role:</strong> ${user.role}<br>
+                            <strong>Created:</strong> ${user.created_at}
+                        </div>`;
+                    });
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ Error: ${data.error}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ Connection Error: ${error.message}<br><br>
+                    Pastikan backend URL benar dan backend sudah running.`;
+            }
+        }
+
+        async function resetPassword() {
+            if (!confirm('Reset admin password ke "admin123"?')) return;
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result info';
+            resultDiv.innerHTML = '⏳ Resetting password...';
+
+            try {
+                const response = await fetch(`${getApiUrl()}/api/simple-reset/reset-now`);
+                const data = await response.json();
+
+                if (data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        ✅ ${data.message} (${data.action})<br>
+                        <div class="credentials">
+                            <div><strong>Username:</strong> ${data.credentials.username}</div>
+                            <div><strong>Password:</strong> ${data.credentials.password}</div>
+                            <div style="margin-top:10px; padding-top:10px; border-top:1px solid rgba(0,0,0,0.1)">
+                                <strong>Hash:</strong><br>
+                                <small>${data.hash}</small>
+                            </div>
+                        </div>
+                        <br>
+                        <strong>🎉 Sekarang coba login!</strong><br>
+                        Atau klik "Test Login" untuk verify.
+                    `;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ Error: ${data.error}<br><pre>${data.stack}</pre>`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ Connection Error: ${error.message}`;
+            }
+        }
+
+        async function testLogin() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result info';
+            resultDiv.innerHTML = '⏳ Testing login...';
+
+            try {
+                const response = await fetch(`${getApiUrl()}/api/simple-reset/test-login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: 'admin',
+                        password: 'admin123'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        ✅ ${data.message}<br>
+                        <div class="credentials">
+                            <div><strong>User ID:</strong> ${data.user.id}</div>
+                            <div><strong>Username:</strong> ${data.user.username}</div>
+                            <div><strong>Name:</strong> ${data.user.nama}</div>
+                            <div><strong>Role:</strong> ${data.user.role}</div>
+                        </div>
+                        <br>
+                        <strong>🎉 Password bekerja! Silakan login di aplikasi.</strong>
+                    `;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `
+                        ❌ ${data.message}<br>
+                        <div class="credentials">
+                            <div><strong>Tested Password:</strong> ${data.testedPassword}</div>
+                            <div><strong>Hash in DB:</strong><br><small>${data.passwordHash}</small></div>
+                        </div>
+                        <br>
+                        Coba klik "Reset Admin Password" terlebih dahulu.
+                    `;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ Connection Error: ${error.message}`;
+            }
+        }
+
+        // Auto load users on page load
+        window.onload = () => {
+            setTimeout(listUsers, 500);
+        };
+    </script>
+</body>
+</html>
