@@ -2,8 +2,8 @@ const axios = require('axios');
 const otpGenerator = require('otp-generator');
 
 // Konfigurasi WhatsApp API (Fonnte)
-const FONNTE_API_URL = 'https://api.fonnte.com/send';
-const FONNTE_TOKEN = process.env.FONNTE_TOKEN || ''; // Tambahkan di .env
+const FONNTE_API_URL = process.env.WHATSAPP_API_URL || 'https://api.fonnte.com/send';
+const FONNTE_TOKEN = process.env.WHATSAPP_API_TOKEN || ''; // Dari .env
 
 // Store OTP sementara (production: gunakan Redis atau database)
 const otpStore = new Map();
@@ -77,41 +77,76 @@ function formatPhoneNumber(phone) {
 }
 
 /**
- * Kirim OTP via WhatsApp menggunakan Fonnte
+ * Kirim notifikasi keputusan HRD via WhatsApp menggunakan Fonnte
  */
 async function sendOTPWhatsApp(phoneNumber, nama, status, jenisPerizinan, catatan = '') {
   try {
-    // Generate OTP
-    const otp = generateOTP();
-    
     // Format nomor telepon
     const formattedPhone = formatPhoneNumber(phoneNumber);
     
-    // Simpan OTP
-    saveOTP(formattedPhone, otp);
+    // Buat pesan berdasarkan status
+    let message = '';
     
-    // Buat pesan
-    const statusText = status === 'approved' ? 'DISETUJUI ✅' : 'DITOLAK ❌';
-    const message = `
-*NOTIFIKASI PERIZINAN IWARE*
+    if (status === 'approved') {
+      message = `
+*✅ PENGAJUAN DISETUJUI*
 
-Halo ${nama},
+Halo *${nama}*,
 
-Pengajuan perizinan Anda untuk *${jenisPerizinan}* telah *${statusText}*
+Pengajuan perizinan Anda telah *DISETUJUI* oleh HRD.
 
-${catatan ? `Catatan: ${catatan}\n` : ''}
-Kode OTP Anda: *${otp}*
+📋 *Detail Pengajuan:*
+Jenis: ${jenisPerizinan}
+Status: DISETUJUI ✅
 
-Kode OTP berlaku selama 5 menit.
+${catatan ? `💬 *Catatan HRD:*\n${catatan}\n` : ''}
+Silakan cek aplikasi untuk detail lebih lanjut.
 
 Terima kasih.
-    `.trim();
+_Sistem Perizinan IWARE_
+      `.trim();
+    } else if (status === 'rejected') {
+      message = `
+*❌ PENGAJUAN DITOLAK*
+
+Halo *${nama}*,
+
+Mohon maaf, pengajuan perizinan Anda *DITOLAK* oleh HRD.
+
+📋 *Detail Pengajuan:*
+Jenis: ${jenisPerizinan}
+Status: DITOLAK ❌
+
+${catatan ? `💬 *Alasan Penolakan:*\n${catatan}\n` : ''}
+Anda dapat mengajukan kembali dengan melengkapi persyaratan yang diperlukan.
+
+Terima kasih.
+_Sistem Perizinan IWARE_
+      `.trim();
+    } else {
+      // Status pending atau lainnya
+      message = `
+*📢 NOTIFIKASI PERIZINAN*
+
+Halo *${nama}*,
+
+Status pengajuan perizinan Anda untuk *${jenisPerizinan}* telah diupdate.
+
+Status: ${status.toUpperCase()}
+
+${catatan ? `Catatan: ${catatan}\n` : ''}
+Silakan cek aplikasi untuk detail lebih lanjut.
+
+Terima kasih.
+_Sistem Perizinan IWARE_
+      `.trim();
+    }
     
     // Kirim via Fonnte API
     if (!FONNTE_TOKEN) {
-      console.warn('⚠️ FONNTE_TOKEN tidak ditemukan, OTP tidak dikirim');
-      console.log('📱 OTP untuk testing:', otp);
-      return { success: true, otp, message: 'OTP generated (testing mode)' };
+      console.warn('⚠️ FONNTE_TOKEN tidak ditemukan, notifikasi tidak dikirim');
+      console.log('📱 Pesan untuk testing:', message);
+      return { success: false, message: 'Token not configured' };
     }
     
     const response = await axios.post(
@@ -128,22 +163,26 @@ Terima kasih.
       }
     );
     
-    console.log('✅ WhatsApp OTP sent to:', formattedPhone);
+    console.log('✅ WhatsApp notification sent to:', formattedPhone);
+    console.log('📱 Status:', status, '| Jenis:', jenisPerizinan);
     
     return {
       success: true,
-      otp: otp, // Untuk testing, hapus di production
-      data: response.data
+      data: response.data,
+      phone: formattedPhone
     };
     
   } catch (error) {
-    console.error('❌ Error sending WhatsApp OTP:', error.message);
+    console.error('❌ Error sending WhatsApp notification:', error.message);
     
-    // Jika error, tetap return OTP untuk testing
+    if (error.response) {
+      console.error('Response error:', error.response.data);
+    }
+    
     return {
       success: false,
       error: error.message,
-      otp: otp // Untuk testing
+      details: error.response?.data
     };
   }
 }
