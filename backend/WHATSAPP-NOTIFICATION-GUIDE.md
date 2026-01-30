@@ -65,7 +65,19 @@ File `.env` sudah dikonfigurasi:
 WHATSAPP_API_URL=https://api.fonnte.com/send
 WHATSAPP_API_TOKEN=f3LA5pzTUJvkbAX8ng9L
 WHATSAPP_ENABLED=true
+WHATSAPP_HRD_NUMBER=085708600406
 ```
+
+### 📱 Nomor Pengirim (HRD)
+
+Pesan WhatsApp akan dikirim dari **nomor HRD: 085708600406**
+
+**Penting:**
+- Nomor ini harus terhubung ke akun Fonnte Anda
+- Login ke https://fonnte.com
+- Menu "Device" → Pastikan nomor 085708600406 sudah tersambung
+- Status harus "Connected" (hijau)
+- Jika belum, scan QR code dengan WhatsApp nomor tersebut
 
 ## 🧪 Testing
 

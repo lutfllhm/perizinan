@@ -4,6 +4,7 @@ const otpGenerator = require('otp-generator');
 // Konfigurasi WhatsApp API (Fonnte)
 const FONNTE_API_URL = process.env.WHATSAPP_API_URL || 'https://api.fonnte.com/send';
 const FONNTE_TOKEN = process.env.WHATSAPP_API_TOKEN || ''; // Dari .env
+const HRD_NUMBER = process.env.WHATSAPP_HRD_NUMBER || '085708600406'; // Nomor HRD pengirim
 
 // Store OTP sementara (production: gunakan Redis atau database)
 const otpStore = new Map();
@@ -163,8 +164,8 @@ _Sistem Perizinan IWARE_
       }
     );
     
-    console.log('✅ WhatsApp notification sent to:', formattedPhone);
-    console.log('📱 Status:', status, '| Jenis:', jenisPerizinan);
+    console.log('✅ WhatsApp notification sent from HRD:', HRD_NUMBER);
+    console.log('📱 Sent to:', formattedPhone, '| Status:', status, '| Jenis:', jenisPerizinan);
     
     return {
       success: true,

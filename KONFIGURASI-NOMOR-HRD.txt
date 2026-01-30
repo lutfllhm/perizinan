@@ -1,0 +1,123 @@
+═══════════════════════════════════════════════════════════════
+  KONFIGURASI NOMOR HRD UNTUK NOTIFIKASI WHATSAPP
+═══════════════════════════════════════════════════════════════
+
+📱 NOMOR HRD: 085708600406
+
+✅ SUDAH DIKONFIGURASI DI:
+   1. backend/.env
+   2. backend/.env.railway
+   3. backend/.env.production
+   4. backend/.env.example
+   5. backend/services/whatsapp.js
+
+───────────────────────────────────────────────────────────────
+🎯 CARA KERJA
+───────────────────────────────────────────────────────────────
+
+1. Pegawai mengajukan izin melalui aplikasi
+2. HRD review dan approve/reject pengajuan
+3. Sistem otomatis kirim WhatsApp ke pegawai
+4. Pesan dikirim DARI nomor HRD: 085708600406
+5. Pegawai terima notifikasi dari nomor HRD
+
+───────────────────────────────────────────────────────────────
+📋 FORMAT PESAN
+───────────────────────────────────────────────────────────────
+
+APPROVED:
+  ✅ PENGAJUAN DISETUJUI
+  Halo *[Nama]*,
+  Pengajuan perizinan Anda telah *DISETUJUI* oleh HRD.
+  [Detail lengkap...]
+
+REJECTED:
+  ❌ PENGAJUAN DITOLAK
+  Halo *[Nama]*,
+  Mohon maaf, pengajuan perizinan Anda *DITOLAK* oleh HRD.
+  [Detail lengkap...]
+
+───────────────────────────────────────────────────────────────
+⚙️ SETUP FONNTE (PENTING!)
+───────────────────────────────────────────────────────────────
+
+Agar pesan dikirim dari nomor 085708600406:
+
+1. Login ke https://fonnte.com
+2. Menu "Device" → "Add Device"
+3. Scan QR code dengan WhatsApp nomor 085708600406
+4. Pastikan status "Connected" (hijau)
+5. Jika sudah connected, pesan akan otomatis dikirim dari nomor ini
+
+───────────────────────────────────────────────────────────────
+🧪 TESTING
+───────────────────────────────────────────────────────────────
+
+Test via script:
+  cd backend
+  node test-hrd-notification.js
+
+Test via aplikasi:
+  1. Login sebagai pegawai → Ajukan izin
+  2. Login sebagai HRD → Approve/Reject
+  3. Cek WhatsApp pegawai → Pesan dari 085708600406
+
+───────────────────────────────────────────────────────────────
+📁 FILE YANG DIUPDATE
+───────────────────────────────────────────────────────────────
+
+✅ backend/services/whatsapp.js
+   - Tambah konstanta HRD_NUMBER
+   - Update log untuk menampilkan nomor HRD
+
+✅ backend/.env
+   - Tambah WHATSAPP_HRD_NUMBER=085708600406
+
+✅ backend/.env.railway
+   - Tambah WHATSAPP_HRD_NUMBER=085708600406
+
+✅ backend/.env.production
+   - Tambah WHATSAPP_HRD_NUMBER=085708600406
+
+✅ backend/.env.example
+   - Tambah WHATSAPP_HRD_NUMBER=085708600406
+
+✅ backend/test-hrd-notification.js (BARU)
+   - Script untuk test notifikasi dari nomor HRD
+
+✅ backend/FLOW-NOTIFIKASI-HRD.md (BARU)
+   - Dokumentasi lengkap flow notifikasi
+
+✅ backend/WHATSAPP-NOTIFICATION-GUIDE.md
+   - Update dengan info nomor HRD
+
+───────────────────────────────────────────────────────────────
+🔍 TROUBLESHOOTING
+───────────────────────────────────────────────────────────────
+
+Pesan tidak terkirim?
+  → Cek device 085708600406 di Fonnte (harus Connected)
+  → Cek token API di .env
+  → Cek quota/saldo Fonnte
+  → Restart server setelah update .env
+
+Pesan terkirim tapi dari nomor lain?
+  → Pastikan nomor 085708600406 yang aktif di Fonnte
+  → Jika ada multiple device, set sebagai default
+
+───────────────────────────────────────────────────────────────
+📞 DOKUMENTASI LENGKAP
+───────────────────────────────────────────────────────────────
+
+Lihat file:
+  - backend/FLOW-NOTIFIKASI-HRD.md
+  - backend/WHATSAPP-NOTIFICATION-GUIDE.md
+  - backend/DEBUG-WHATSAPP.md
+
+───────────────────────────────────────────────────────────────
+
+Status: ✅ CONFIGURED
+Tanggal: 2026-01-30
+Nomor HRD: 085708600406
+
+═══════════════════════════════════════════════════════════════
