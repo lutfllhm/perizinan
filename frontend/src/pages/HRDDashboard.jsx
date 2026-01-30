@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { pengajuanAPI, authAPI, API_URL } from '../utils/api';
 import { 
@@ -11,6 +11,9 @@ import {
   LineChart, Line, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
 } from 'recharts';
+import LazyImage from '../components/LazyImage';
+import ImageModal from '../components/ImageModal';
+import { SkeletonTable } from '../components/SkeletonLoader';
 
 const HRDDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -450,6 +453,8 @@ const DaftarPengajuan = () => {
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     fetchPengajuan();
@@ -494,157 +499,225 @@ const DaftarPengajuan = () => {
     setShowDetailModal(true);
   };
 
-  if (loading) return <div className="text-center py-12">Loading...</div>;
+  const handleShowImage = (imageSrc, imageAlt) => {
+    setSelectedImage({ src: imageSrc, alt: imageAlt });
+    setShowImageModal(true);
+  };
+
+  if (loading) return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-800">Daftar Pengajuan</h2>
+      <SkeletonTable rows={8} />
+    </div>
+  );
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">Daftar Pengajuan</h2>
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center justify-between"
+      >
+        <h2 className="text-2xl font-bold text-gray-800">Daftar Pengajuan</h2>
+        <div className="text-sm text-gray-600">
+          Total: <span className="font-bold text-primary-600">{pengajuan.length}</span> pengajuan
+        </div>
+      </motion.div>
 
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="bg-white rounded-xl shadow-lg overflow-hidden"
+      >
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No. Telp</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jenis</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Nama</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">No. Telp</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Jenis</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Tanggal</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {pengajuan.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">{item.nama}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.no_telp}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
-                      {item.jenis_perizinan}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    {new Date(item.tanggal_mulai).toLocaleDateString('id-ID')}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 rounded-full text-sm ${
-                      item.status === 'approved' ? 'bg-green-100 text-green-800' :
-                      item.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                      'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {item.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleShowDetail(item)}
-                        className="flex items-center space-x-1 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-                        title="Lihat Detail"
+              <AnimatePresence>
+                {pengajuan.map((item, index) => (
+                  <motion.tr
+                    key={item.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="hover:bg-blue-50 transition-colors duration-200"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{item.nama}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-600">{item.no_telp}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <motion.span
+                        whileHover={{ scale: 1.05 }}
+                        className="px-3 py-1 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 rounded-full text-sm font-semibold"
                       >
-                        <FiEye />
-                        <span>Detail</span>
-                      </button>
-                      {item.status === 'pending' && (
-                        <>
-                          <button
-                            onClick={() => handleUpdateStatus(item.id, 'approved')}
-                            className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
-                          >
-                            Setuju
-                          </button>
-                          <button
-                            onClick={() => handleUpdateStatus(item.id, 'rejected')}
-                            className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
-                          >
-                            Tolak
-                          </button>
-                        </>
-                      )}
-                      <button
-                        onClick={() => handleDelete(item.id)}
-                        className="flex items-center space-x-1 px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm"
-                        title="Hapus Pengajuan"
+                        {item.jenis_perizinan}
+                      </motion.span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      {new Date(item.tanggal_mulai).toLocaleDateString('id-ID')}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <motion.span
+                        whileHover={{ scale: 1.05 }}
+                        className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                          item.status === 'approved' ? 'bg-gradient-to-r from-green-100 to-green-200 text-green-800' :
+                          item.status === 'rejected' ? 'bg-gradient-to-r from-red-100 to-red-200 text-red-800' :
+                          'bg-gradient-to-r from-yellow-100 to-yellow-200 text-yellow-800'
+                        }`}
                       >
-                        <FiTrash2 />
-                        <span>Hapus</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                        {item.status}
+                      </motion.span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex space-x-2">
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleShowDetail(item)}
+                          className="flex items-center space-x-1 px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:shadow-lg transition-all text-sm font-medium"
+                          title="Lihat Detail"
+                        >
+                          <FiEye />
+                          <span>Detail</span>
+                        </motion.button>
+                        {item.status === 'pending' && (
+                          <>
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => handleUpdateStatus(item.id, 'approved')}
+                              className="px-3 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:shadow-lg transition-all text-sm font-medium"
+                            >
+                              Setuju
+                            </motion.button>
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => handleUpdateStatus(item.id, 'rejected')}
+                              className="px-3 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:shadow-lg transition-all text-sm font-medium"
+                            >
+                              Tolak
+                            </motion.button>
+                          </>
+                        )}
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleDelete(item.id)}
+                          className="flex items-center space-x-1 px-3 py-2 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-lg hover:shadow-lg transition-all text-sm font-medium"
+                          title="Hapus Pengajuan"
+                        >
+                          <FiTrash2 />
+                          <span>Hapus</span>
+                        </motion.button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))}
+              </AnimatePresence>
             </tbody>
           </table>
         </div>
-      </div>
+      </motion.div>
 
       {/* Modal Detail Pengajuan */}
       {showDetailModal && selectedItem && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={() => setShowDetailModal(false)}>
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ type: "spring", damping: 25 }}
+            className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-2xl font-bold text-gray-800">Detail Pengajuan</h3>
-                <button
+            <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-cyan-600 text-white p-6 rounded-t-2xl z-10">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-2xl font-bold">Detail Pengajuan</h3>
+                  <p className="text-blue-100 text-sm mt-1">ID: #{selectedItem.id}</p>
+                </div>
+                <motion.button
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={() => setShowDetailModal(false)}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors"
                 >
                   <FiX size={24} />
-                </button>
+                </motion.button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-xl border border-blue-200"
+                >
+                  <label className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Status</label>
+                  <p className="mt-2">
+                    <span className={`inline-block px-4 py-2 rounded-lg text-sm font-bold ${
+                      selectedItem.status === 'approved' ? 'bg-green-500 text-white' :
+                      selectedItem.status === 'rejected' ? 'bg-red-500 text-white' :
+                      'bg-yellow-500 text-white'
+                    }`}>
+                      {selectedItem.status.toUpperCase()}
+                    </span>
+                  </p>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.15 }}
+                  className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-xl border border-purple-200"
+                >
+                  <label className="text-xs font-semibold text-purple-600 uppercase tracking-wide">Jenis Perizinan</label>
+                  <p className="text-lg font-bold text-gray-800 mt-2 capitalize">{selectedItem.jenis_perizinan}</p>
+                </motion.div>
               </div>
 
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">ID Pengajuan</label>
-                    <p className="text-lg font-semibold text-gray-800">{selectedItem.id}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Status</label>
-                    <p>
-                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                        selectedItem.status === 'approved' ? 'bg-green-100 text-green-800' :
-                        selectedItem.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                        'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {selectedItem.status.toUpperCase()}
-                      </span>
-                    </p>
-                  </div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="space-y-4"
+              >
+                <div className="bg-gray-50 p-4 rounded-xl">
+                  <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Nama Lengkap</label>
+                  <p className="text-lg font-semibold text-gray-800 mt-1">{selectedItem.nama}</p>
                 </div>
 
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Nama Lengkap</label>
-                  <p className="text-lg font-semibold text-gray-800">{selectedItem.nama}</p>
+                <div className="bg-gray-50 p-4 rounded-xl">
+                  <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">No. Telepon/WhatsApp</label>
+                  <p className="text-lg font-semibold text-gray-800 mt-1">{selectedItem.no_telp}</p>
                 </div>
 
-                <div>
-                  <label className="text-sm font-medium text-gray-500">No. Telepon/WhatsApp</label>
-                  <p className="text-lg font-semibold text-gray-800">{selectedItem.no_telp}</p>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Jenis Perizinan</label>
-                  <p className="text-lg font-semibold text-gray-800 capitalize">{selectedItem.jenis_perizinan}</p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Tanggal & Jam Mulai</label>
-                    <p className="text-lg font-semibold text-gray-800">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-green-50 p-4 rounded-xl border border-green-200">
+                    <label className="text-xs font-semibold text-green-600 uppercase tracking-wide">Tanggal & Jam Mulai</label>
+                    <p className="text-sm font-semibold text-gray-800 mt-1">
                       {new Date(selectedItem.tanggal_mulai).toLocaleString('id-ID', {
                         dateStyle: 'full',
                         timeStyle: 'short'
                       })}
                     </p>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Tanggal & Jam Selesai</label>
-                    <p className="text-lg font-semibold text-gray-800">
+                  <div className="bg-red-50 p-4 rounded-xl border border-red-200">
+                    <label className="text-xs font-semibold text-red-600 uppercase tracking-wide">Tanggal & Jam Selesai</label>
+                    <p className="text-sm font-semibold text-gray-800 mt-1">
                       {new Date(selectedItem.tanggal_selesai).toLocaleString('id-ID', {
                         dateStyle: 'full',
                         timeStyle: 'short'
@@ -654,74 +727,94 @@ const DaftarPengajuan = () => {
                 </div>
 
                 {selectedItem.bukti_foto && (
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Bukti Foto</label>
-                    <div className="mt-2">
-                      <img
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <label className="text-sm font-semibold text-gray-700 mb-3 block">Bukti Foto</label>
+                    <div className="relative rounded-xl overflow-hidden border-4 border-gray-200 hover:border-blue-400 transition-all duration-300 shadow-lg hover:shadow-2xl">
+                      <LazyImage
                         src={`${API_URL}/uploads/${selectedItem.bukti_foto}`}
-                        alt="Bukti"
-                        className="max-w-full h-auto rounded-lg shadow-md"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'block';
-                        }}
+                        alt="Bukti Foto"
+                        className="w-full h-80"
+                        thumbnail={true}
+                        onClick={() => handleShowImage(`${API_URL}/uploads/${selectedItem.bukti_foto}`, 'Bukti Foto')}
                       />
-                      <p className="text-sm text-gray-500 hidden">File tidak dapat ditampilkan</p>
                     </div>
-                  </div>
+                    <p className="text-xs text-gray-500 mt-2 text-center italic">💡 Klik gambar untuk memperbesar dan zoom</p>
+                  </motion.div>
                 )}
 
                 {selectedItem.catatan && (
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Catatan</label>
-                    <p className="text-gray-800">{selectedItem.catatan}</p>
+                  <div className="bg-yellow-50 p-4 rounded-xl border border-yellow-200">
+                    <label className="text-xs font-semibold text-yellow-600 uppercase tracking-wide">Catatan</label>
+                    <p className="text-gray-800 mt-1">{selectedItem.catatan}</p>
                   </div>
                 )}
 
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Tanggal Pengajuan</label>
-                  <p className="text-gray-800">
+                <div className="bg-gray-50 p-4 rounded-xl">
+                  <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Tanggal Pengajuan</label>
+                  <p className="text-sm text-gray-800 mt-1">
                     {new Date(selectedItem.created_at).toLocaleString('id-ID', {
                       dateStyle: 'full',
                       timeStyle: 'short'
                     })}
                   </p>
                 </div>
-              </div>
+              </motion.div>
 
-              <div className="mt-6 flex justify-end space-x-3">
+              <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
                 {selectedItem.status === 'pending' && (
                   <>
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => {
                         handleUpdateStatus(selectedItem.id, 'approved');
                         setShowDetailModal(false);
                       }}
-                      className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:shadow-lg font-semibold transition-all"
                     >
-                      Setujui
-                    </button>
-                    <button
+                      ✓ Setujui
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => {
                         handleUpdateStatus(selectedItem.id, 'rejected');
                         setShowDetailModal(false);
                       }}
-                      className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-semibold"
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:shadow-lg font-semibold transition-all"
                     >
-                      Tolak
-                    </button>
+                      ✗ Tolak
+                    </motion.button>
                   </>
                 )}
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => setShowDetailModal(false)}
-                  className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 font-semibold"
+                  className={`${selectedItem.status === 'pending' ? 'w-full' : 'flex-1'} px-6 py-3 bg-gray-300 text-gray-700 rounded-xl hover:bg-gray-400 font-semibold transition-all`}
                 >
                   Tutup
-                </button>
+                </motion.button>
               </div>
             </div>
           </motion.div>
         </div>
+      )}
+
+      {/* Image Modal */}
+      {showImageModal && selectedImage && (
+        <ImageModal
+          src={selectedImage.src}
+          alt={selectedImage.alt}
+          onClose={() => {
+            setShowImageModal(false);
+            setSelectedImage(null);
+          }}
+        />
       )}
     </div>
   );

@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const db = require('../config/mysql');
 const { auth } = require('../middleware/auth');
+const { sendOTPWhatsApp } = require('../services/whatsapp');
 
 // Konfigurasi multer untuk upload file
 const storage = multer.diskStorage({
@@ -239,6 +240,19 @@ router.put('/:id', auth, async (req, res) => {
       });
     }
 
+    // Ambil data pengajuan untuk kirim notifikasi
+    const [pengajuan] = await db.query(
+      'SELECT * FROM pengajuan WHERE id = ?',
+      [req.params.id]
+    );
+
+    if (pengajuan.length === 0) {
+      return res.status(404).json({ 
+        message: 'Pengajuan tidak ditemukan' 
+      });
+    }
+
+    // Update status
     await db.query(
       'UPDATE pengajuan SET status = ?, catatan = ? WHERE id = ?',
       [status, catatan || '', req.params.id]
@@ -246,9 +260,39 @@ router.put('/:id', auth, async (req, res) => {
 
     console.log('✅ Status updated:', req.params.id, status);
 
-    res.json({
-      message: 'Status pengajuan berhasil diupdate'
-    });
+    // Kirim OTP via WhatsApp jika status approved atau rejected
+    if (status === 'approved' || status === 'rejected') {
+      const data = pengajuan[0];
+      
+      try {
+        const otpResult = await sendOTPWhatsApp(
+          data.no_telp,
+          data.nama,
+          status,
+          data.jenis_perizinan,
+          catatan || ''
+        );
+        
+        console.log('📱 OTP sent:', otpResult);
+        
+        res.json({
+          message: 'Status pengajuan berhasil diupdate dan notifikasi OTP telah dikirim',
+          otp: otpResult.otp // Untuk testing, hapus di production
+        });
+      } catch (whatsappError) {
+        console.error('⚠️ WhatsApp error:', whatsappError);
+        
+        // Tetap return success meskipun WhatsApp gagal
+        res.json({
+          message: 'Status pengajuan berhasil diupdate, namun notifikasi gagal dikirim',
+          warning: 'WhatsApp notification failed'
+        });
+      }
+    } else {
+      res.json({
+        message: 'Status pengajuan berhasil diupdate'
+      });
+    }
 
   } catch (error) {
     console.error('❌ Error update status:', error);
@@ -278,6 +322,19 @@ router.patch('/:id/status', auth, async (req, res) => {
       });
     }
 
+    // Ambil data pengajuan untuk kirim notifikasi
+    const [pengajuan] = await db.query(
+      'SELECT * FROM pengajuan WHERE id = ?',
+      [req.params.id]
+    );
+
+    if (pengajuan.length === 0) {
+      return res.status(404).json({ 
+        message: 'Pengajuan tidak ditemukan' 
+      });
+    }
+
+    // Update status
     await db.query(
       'UPDATE pengajuan SET status = ?, catatan = ? WHERE id = ?',
       [status, catatan || '', req.params.id]
@@ -285,9 +342,39 @@ router.patch('/:id/status', auth, async (req, res) => {
 
     console.log('✅ Status updated:', req.params.id, status);
 
-    res.json({
-      message: 'Status pengajuan berhasil diupdate'
-    });
+    // Kirim OTP via WhatsApp jika status approved atau rejected
+    if (status === 'approved' || status === 'rejected') {
+      const data = pengajuan[0];
+      
+      try {
+        const otpResult = await sendOTPWhatsApp(
+          data.no_telp,
+          data.nama,
+          status,
+          data.jenis_perizinan,
+          catatan || ''
+        );
+        
+        console.log('📱 OTP sent:', otpResult);
+        
+        res.json({
+          message: 'Status pengajuan berhasil diupdate dan notifikasi OTP telah dikirim',
+          otp: otpResult.otp // Untuk testing, hapus di production
+        });
+      } catch (whatsappError) {
+        console.error('⚠️ WhatsApp error:', whatsappError);
+        
+        // Tetap return success meskipun WhatsApp gagal
+        res.json({
+          message: 'Status pengajuan berhasil diupdate, namun notifikasi gagal dikirim',
+          warning: 'WhatsApp notification failed'
+        });
+      }
+    } else {
+      res.json({
+        message: 'Status pengajuan berhasil diupdate'
+      });
+    }
 
   } catch (error) {
     console.error('❌ Error update status:', error);
