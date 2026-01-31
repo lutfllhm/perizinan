@@ -131,25 +131,21 @@ const Home = () => {
                 animation: 'fadeInUp 1s ease-out 0.4s both'
               }}
             >
-              <a href="#features">
-                <button className="group px-8 py-4 bg-white/90 backdrop-blur-sm border-2 border-blue-500 text-blue-600 rounded-2xl font-semibold hover:bg-blue-500 hover:text-white transform hover:scale-110 hover:-translate-y-1 transition-all duration-300 shadow-xl hover:shadow-2xl">
-                  <span className="relative z-10 flex items-center justify-center">
-                    Pelajari Lebih Lanjut
-                    <svg className="w-5 h-5 ml-2 group-hover:translate-y-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </span>
-                </button>
-              </a>
-              <Link to="/login">
-                <button className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl font-semibold shadow-xl hover:shadow-2xl hover:shadow-blue-500/50 transform hover:scale-110 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+              <Link to="/pengajuan-form">
+                <button className="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl font-semibold shadow-lg hover:shadow-2xl hover:shadow-blue-500/50 transform hover:scale-110 hover:-translate-y-1 transition-all duration-300 overflow-hidden">
                   <span className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                  <span className="relative z-10 flex items-center justify-center">
-                    Login Sekarang
+                  <span className="relative z-10 flex items-center">
+                    Ajukan Perizinan
                     <svg className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   </span>
+                </button>
+              </Link>
+              <Link to="/login">
+                <button className="group px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/30 text-white rounded-2xl font-semibold hover:bg-white/20 hover:border-white/40 transform hover:scale-110 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+                  <span className="absolute inset-0 bg-white/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
+                  <span className="relative z-10">Login Staff</span>
                 </button>
               </Link>
             </div>
@@ -182,7 +178,7 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section id="features" ref={featuresRef} className="relative z-10 py-24 px-4 bg-black/20 backdrop-blur-sm">
+      <section ref={featuresRef} className="relative z-10 py-24 px-4 bg-black/20 backdrop-blur-sm">
         <div className="max-w-5xl mx-auto">
           <div className={`text-center mb-16 transition-all duration-1000 ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
