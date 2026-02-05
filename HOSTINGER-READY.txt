@@ -1,0 +1,89 @@
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║          ✅ FOLDER HOSTINGER SIAP UPLOAD!                    ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+📁 FOLDER: hostinger-upload/
+
+Folder ini berisi SEMUA file yang siap di-upload ke Hostinger.
+Tidak ada file dokumentasi .md, hanya file production.
+
+═══════════════════════════════════════════════════════════════
+
+📦 ISI FOLDER (12 files):
+
+PRODUCTION FILES:
+✓ .htaccess              - Apache config (PENTING!)
+✓ index.html             - Main HTML
+✓ manifest.json          - PWA manifest
+✓ asset-manifest.json    - Build manifest
+✓ img/bg.jpeg           - Background image
+✓ img/logo.png          - Logo
+✓ static/css/main.css   - Stylesheet (minified)
+✓ static/js/main.js     - JavaScript (minified)
+✓ static/js/LICENSE.txt - License info
+
+DOKUMENTASI:
+✓ README.txt             - Panduan upload lengkap
+✓ CHECKLIST.txt          - Checklist upload
+✓ INFO.txt               - Info file & build
+
+Total size: ~19 MB uncompressed (~252 KB gzipped)
+
+═══════════════════════════════════════════════════════════════
+
+🚀 CARA UPLOAD (SINGKAT):
+
+1. Buka folder: hostinger-upload/
+2. Login ke hPanel Hostinger
+3. Buka File Manager → public_html/
+4. Upload SEMUA file dari folder hostinger-upload/
+5. Pastikan .htaccess ter-upload (show hidden files)
+6. Test: https://iwareid.com
+
+Panduan lengkap ada di: hostinger-upload/README.txt
+
+═══════════════════════════════════════════════════════════════
+
+⚙️  KONFIGURASI:
+
+Domain: iwareid.com
+API URL: https://iwareid.com
+Environment: Production
+Build Date: 2026-02-05 14:20
+
+═══════════════════════════════════════════════════════════════
+
+🔄 UPDATE/RE-DEPLOY:
+
+Jika ada perubahan code:
+
+cd frontend
+npm run build
+xcopy /E /I /Y build\* ..\hostinger-upload\
+
+Lalu upload ulang ke Hostinger.
+
+═══════════════════════════════════════════════════════════════
+
+✅ CHECKLIST:
+
+□ Buka folder hostinger-upload/
+□ Upload semua file ke Hostinger
+□ Cek .htaccess ter-upload
+□ Test website: https://iwareid.com
+□ Cek routing bekerja (refresh tidak 404)
+
+═══════════════════════════════════════════════════════════════
+
+📚 DOKUMENTASI:
+
+- hostinger-upload/README.txt (panduan upload)
+- PANDUAN-HOSTING-HOSTINGER.md (panduan lengkap)
+
+═══════════════════════════════════════════════════════════════
+
+                    SIAP DEPLOY! 🎉
+
+═══════════════════════════════════════════════════════════════

@@ -1,0 +1,65 @@
+═══════════════════════════════════════════════════════════════
+  FILE INFO - HOSTINGER UPLOAD
+═══════════════════════════════════════════════════════════════
+
+Total Files: 11
+Total Size: ~19 MB (uncompressed)
+           ~252 KB (gzipped saat di-serve)
+
+═══════════════════════════════════════════════════════════════
+
+FILE LIST:
+
+ROOT FILES:
+  .htaccess              1 KB    Apache config
+  index.html             697 B   Main HTML
+  manifest.json          480 B   PWA manifest
+  asset-manifest.json    369 B   Build manifest
+  README.txt             5 KB    Panduan upload
+  CHECKLIST.txt          2 KB    Checklist
+  INFO.txt               1 KB    File ini
+
+IMAGES (img/):
+  bg.jpeg                ~500 KB Background
+  logo.png               ~50 KB  Logo
+
+STYLESHEETS (static/css/):
+  main.39b5f453.css      ~50 KB  All styles (minified)
+
+JAVASCRIPT (static/js/):
+  main.fc7d1190.js       ~18 MB  All JS (minified)
+  main.fc7d1190.js.LICENSE.txt  License info
+
+═══════════════════════════════════════════════════════════════
+
+BUILD INFO:
+
+Build Date: 2026-02-05 14:20
+Environment: Production
+React: 18.2.0
+Optimized: Yes (minified)
+
+API URL: https://iwareid.com
+
+═══════════════════════════════════════════════════════════════
+
+UPLOAD INSTRUCTIONS:
+
+1. Login ke hPanel Hostinger
+2. File Manager → public_html/
+3. Upload SEMUA file dari folder ini
+4. Enable "Show Hidden Files" untuk .htaccess
+5. Test: https://iwareid.com
+
+Detail: Baca README.txt
+
+═══════════════════════════════════════════════════════════════
+
+NOTES:
+
+- File sudah di-minify untuk production
+- GZIP compression akan aktif via .htaccess
+- Browser caching sudah dikonfigurasi
+- Security headers sudah ditambahkan
+
+═══════════════════════════════════════════════════════════════
