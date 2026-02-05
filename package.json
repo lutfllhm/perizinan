@@ -1,0 +1,32 @@
+{
+  "name": "iware-perizinan",
+  "version": "1.0.0",
+  "description": "Aplikasi Perizinan Cuti/Lembur IWARE",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "cd backend && npm start",
+    "server": "cd backend && npm start",
+    "server:dev": "cd backend && npm run dev",
+    "client": "cd frontend && npm start",
+    "client:dev": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "deploy-check": "node deploy-check.js",
+    "build": "cd frontend && npm install && npm run build",
+    "postbuild": "cd backend && npm install",
+    "hostinger:install": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "hostinger:build": "cd frontend && npm run build",
+    "hostinger:start": "cd backend && npm start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

@@ -1,0 +1,55 @@
+# Dependencies
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# Environment variables
+.env
+backend/.env
+.env.local
+.env.production
+.env.railway.local
+
+# Credentials (jangan commit!)
+CREDENTIALS.md
+DEPLOYMENT-URLS.md
+.deploy-config.txt
+RAILWAY_CREDENTIALS.md
+backend/jwt-secret.txt
+jwt-secret.txt
+
+# Build files
+frontend/build/
+dist/
+
+# Uploads
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Database exports (jangan commit data production!)
+*.sql
+!backend/config/init-db.sql
+!backend/config/reset-admin.sql
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Railway
+.railway/
+
+# Hostinger
+# Template files (.env.hostinger, .env.iwareid) are safe to commit
+# Actual .env files with real credentials should never be committed
+backend/.env.iwareid.filled
+*.filled
