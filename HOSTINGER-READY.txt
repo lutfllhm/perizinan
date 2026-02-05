@@ -1,86 +1,109 @@
 ╔═══════════════════════════════════════════════════════════════╗
 ║                                                               ║
-║          ✅ FOLDER HOSTINGER SIAP UPLOAD!                    ║
+║          ✅ REPOSITORY SIAP DEPLOY KE HOSTINGER!             ║
 ║                                                               ║
 ╚═══════════════════════════════════════════════════════════════╝
 
-📁 FOLDER: hostinger-upload/
+📁 STRUKTUR PROJECT:
 
-Folder ini berisi SEMUA file yang siap di-upload ke Hostinger.
-Tidak ada file dokumentasi .md, hanya file production.
-
-═══════════════════════════════════════════════════════════════
-
-📦 ISI FOLDER (12 files):
-
-PRODUCTION FILES:
-✓ .htaccess              - Apache config (PENTING!)
-✓ index.html             - Main HTML
-✓ manifest.json          - PWA manifest
-✓ asset-manifest.json    - Build manifest
-✓ img/bg.jpeg           - Background image
-✓ img/logo.png          - Logo
-✓ static/css/main.css   - Stylesheet (minified)
-✓ static/js/main.js     - JavaScript (minified)
-✓ static/js/LICENSE.txt - License info
-
-DOKUMENTASI:
-✓ README.txt             - Panduan upload lengkap
-✓ CHECKLIST.txt          - Checklist upload
-✓ INFO.txt               - Info file & build
-
-Total size: ~19 MB uncompressed (~252 KB gzipped)
+Repository ini berisi aplikasi fullstack React + Express + MySQL
+yang sudah dikonfigurasi untuk deploy ke Hostinger.
 
 ═══════════════════════════════════════════════════════════════
 
-🚀 CARA UPLOAD (SINGKAT):
+📦 FILE KONFIGURASI HOSTINGER:
 
-1. Buka folder: hostinger-upload/
+✓ composer.json          - Deteksi framework PHP
+✓ index.php              - Entry point utama
+✓ .htaccess              - Apache routing config
+✓ backend/server.php     - PHP wrapper untuk Node.js
+✓ hostinger-deploy.json  - Konfigurasi deployment
+✓ hostinger-setup.sh     - Script setup otomatis
+
+STRUKTUR APLIKASI:
+✓ frontend/              - React app (akan di-build)
+✓ backend/               - Express API + MySQL
+✓ backend/.env.hostinger - Template environment variables
+
+═══════════════════════════════════════════════════════════════
+
+🚀 CARA DEPLOY KE HOSTINGER:
+
+METODE 1: Import dari GitHub (RECOMMENDED)
+1. Push repository ini ke GitHub
 2. Login ke hPanel Hostinger
-3. Buka File Manager → public_html/
-4. Upload SEMUA file dari folder hostinger-upload/
-5. Pastikan .htaccess ter-upload (show hidden files)
-6. Test: https://iwareid.com
+3. Pilih "Git" di menu
+4. Klik "Create" dan pilih repository ini
+5. Hostinger akan otomatis detect framework dan deploy
 
-Panduan lengkap ada di: hostinger-upload/README.txt
+METODE 2: Upload Manual
+1. Build frontend: cd frontend && npm run build
+2. Upload semua file ke public_html via FTP/File Manager
+3. Setup Node.js App di cPanel (lihat instruksi di bawah)
+4. Setup database MySQL
+5. Configure environment variables
 
 ═══════════════════════════════════════════════════════════════
 
-⚙️  KONFIGURASI:
+⚙️  SETUP NODE.JS DI HOSTINGER:
 
-Domain: iwareid.com
-API URL: https://iwareid.com
-Environment: Production
-Build Date: 2026-02-05 14:20
+1. Login ke hPanel → Advanced → Setup Node.js App
+2. Klik "Create Application"
+3. Isi form:
+   - Node.js version: 18.x
+   - Application mode: Production
+   - Application root: backend
+   - Application URL: (kosongkan atau /api)
+   - Application startup file: server.js
+4. Klik "Create"
+5. Copy command untuk setup environment
+6. Jalankan di SSH atau Terminal
+
+📊 SETUP DATABASE:
+
+1. hPanel → Databases → MySQL Databases
+2. Create database baru (misal: u123456_perizinan)
+3. Create user dan assign ke database
+4. Catat: DB_HOST, DB_NAME, DB_USER, DB_PASSWORD
+5. Update file backend/.env dengan info database
+6. Jalankan: node backend/scripts/init-database.js
 
 ═══════════════════════════════════════════════════════════════
 
 🔄 UPDATE/RE-DEPLOY:
 
-Jika ada perubahan code:
+Jika menggunakan Git:
+- Push changes ke GitHub
+- Hostinger auto-deploy (jika enabled)
+- Atau manual pull di hPanel Git menu
 
-cd frontend
-npm run build
-xcopy /E /I /Y build\* ..\hostinger-upload\
-
-Lalu upload ulang ke Hostinger.
-
-═══════════════════════════════════════════════════════════════
-
-✅ CHECKLIST:
-
-□ Buka folder hostinger-upload/
-□ Upload semua file ke Hostinger
-□ Cek .htaccess ter-upload
-□ Test website: https://iwareid.com
-□ Cek routing bekerja (refresh tidak 404)
+Jika upload manual:
+- Build: npm run hostinger:build
+- Upload file yang berubah via FTP
+- Restart Node.js app di cPanel
 
 ═══════════════════════════════════════════════════════════════
 
-📚 DOKUMENTASI:
+✅ CHECKLIST DEPLOYMENT:
 
-- hostinger-upload/README.txt (panduan upload)
-- PANDUAN-HOSTING-HOSTINGER.md (panduan lengkap)
+□ Push repository ke GitHub
+□ Import repository di Hostinger Git
+□ Setup Node.js App (backend)
+□ Create MySQL database
+□ Configure environment variables (.env)
+□ Run database initialization script
+□ Test API endpoint: https://yourdomain.com/api/health
+□ Test frontend: https://yourdomain.com
+□ Test login dan fitur utama
+
+═══════════════════════════════════════════════════════════════
+
+📚 FILE PENTING:
+
+- backend/.env.hostinger (template environment)
+- backend/scripts/init-database.js (setup database)
+- composer.json (framework detection)
+- hostinger-deploy.json (deployment config)
 
 ═══════════════════════════════════════════════════════════════
 

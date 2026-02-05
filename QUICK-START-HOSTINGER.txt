@@ -1,0 +1,79 @@
+═══════════════════════════════════════════════════════════════
+  🚀 QUICK START - DEPLOY KE HOSTINGER
+═══════════════════════════════════════════════════════════════
+
+✅ VALIDASI SEBELUM DEPLOY
+
+npm run hostinger:validate
+
+═══════════════════════════════════════════════════════════════
+
+📤 PUSH KE GITHUB
+
+git add .
+git commit -m "Ready for Hostinger"
+git push origin main
+
+═══════════════════════════════════════════════════════════════
+
+🌐 IMPORT DI HOSTINGER
+
+1. hPanel → Git → Create
+2. Paste URL GitHub
+3. Branch: main
+4. Deploy path: public_html
+5. Klik Import
+
+═══════════════════════════════════════════════════════════════
+
+⚙️  SETUP NODE.JS
+
+1. hPanel → Advanced → Setup Node.js App
+2. Node: 18.x, Mode: Production
+3. Root: backend, File: server.js
+4. Create
+
+═══════════════════════════════════════════════════════════════
+
+🗄️  SETUP DATABASE
+
+1. hPanel → Databases → MySQL Databases
+2. Create database & user
+3. Assign user ke database
+4. Catat: DB_HOST, DB_NAME, DB_USER, DB_PASSWORD
+
+═══════════════════════════════════════════════════════════════
+
+🔐 CONFIGURE .ENV
+
+1. File Manager → backend/
+2. Copy .env.hostinger → .env
+3. Edit .env dengan database credentials
+4. Generate JWT: node backend/scripts/generate-jwt-secret.js
+5. Update FRONTEND_URL
+
+═══════════════════════════════════════════════════════════════
+
+🔄 INIT DATABASE
+
+cd public_html/backend
+node scripts/init-database.js
+
+Default login:
+Username: admin
+Password: admin123
+
+═══════════════════════════════════════════════════════════════
+
+✅ TEST
+
+API: https://yourdomain.com/api/health
+Web: https://yourdomain.com
+
+═══════════════════════════════════════════════════════════════
+
+📚 DOKUMENTASI LENGKAP
+
+Lihat: DEPLOY-HOSTINGER.txt
+
+═══════════════════════════════════════════════════════════════

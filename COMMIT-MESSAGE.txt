@@ -1,0 +1,19 @@
+Fixed Hostinger deployment compatibility
+
+- Added composer.json for framework detection
+- Added index.php as main entry point
+- Added .htaccess for Apache routing
+- Added backend/server.php as PHP wrapper for Node.js
+- Added hostinger-deploy.json for deployment config
+- Added validation script (validate-hostinger.js)
+- Added deployment documentation (DEPLOY-HOSTINGER.txt)
+- Added quick start guide (QUICK-START-HOSTINGER.txt)
+- Added .gitattributes for line endings consistency
+- Added .hostingerignore for deployment optimization
+- Updated README.md with Hostinger instructions
+- Updated package.json with hostinger:* scripts
+
+This fixes the "Framework tidak kompatibel" error when importing
+repository to Hostinger Git.
+
+Ready for deployment via Hostinger Git Import.

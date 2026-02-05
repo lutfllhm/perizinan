@@ -17,7 +17,9 @@
     "hostinger:install": "npm install && cd frontend && npm install && cd ../backend && npm install",
     "hostinger:build": "cd frontend && npm run build",
     "hostinger:deploy": "cd frontend && npm run build && cd .. && node copy-to-hostinger.js",
-    "hostinger:start": "cd backend && npm start"
+    "hostinger:start": "cd backend && npm start",
+    "hostinger:validate": "node validate-hostinger.js",
+    "precommit": "npm run hostinger:validate"
   },
   "keywords": [],
   "author": "",
