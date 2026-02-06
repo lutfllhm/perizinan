@@ -1,145 +1,246 @@
-# IWARE Perizinan
+# 📋 IWARE Perizinan
 
 Aplikasi Perizinan Cuti/Lembur berbasis React + Express + MySQL
 
-## 🚀 Deploy ke Hostinger
+[![Node.js](https://img.shields.io/badge/Node.js-18.x-green.svg)](https://nodejs.org/)
+[![React](https://img.shields.io/badge/React-18.x-blue.svg)](https://reactjs.org/)
+[![Express](https://img.shields.io/badge/Express-4.x-lightgrey.svg)](https://expressjs.com/)
+[![MySQL](https://img.shields.io/badge/MySQL-8.x-orange.svg)](https://www.mysql.com/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
 
-📄 **[START-HERE.txt](./START-HERE.txt)** - Panduan cepat untuk memulai
+---
 
-### Metode 1: ZIP Upload (Paling Mudah) ⭐
+## 🚀 HOSTING DI HOSTINGER VPS
 
-```bash
-# Build dan buat ZIP dalam 1 command
-npm run hostinger:zip
-```
+**Punya VPS Hostinger & Domain iwareid.com?**
 
-Atau double-click: `create-zip.bat` (Windows)
+👉 **[HOSTING-HOSTINGER-IWAREID.md](HOSTING-HOSTINGER-IWAREID.md)** - Panduan lengkap dari NOL sampai SELESAI!
 
-Kemudian:
-1. Login ke Hostinger hPanel
-2. Pilih "Deploy Aplikasi Web Node.js"
-3. Pilih "Upload file"
-4. Upload: `hostinger-deploy.zip`
+📖 **Quick Reference:** [HOSTINGER-QUICK-REFERENCE.md](HOSTINGER-QUICK-REFERENCE.md)
 
-📖 Panduan lengkap: [ZIP-UPLOAD-GUIDE.txt](./ZIP-UPLOAD-GUIDE.txt)
+---
 
-### Metode 2: Folder Upload (Manual)
+## 🎯 MULAI DI SINI
 
-```bash
-# Siapkan folder upload
-npm run hostinger:prepare
-```
+**Baru pertama kali?** Baca: **[00-MULAI-DISINI.md](00-MULAI-DISINI.md)**
 
-Atau double-click: `prepare-upload.bat` (Windows)
+**Bingung pilih panduan?** Baca: **[PILIH-PANDUAN.md](PILIH-PANDUAN.md)**
 
-Hasil: Folder `hostinger-upload/` siap untuk:
-- Di-compress menjadi ZIP
-- Di-upload via FTP
-- Di-upload via File Manager
+**Ingin deploy cepat?** Baca: **[QUICK-START.md](QUICK-START.md)**
 
-📖 Panduan lengkap: [FOLDER-UPLOAD-GUIDE.md](./FOLDER-UPLOAD-GUIDE.md)
+---
 
-### Metode 3: Git Import
+## 🚀 Deploy ke VPS
 
-1. Push repository ke GitHub
-2. Login ke hPanel Hostinger
-3. Pilih menu "Git" → "Create"
-4. Pilih repository ini
-5. Hostinger akan auto-detect dan deploy
+### Prasyarat
+- Node.js >= 18.0.0
+- npm >= 9.0.0
+- MySQL >= 5.7
+- PM2 (untuk production)
 
-### Quick Reference
-
-📄 [UPLOAD-QUICK-REFERENCE.txt](./UPLOAD-QUICK-REFERENCE.txt) - Panduan cepat semua metode
-
-## ⚙️ Setup di Hostinger
-
-### 1. Setup Node.js App
-
-- hPanel → Advanced → Setup Node.js App
-- Node version: 18.x
-- Application root: `backend`
-- Startup file: `server.js`
-- Application mode: Production
-
-### 2. Setup MySQL Database
-
-- hPanel → Databases → MySQL Databases
-- Create database dan user
-- Update `backend/.env` dengan credentials
-
-### 3. Initialize Database
+### 1. Clone Repository
 
 ```bash
-node backend/scripts/init-database.js
+git clone <repository-url>
+cd iware-perizinan
 ```
 
-### 4. Test
+### 2. Install Dependencies
 
-- Frontend: https://yourdomain.com
-- API: https://yourdomain.com/api/health
+```bash
+npm run install:all
+```
 
-## 📁 Struktur
+### 3. Setup Database
+
+Buat database MySQL:
+```sql
+CREATE DATABASE iware_perizinan;
+```
+
+### 4. Konfigurasi Environment
+
+Copy file `.env.vps` ke `.env` dan sesuaikan:
+```bash
+cd backend
+cp .env.vps .env
+nano .env
+```
+
+Sesuaikan konfigurasi:
+- `DB_HOST` - Host MySQL (biasanya localhost)
+- `DB_USER` - Username MySQL
+- `DB_PASSWORD` - Password MySQL
+- `DB_NAME` - Nama database (iware_perizinan)
+- `FRONTEND_URL` - URL frontend (http://your-vps-ip:3000)
+- `JWT_SECRET` - Generate dengan: `node scripts/generate-jwt-secret.js`
+
+### 5. Initialize Database
+
+```bash
+cd backend
+npm run init-db
+```
+
+Default admin user:
+- Username: `admin`
+- Password: `admin123`
+
+### 6. Build Frontend
+
+```bash
+npm run build
+```
+
+### 7. Start Application
+
+#### Development Mode
+```bash
+npm run dev
+```
+
+#### Production Mode dengan PM2
+
+Install PM2:
+```bash
+npm install -g pm2
+```
+
+Start backend:
+```bash
+cd backend
+pm2 start server.js --name iware-backend
+```
+
+Serve frontend (gunakan nginx atau serve):
+```bash
+cd frontend
+npm install -g serve
+pm2 start "serve -s build -l 3000" --name iware-frontend
+```
+
+### 8. Setup Nginx (Opsional)
+
+Buat konfigurasi nginx untuk reverse proxy:
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    # Frontend
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # Backend API
+    location /api {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+Restart nginx:
+```bash
+sudo systemctl restart nginx
+```
+
+## 📁 Struktur Aplikasi
 
 ```
 ├── frontend/          # React app
+│   ├── src/
+│   ├── public/
+│   └── build/        # Production build
 ├── backend/           # Express API
-├── .htaccess          # Apache config
-├── index.php          # Entry point
-└── composer.json      # Framework detection
+│   ├── routes/       # API routes
+│   ├── middleware/   # Auth middleware
+│   ├── config/       # Database config
+│   ├── scripts/      # Utility scripts
+│   └── uploads/      # File uploads
+└── package.json      # Root package
 ```
 
-## 🔧 Environment Variables
-
-Copy `backend/.env.hostinger` ke `backend/.env` dan sesuaikan:
-
-- DB_HOST, DB_USER, DB_PASSWORD, DB_NAME
-- JWT_SECRET (generate dengan script)
-- FRONTEND_URL
-- FONNTE_TOKEN (optional)
-
-## 📚 Scripts
+## 🔧 Scripts
 
 ### Development
 - `npm run dev` - Run frontend + backend
 - `npm run client` - Run frontend only
 - `npm run server` - Run backend only
 
-### Hostinger Deployment
-- `npm run hostinger:zip` - Build + create ZIP for upload ⭐
-- `npm run hostinger:prepare` - Create upload folder 📁
-- `npm run hostinger:build` - Build frontend
-- `npm run hostinger:start` - Start backend
-- `npm run hostinger:install` - Install all dependencies
-- `npm run hostinger:validate` - Validate configuration
+### Production
+- `npm run vps:install` - Install all dependencies
+- `npm run vps:build` - Build frontend
+- `npm run vps:start` - Start backend
 
-### Utilities
-- `prepare-upload.bat` - Windows: Prepare upload folder (double-click)
-- `create-zip.bat` - Windows: Create ZIP (double-click)
-- `node prepare-hostinger-upload.js` - Prepare upload folder
-- `node create-zip-simple.js` - Create ZIP without build
-- `powershell -File create-zip.ps1` - PowerShell script
+### Database
+- `cd backend && npm run init-db` - Initialize database
+
+## 🔐 Default Credentials
+
+**Admin:**
+- Username: `admin`
+- Password: `admin123`
+
+⚠️ **Penting:** Ubah password default setelah login pertama!
+
+## 🌐 Akses Aplikasi
+
+- Frontend: http://your-vps-ip:3000
+- Backend API: http://your-vps-ip:5000/api
+- Health Check: http://your-vps-ip:5000/health
 
 ## 🆘 Troubleshooting
 
-**Error: Framework tidak kompatibel**
-- Pastikan `composer.json` ada di root
-- Pastikan `.htaccess` ter-upload
+### Error: Database connection failed
+- Pastikan MySQL berjalan: `sudo systemctl status mysql`
+- Cek credentials di `backend/.env`
+- Test connection: `mysql -u root -p`
 
-**Error: Node.js not available**
-- Setup Node.js App di cPanel
-- Restart aplikasi setelah setup
+### Error: Port already in use
+- Cek port yang digunakan: `lsof -i :5000` atau `lsof -i :3000`
+- Kill process: `kill -9 <PID>`
 
-**Error: Database connection**
-- Cek credentials di `.env`
-- Pastikan database sudah dibuat
-- Test connection dari cPanel
+### Error: Permission denied
+- Pastikan user memiliki akses ke folder: `chmod -R 755 .`
+- Untuk uploads: `chmod -R 777 backend/uploads`
+
+### PM2 Commands
+- List processes: `pm2 list`
+- View logs: `pm2 logs`
+- Restart: `pm2 restart all`
+- Stop: `pm2 stop all`
+- Delete: `pm2 delete all`
+
+## 📝 Fitur
+
+- ✅ Login Admin & HRD
+- ✅ Kelola User HRD
+- ✅ Form Pengajuan Cuti/Lembur
+- ✅ Approval System
+- ✅ Dashboard Statistics
+- ✅ WhatsApp Notification (Optional)
+- ✅ Responsive Design (Mobile & Desktop)
+
+## 🔄 Update Aplikasi
+
+```bash
+git pull origin main
+npm run install:all
+npm run build
+pm2 restart all
+```
 
 ---
 
 © 2026 IWARE. All rights reserved.
-
-## 👥 Support
-
-Untuk bantuan:
-- Buka issue di repository
-- Email: support@iware.com

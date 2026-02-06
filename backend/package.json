@@ -6,10 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "init-db": "node scripts/init-database.js",
-    "init-railway-db": "node scripts/init-railway-db.js",
-    "test-mysql": "node test-mysql-connection.js",
-    "test-railway": "node test-railway-mysql.js"
+    "init-db": "node scripts/init-database.js"
   },
   "keywords": [
     "express",
