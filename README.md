@@ -4,7 +4,42 @@ Aplikasi Perizinan Cuti/Lembur berbasis React + Express + MySQL
 
 ## 🚀 Deploy ke Hostinger
 
-### Metode 1: Git Import (Recommended)
+📄 **[START-HERE.txt](./START-HERE.txt)** - Panduan cepat untuk memulai
+
+### Metode 1: ZIP Upload (Paling Mudah) ⭐
+
+```bash
+# Build dan buat ZIP dalam 1 command
+npm run hostinger:zip
+```
+
+Atau double-click: `create-zip.bat` (Windows)
+
+Kemudian:
+1. Login ke Hostinger hPanel
+2. Pilih "Deploy Aplikasi Web Node.js"
+3. Pilih "Upload file"
+4. Upload: `hostinger-deploy.zip`
+
+📖 Panduan lengkap: [ZIP-UPLOAD-GUIDE.txt](./ZIP-UPLOAD-GUIDE.txt)
+
+### Metode 2: Folder Upload (Manual)
+
+```bash
+# Siapkan folder upload
+npm run hostinger:prepare
+```
+
+Atau double-click: `prepare-upload.bat` (Windows)
+
+Hasil: Folder `hostinger-upload/` siap untuk:
+- Di-compress menjadi ZIP
+- Di-upload via FTP
+- Di-upload via File Manager
+
+📖 Panduan lengkap: [FOLDER-UPLOAD-GUIDE.md](./FOLDER-UPLOAD-GUIDE.md)
+
+### Metode 3: Git Import
 
 1. Push repository ke GitHub
 2. Login ke hPanel Hostinger
@@ -12,15 +47,9 @@ Aplikasi Perizinan Cuti/Lembur berbasis React + Express + MySQL
 4. Pilih repository ini
 5. Hostinger akan auto-detect dan deploy
 
-### Metode 2: Manual Upload
+### Quick Reference
 
-```bash
-# Build frontend
-npm run hostinger:build
-
-# Upload via FTP/File Manager ke public_html
-# Pastikan upload: .htaccess, index.php, composer.json
-```
+📄 [UPLOAD-QUICK-REFERENCE.txt](./UPLOAD-QUICK-REFERENCE.txt) - Panduan cepat semua metode
 
 ## ⚙️ Setup di Hostinger
 
@@ -70,9 +99,25 @@ Copy `backend/.env.hostinger` ke `backend/.env` dan sesuaikan:
 
 ## 📚 Scripts
 
+### Development
+- `npm run dev` - Run frontend + backend
+- `npm run client` - Run frontend only
+- `npm run server` - Run backend only
+
+### Hostinger Deployment
+- `npm run hostinger:zip` - Build + create ZIP for upload ⭐
+- `npm run hostinger:prepare` - Create upload folder 📁
 - `npm run hostinger:build` - Build frontend
 - `npm run hostinger:start` - Start backend
 - `npm run hostinger:install` - Install all dependencies
+- `npm run hostinger:validate` - Validate configuration
+
+### Utilities
+- `prepare-upload.bat` - Windows: Prepare upload folder (double-click)
+- `create-zip.bat` - Windows: Create ZIP (double-click)
+- `node prepare-hostinger-upload.js` - Prepare upload folder
+- `node create-zip-simple.js` - Create ZIP without build
+- `powershell -File create-zip.ps1` - PowerShell script
 
 ## 🆘 Troubleshooting
 

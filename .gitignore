@@ -53,3 +53,9 @@ Thumbs.db
 # Actual .env files with real credentials should never be committed
 backend/.env.iwareid.filled
 *.filled
+
+# ZIP deployment files
+*.zip
+hostinger-deploy.zip
+temp-hostinger-deploy/
+hostinger-upload/
