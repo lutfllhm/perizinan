@@ -6,7 +6,10 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "init-db": "node scripts/init-database.js"
+    "init-db": "node scripts/init-database.js",
+    "update-db": "node scripts/update-database-v2.js",
+    "import-karyawan": "node scripts/import-karyawan.js",
+    "setup-db": "npm run update-db && npm run import-karyawan"
   },
   "keywords": [
     "express",
