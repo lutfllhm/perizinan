@@ -7,9 +7,10 @@ import { motion } from 'framer-motion';
 const MobileCard = ({ children, onClick, className = '' }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileTap={{ scale: 0.98 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.15 }}
+      whileTap={{ scale: 0.99 }}
       onClick={onClick}
       className={`bg-white rounded-xl shadow-md p-4 mb-3 border border-gray-200 active:shadow-lg transition-shadow ${
         onClick ? 'cursor-pointer' : ''

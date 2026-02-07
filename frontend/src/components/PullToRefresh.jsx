@@ -42,7 +42,8 @@ const PullToRefresh = ({ onRefresh, children }) => {
       <motion.div
         drag="y"
         dragConstraints={{ top: 0, bottom: 0 }}
-        dragElastic={0.3}
+        dragElastic={0.2}
+        dragTransition={{ duration: 0.2 }}
         style={{ y }}
         onDragEnd={handleDragEnd}
         className={isRefreshing ? 'pointer-events-none' : ''}

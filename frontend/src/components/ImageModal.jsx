@@ -25,20 +25,19 @@ const ImageModal = ({ src, alt, onClose }) => {
         onClick={onClose}
       >
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
+          initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.8, opacity: 0 }}
-          transition={{ type: "spring", damping: 25 }}
+          exit={{ scale: 0.95, opacity: 0 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
           className="relative max-w-7xl max-h-[90vh] w-full"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Controls */}
           <div className="absolute top-4 right-4 flex space-x-2 z-10">
             <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => setZoom(Math.min(zoom + 0.25, 3))}
-              className="p-3 bg-white rounded-full shadow-lg hover:bg-gray-100 transition"
+              className="p-3 bg-white rounded-full shadow-lg hover:bg-gray-100 transition-colors duration-150"
               title="Zoom In"
             >
               <FiZoomIn className="text-gray-800" size={20} />
@@ -47,25 +46,23 @@ const ImageModal = ({ src, alt, onClose }) => {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => setZoom(Math.max(zoom - 0.25, 0.5))}
-              className="p-3 bg-white rounded-full shadow-lg hover:bg-gray-100 transition"
+              className="p-3 bg-white rounded-full shadow-lg hover:bg-gray-100 transition-colors duration-150"
               title="Zoom Out"
             >
               <FiZoomOut className="text-gray-800" size={20} />
             </motion.button>
             <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+              whileTap={{ scale: 0.95 }}
               onClick={handleDownload}
-              className="p-3 bg-white rounded-full shadow-lg hover:bg-gray-100 transition"
+              className="p-3 bg-white rounded-full shadow-lg hover:bg-gray-100 transition-colors duration-150"
               title="Download"
             >
               <FiDownload className="text-gray-800" size={20} />
             </motion.button>
             <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+              whileTap={{ scale: 0.95 }}
               onClick={onClose}
-              className="p-3 bg-red-500 rounded-full shadow-lg hover:bg-red-600 transition"
+              className="p-3 bg-red-500 rounded-full shadow-lg hover:bg-red-600 transition-colors duration-150"
               title="Close"
             >
               <FiX className="text-white" size={20} />
@@ -83,7 +80,7 @@ const ImageModal = ({ src, alt, onClose }) => {
               src={src}
               alt={alt}
               style={{ transform: `scale(${zoom})` }}
-              className="max-w-full h-auto rounded-lg shadow-2xl transition-transform duration-300"
+              className="max-w-full h-auto rounded-lg shadow-2xl transition-transform duration-150"
               onLoad={() => setLoading(false)}
               onError={(e) => {
                 setLoading(false);

@@ -29,6 +29,9 @@ const SwipeableCard = ({
     }
   };
 
+  // Simplified drag configuration
+  const dragTransition = { duration: 0.2, ease: "easeOut" };
+
   return (
     <div className="relative overflow-hidden rounded-xl">
       {/* Left Action Background */}
@@ -61,7 +64,8 @@ const SwipeableCard = ({
       <motion.div
         drag="x"
         dragConstraints={{ left: 0, right: 0 }}
-        dragElastic={0.2}
+        dragElastic={0.1}
+        dragTransition={dragTransition}
         style={{ x }}
         onDragStart={() => setIsDragging(true)}
         onDragEnd={handleDragEnd}
