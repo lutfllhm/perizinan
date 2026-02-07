@@ -39,6 +39,16 @@ export const pengajuanAPI = {
   getReport: (params) => api.get('/pengajuan/report', { params }),
 };
 
+export const karyawanAPI = {
+  getAll: (params) => api.get('/karyawan', { params }),
+  getById: (id) => api.get(`/karyawan/${id}`),
+  getQuota: (id) => api.get(`/karyawan/${id}/quota`),
+  create: (data) => api.post('/karyawan', data),
+  update: (id, data) => api.put(`/karyawan/${id}`, data),
+  resetCuti: (id, data) => api.post(`/karyawan/${id}/reset-cuti`, data),
+  delete: (id) => api.delete(`/karyawan/${id}`),
+};
+
 // Export API_URL untuk digunakan di komponen lain (misal untuk image URL)
 export { API_URL };
 

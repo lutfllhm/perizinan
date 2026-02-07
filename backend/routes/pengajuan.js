@@ -186,7 +186,7 @@ router.get('/:id', auth, async (req, res) => {
 // Create pengajuan
 router.post('/', upload.single('bukti_foto'), async (req, res) => {
   try {
-    const { nama, no_telp, jenis_perizinan, tanggal_mulai, tanggal_selesai, catatan } = req.body;
+    const { karyawan_id, kantor, nama, jabatan, departemen, no_telp, jenis_perizinan, tanggal_mulai, tanggal_selesai, catatan } = req.body;
 
     // Validasi input
     if (!nama || !no_telp || !jenis_perizinan || !tanggal_mulai || !tanggal_selesai) {
@@ -195,13 +195,67 @@ router.post('/', upload.single('bukti_foto'), async (req, res) => {
       });
     }
 
+    // Validasi dinas luar harus ada foto
+    if (jenis_perizinan === 'dinas_luar' && !req.file) {
+      return res.status(400).json({ 
+        message: 'Dinas luar wajib melampirkan bukti foto' 
+      });
+    }
+
     const bukti_foto = req.file ? req.file.filename : null;
+    const bulan = new Date().getMonth() + 1;
+    const tahun = new Date().getFullYear();
+
+    // Validasi quota untuk pulang_cepat dan datang_terlambat
+    if (karyawan_id && (jenis_perizinan === 'pulang_cepat' || jenis_perizinan === 'datang_terlambat')) {
+      // Get or create quota bulanan
+      let [quota] = await db.query(
+        'SELECT * FROM quota_bulanan WHERE karyawan_id = ? AND bulan = ? AND tahun = ?',
+        [karyawan_id, bulan, tahun]
+      );
+
+      if (quota.length === 0) {
+        await db.query(
+          'INSERT INTO quota_bulanan (karyawan_id, bulan, tahun) VALUES (?, ?, ?)',
+          [karyawan_id, bulan, tahun]
+        );
+        quota = [{ pulang_cepat: 0, datang_terlambat: 0 }];
+      }
+
+      const currentQuota = quota[0];
+      
+      if (jenis_perizinan === 'pulang_cepat' && currentQuota.pulang_cepat >= 3) {
+        return res.status(400).json({ 
+          message: 'Quota pulang cepat bulan ini sudah habis (maksimal 3x)' 
+        });
+      }
+
+      if (jenis_perizinan === 'datang_terlambat' && currentQuota.datang_terlambat >= 3) {
+        return res.status(400).json({ 
+          message: 'Quota datang terlambat bulan ini sudah habis (maksimal 3x)' 
+        });
+      }
+    }
+
+    // Validasi cuti jika ada karyawan_id
+    if (karyawan_id && jenis_perizinan === 'cuti') {
+      const [karyawan] = await db.query(
+        'SELECT sisa_cuti FROM karyawan WHERE id = ?',
+        [karyawan_id]
+      );
+
+      if (karyawan.length > 0 && karyawan[0].sisa_cuti <= 0) {
+        return res.status(400).json({ 
+          message: 'Sisa cuti Anda sudah habis' 
+        });
+      }
+    }
 
     const [result] = await db.query(
       `INSERT INTO pengajuan 
-       (nama, no_telp, jenis_perizinan, tanggal_mulai, tanggal_selesai, bukti_foto, catatan, status) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')`,
-      [nama, no_telp, jenis_perizinan, tanggal_mulai, tanggal_selesai, bukti_foto, catatan || '']
+       (karyawan_id, kantor, nama, jabatan, departemen, no_telp, jenis_perizinan, tanggal_mulai, tanggal_selesai, bukti_foto, catatan, status) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
+      [karyawan_id || null, kantor || null, nama, jabatan || null, departemen || null, no_telp, jenis_perizinan, tanggal_mulai, tanggal_selesai, bukti_foto, catatan || '']
     );
 
     console.log('✅ Pengajuan created:', result.insertId);
@@ -249,6 +303,34 @@ router.put('/:id', auth, async (req, res) => {
       return res.status(404).json({ 
         message: 'Pengajuan tidak ditemukan' 
       });
+    }
+
+    const item = pengajuan[0];
+    const bulan = new Date().getMonth() + 1;
+    const tahun = new Date().getFullYear();
+
+    // Jika approved, update quota dan cuti
+    if (status === 'approved' && item.karyawan_id) {
+      // Update quota untuk pulang_cepat dan datang_terlambat
+      if (item.jenis_perizinan === 'pulang_cepat' || item.jenis_perizinan === 'datang_terlambat') {
+        const field = item.jenis_perizinan;
+        
+        // Pastikan quota bulanan ada
+        await db.query(
+          `INSERT INTO quota_bulanan (karyawan_id, bulan, tahun, ${field}) 
+           VALUES (?, ?, ?, 1)
+           ON DUPLICATE KEY UPDATE ${field} = ${field} + 1`,
+          [item.karyawan_id, bulan, tahun]
+        );
+      }
+
+      // Update sisa cuti
+      if (item.jenis_perizinan === 'cuti') {
+        await db.query(
+          'UPDATE karyawan SET sisa_cuti = sisa_cuti - 1 WHERE id = ? AND sisa_cuti > 0',
+          [item.karyawan_id]
+        );
+      }
     }
 
     // Update status

@@ -155,6 +155,7 @@ app.get('/api/health', (req, res) => {
 try {
   app.use('/api/auth', require('./routes/auth'));
   app.use('/api/pengajuan', require('./routes/pengajuan'));
+  app.use('/api/karyawan', require('./routes/karyawan'));
   app.use('/api/admin-reset', require('./routes/reset-admin')); // TEMPORARY - Remove after use
   app.use('/api/simple-reset', require('./routes/simple-reset')); // SIMPLE RESET - Remove after use
   console.log('✅ Routes loaded successfully');

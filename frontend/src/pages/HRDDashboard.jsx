@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
-import { pengajuanAPI, authAPI, API_URL } from '../utils/api';
+import { pengajuanAPI, authAPI, API_URL, karyawanAPI } from '../utils/api';
 import { 
   FiHome, FiFileText, FiBarChart2, FiLogOut, FiMenu, FiX,
-  FiClock, FiCheckCircle, FiXCircle, FiEye, FiTrash2, FiSettings, FiUser, FiSend
+  FiClock, FiCheckCircle, FiXCircle, FiEye, FiTrash2, FiSettings, FiUser, FiSend, FiEdit, FiPlus, FiRefreshCw
 } from 'react-icons/fi';
 import { 
   LineChart, Line, PieChart, Pie, Cell,
@@ -32,6 +32,7 @@ const HRDDashboard = () => {
     const menuItems = [
       { path: '/hrd', icon: FiHome, label: 'Dashboard', exact: true },
       { path: '/hrd/pengajuan', icon: FiFileText, label: 'Daftar Pengajuan' },
+      { path: '/hrd/karyawan', icon: FiUser, label: 'Daftar Karyawan' },
       { path: '/hrd/report', icon: FiBarChart2, label: 'Report' },
       { path: '/hrd/profile', icon: FiSettings, label: 'Manajemen Akun' },
     ];
@@ -178,6 +179,7 @@ const HRDDashboard = () => {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/pengajuan" element={<DaftarPengajuan />} />
+            <Route path="/karyawan" element={<DaftarKaryawan />} />
             <Route path="/report" element={<Report />} />
             <Route path="/profile" element={<ManajemenAkun />} />
           </Routes>
@@ -1220,6 +1222,406 @@ const ManajemenAkun = () => {
           )}
         </div>
       </div>
+    </div>
+  );
+};
+
+const DaftarKaryawan = () => {
+  const [karyawan, setKaryawan] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filterKantor, setFilterKantor] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [modalMode, setModalMode] = useState('add');
+  const [selectedKaryawan, setSelectedKaryawan] = useState(null);
+  const [formData, setFormData] = useState({
+    kantor: '',
+    nama: '',
+    jabatan: '',
+    departemen: '',
+    no_telp: '',
+    jatah_cuti: 12,
+    sisa_cuti: 12,
+    status: 'aktif'
+  });
+
+  const daftarKantor = [
+    'RBM-IWARE SURABAYA',
+    'SBA-WMP',
+    'RBM-IWARE JAKARTA',
+    'ILUMINDO',
+    'RBM - LABEL',
+    'ALGOO',
+    'RBM - IWARE BALI',
+    'RBM-IWARE JOGJA'
+  ];
+
+  useEffect(() => {
+    fetchKaryawan();
+  }, [filterKantor]);
+
+  const fetchKaryawan = async () => {
+    try {
+      const params = filterKantor ? { kantor: filterKantor } : {};
+      const response = await karyawanAPI.getAll(params);
+      setKaryawan(response.data);
+    } catch (error) {
+      toast.error('Gagal memuat data karyawan');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOpenModal = (mode, karyawanData = null) => {
+    setModalMode(mode);
+    if (mode === 'edit' && karyawanData) {
+      setSelectedKaryawan(karyawanData);
+      setFormData({
+        kantor: karyawanData.kantor,
+        nama: karyawanData.nama,
+        jabatan: karyawanData.jabatan,
+        departemen: karyawanData.departemen,
+        no_telp: karyawanData.no_telp || '',
+        jatah_cuti: karyawanData.jatah_cuti,
+        sisa_cuti: karyawanData.sisa_cuti,
+        status: karyawanData.status
+      });
+    } else {
+      setFormData({
+        kantor: '',
+        nama: '',
+        jabatan: '',
+        departemen: '',
+        no_telp: '',
+        jatah_cuti: 12,
+        sisa_cuti: 12,
+        status: 'aktif'
+      });
+    }
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedKaryawan(null);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (modalMode === 'add') {
+        await karyawanAPI.create(formData);
+        toast.success('Karyawan berhasil ditambahkan');
+      } else {
+        await karyawanAPI.update(selectedKaryawan.id, formData);
+        toast.success('Data karyawan berhasil diperbarui');
+      }
+      handleCloseModal();
+      fetchKaryawan();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Gagal menyimpan data karyawan');
+    }
+  };
+
+  const handleResetCuti = async (id) => {
+    if (!window.confirm('Yakin ingin mereset cuti karyawan ini ke 12 hari?')) return;
+
+    try {
+      await karyawanAPI.resetCuti(id, { jatah_cuti: 12 });
+      toast.success('Cuti berhasil direset');
+      fetchKaryawan();
+    } catch (error) {
+      toast.error('Gagal mereset cuti');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Yakin ingin menghapus karyawan ini?')) return;
+
+    try {
+      await karyawanAPI.delete(id);
+      toast.success('Karyawan berhasil dihapus');
+      fetchKaryawan();
+    } catch (error) {
+      toast.error('Gagal menghapus karyawan');
+    }
+  };
+
+  if (loading) return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-800">Daftar Karyawan</h2>
+      <SkeletonTable rows={8} />
+    </div>
+  );
+
+  return (
+    <div className="space-y-6">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+      >
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">Daftar Karyawan</h2>
+          <p className="text-sm text-gray-600 mt-1">
+            Total: <span className="font-bold text-primary-600">{karyawan.length}</span> karyawan
+          </p>
+        </div>
+        <div className="flex gap-3 w-full sm:w-auto">
+          <select
+            value={filterKantor}
+            onChange={(e) => setFilterKantor(e.target.value)}
+            className="flex-1 sm:flex-none px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+          >
+            <option value="">Semua Kantor</option>
+            {daftarKantor.map(kantor => (
+              <option key={kantor} value={kantor}>{kantor}</option>
+            ))}
+          </select>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => handleOpenModal('add')}
+            className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"
+          >
+            <FiPlus />
+            <span className="hidden sm:inline">Tambah</span>
+          </motion.button>
+        </div>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="bg-white rounded-xl shadow-lg overflow-hidden"
+      >
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+              <tr>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Kantor</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Nama</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Jabatan</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Departemen</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Sisa Cuti</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Status</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Aksi</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              <AnimatePresence>
+                {karyawan.map((item, index) => (
+                  <motion.tr
+                    key={item.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="hover:bg-blue-50 transition-colors duration-200"
+                  >
+                    <td className="px-6 py-4 text-sm text-gray-600">{item.kantor}</td>
+                    <td className="px-6 py-4 font-medium text-gray-900">{item.nama}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{item.jabatan}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{item.departemen}</td>
+                    <td className="px-6 py-4">
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                        item.sisa_cuti > 5 ? 'bg-green-100 text-green-800' :
+                        item.sisa_cuti > 0 ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {item.sisa_cuti}/{item.jatah_cuti} hari
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                        item.status === 'aktif' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {item.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex space-x-2">
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleOpenModal('edit', item)}
+                          className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                          title="Edit"
+                        >
+                          <FiEdit size={16} />
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleResetCuti(item.id)}
+                          className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                          title="Reset Cuti"
+                        >
+                          <FiRefreshCw size={16} />
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleDelete(item.id)}
+                          className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                          title="Hapus"
+                        >
+                          <FiTrash2 size={16} />
+                        </motion.button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))}
+              </AnimatePresence>
+            </tbody>
+          </table>
+        </div>
+      </motion.div>
+
+      {/* Modal Add/Edit Karyawan */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={handleCloseModal}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-cyan-600 text-white p-6 rounded-t-2xl z-10">
+              <div className="flex justify-between items-center">
+                <h3 className="text-2xl font-bold">
+                  {modalMode === 'add' ? 'Tambah Karyawan' : 'Edit Karyawan'}
+                </h3>
+                <motion.button
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleCloseModal}
+                  className="p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors"
+                >
+                  <FiX size={24} />
+                </motion.button>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Kantor *</label>
+                <select
+                  required
+                  value={formData.kantor}
+                  onChange={(e) => setFormData({ ...formData, kantor: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                >
+                  <option value="">-- Pilih Kantor --</option>
+                  {daftarKantor.map(kantor => (
+                    <option key={kantor} value={kantor}>{kantor}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Nama *</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.nama}
+                  onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Jabatan *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.jabatan}
+                    onChange={(e) => setFormData({ ...formData, jabatan: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Departemen *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.departemen}
+                    onChange={(e) => setFormData({ ...formData, departemen: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">No. Telp</label>
+                <input
+                  type="tel"
+                  value={formData.no_telp}
+                  onChange={(e) => setFormData({ ...formData, no_telp: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Jatah Cuti</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.jatah_cuti}
+                    onChange={(e) => setFormData({ ...formData, jatah_cuti: parseInt(e.target.value) })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Sisa Cuti</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.sisa_cuti}
+                    onChange={(e) => setFormData({ ...formData, sisa_cuti: parseInt(e.target.value) })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                  <select
+                    value={formData.status}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="aktif">Aktif</option>
+                    <option value="nonaktif">Non-Aktif</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="submit"
+                  className="flex-1 py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition"
+                >
+                  {modalMode === 'add' ? 'Tambah' : 'Simpan'}
+                </motion.button>
+                <button
+                  type="button"
+                  onClick={handleCloseModal}
+                  className="flex-1 py-3 bg-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-400 transition"
+                >
+                  Batal
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };
