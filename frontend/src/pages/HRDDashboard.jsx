@@ -1257,6 +1257,7 @@ const DaftarKaryawan = () => {
 
   useEffect(() => {
     fetchKaryawan();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterKantor]);
 
   const fetchKaryawan = async () => {

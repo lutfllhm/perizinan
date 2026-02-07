@@ -63,6 +63,7 @@ const PengajuanForm = () => {
       }));
       setQuotaInfo(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataForm.kantor]);
 
   // Fetch quota ketika karyawan dipilih
@@ -72,6 +73,7 @@ const PengajuanForm = () => {
     } else {
       setQuotaInfo(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataForm.karyawan_id]);
 
   const fetchKaryawan = async (kantor) => {
