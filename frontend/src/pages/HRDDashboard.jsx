@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { pengajuanAPI, authAPI, API_URL } from '../utils/api';
 import { 
   FiHome, FiFileText, FiBarChart2, FiLogOut, FiMenu, FiX,
-  FiClock, FiCheckCircle, FiXCircle, FiEye, FiTrash2, FiSettings, FiUser
+  FiClock, FiCheckCircle, FiXCircle, FiEye, FiTrash2, FiSettings, FiUser, FiSend
 } from 'react-icons/fi';
 import { 
   LineChart, Line, PieChart, Pie, Cell,
@@ -494,6 +494,72 @@ const DaftarPengajuan = () => {
     }
   };
 
+  // Fungsi untuk membuka WhatsApp dengan pesan otomatis
+  const handleSendWhatsApp = (item) => {
+    const pegawaiNumber = item.no_telp.replace(/^0/, '62'); // Convert 08xxx ke 628xxx
+    
+    // Buat pesan berdasarkan status
+    let message = '';
+    
+    if (item.status === 'approved') {
+      message = `*PENGAJUAN DISETUJUI* ✅
+
+Halo *${item.nama}*,
+
+Pengajuan perizinan Anda telah *DISETUJUI* oleh HRD.
+
+📋 *Detail Pengajuan:*
+• Jenis: ${item.jenis_perizinan}
+• Tanggal: ${new Date(item.tanggal_mulai).toLocaleDateString('id-ID')} - ${new Date(item.tanggal_selesai).toLocaleDateString('id-ID')}
+• Status: DISETUJUI ✅
+
+${item.catatan ? `💬 *Catatan HRD:*\n${item.catatan}\n\n` : ''}Terima kasih.
+
+_Sistem Perizinan IWARE_`;
+    } else if (item.status === 'rejected') {
+      message = `*PENGAJUAN DITOLAK* ❌
+
+Halo *${item.nama}*,
+
+Mohon maaf, pengajuan perizinan Anda *DITOLAK* oleh HRD.
+
+📋 *Detail Pengajuan:*
+• Jenis: ${item.jenis_perizinan}
+• Tanggal: ${new Date(item.tanggal_mulai).toLocaleDateString('id-ID')} - ${new Date(item.tanggal_selesai).toLocaleDateString('id-ID')}
+• Status: DITOLAK ❌
+
+${item.catatan ? `💬 *Alasan Penolakan:*\n${item.catatan}\n\n` : ''}Anda dapat mengajukan kembali dengan melengkapi persyaratan yang diperlukan.
+
+Terima kasih.
+
+_Sistem Perizinan IWARE_`;
+    } else {
+      message = `*NOTIFIKASI PERIZINAN* 📢
+
+Halo *${item.nama}*,
+
+Status pengajuan perizinan Anda untuk *${item.jenis_perizinan}* telah diupdate.
+
+📋 *Detail Pengajuan:*
+• Jenis: ${item.jenis_perizinan}
+• Tanggal: ${new Date(item.tanggal_mulai).toLocaleDateString('id-ID')} - ${new Date(item.tanggal_selesai).toLocaleDateString('id-ID')}
+• Status: ${item.status.toUpperCase()}
+
+${item.catatan ? `💬 *Catatan:*\n${item.catatan}\n\n` : ''}Silakan cek aplikasi untuk detail lebih lanjut.
+
+Terima kasih.
+
+_Sistem Perizinan IWARE_`;
+    }
+    
+    // Encode pesan untuk URL
+    const encodedMessage = encodeURIComponent(message);
+    
+    // Buka WhatsApp Web/App
+    const whatsappUrl = `https://wa.me/${pegawaiNumber}?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   const handleShowDetail = (item) => {
     setSelectedItem(item);
     setShowDetailModal(true);
@@ -609,6 +675,18 @@ const DaftarPengajuan = () => {
                               Tolak
                             </motion.button>
                           </>
+                        )}
+                        {(item.status === 'approved' || item.status === 'rejected') && (
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => handleSendWhatsApp(item)}
+                            className="flex items-center space-x-1 px-3 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:shadow-lg transition-all text-sm font-medium"
+                            title="Kirim via WhatsApp"
+                          >
+                            <FiSend />
+                            <span>Kirim WA</span>
+                          </motion.button>
                         )}
                         <motion.button
                           whileHover={{ scale: 1.05 }}
@@ -790,6 +868,17 @@ const DaftarPengajuan = () => {
                       ✗ Tolak
                     </motion.button>
                   </>
+                )}
+                {(selectedItem.status === 'approved' || selectedItem.status === 'rejected') && (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleSendWhatsApp(selectedItem)}
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:shadow-lg font-semibold transition-all flex items-center justify-center space-x-2"
+                  >
+                    <FiSend />
+                    <span>📱 Kirim via WhatsApp</span>
+                  </motion.button>
                 )}
                 <motion.button
                   whileHover={{ scale: 1.05 }}

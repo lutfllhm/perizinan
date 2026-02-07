@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { authAPI, pengajuanAPI } from '../utils/api';
 import { 
   FiHome, FiUsers, FiUserPlus, FiLogOut, FiMenu, FiX, FiTrash2, FiSettings,
-  FiFileText, FiClock, FiCheckCircle, FiXCircle, FiAlertCircle, FiUser
+  FiFileText, FiClock, FiCheckCircle, FiXCircle, FiAlertCircle, FiUser, FiSend
 } from 'react-icons/fi';
 import { useIsMobile } from '../hooks/useMediaQuery';
 import BottomNavigation from '../components/BottomNavigation';
