@@ -324,13 +324,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Serve static files from React build (for production)
-if (process.env.NODE_ENV === 'production') {
-  const frontendBuildPath = path.join(__dirname, '../frontend/build');
-  app.use(express.static(frontendBuildPath));
-  console.log('📦 Serving static files from:', frontendBuildPath);
-}
-
 // API Health check
 app.get('/api/health', (req, res) => {
   res.json({ 
@@ -377,14 +370,6 @@ initDatabaseWithRetry()
       console.error('❌ Error loading routes:', error.message);
       console.error('❌ Stack trace:', error.stack);
       throw error;
-    }
-
-    // Serve React app for all non-API routes (for production)
-    if (process.env.NODE_ENV === 'production') {
-      app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
-      });
-      console.log('✅ Catch-all route configured for production');
     }
 
     // Error handler
