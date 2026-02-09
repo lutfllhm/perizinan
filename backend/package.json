@@ -9,7 +9,8 @@
     "init-db": "node scripts/init-database.js",
     "update-db": "node scripts/update-database-v2.js",
     "import-karyawan": "node scripts/import-karyawan.js",
-    "setup-db": "npm run update-db && npm run import-karyawan"
+    "setup-db": "npm run update-db && npm run import-karyawan",
+    "postinstall": "echo '✅ Dependencies installed. Database will auto-migrate on server start.'"
   },
   "keywords": [
     "express",

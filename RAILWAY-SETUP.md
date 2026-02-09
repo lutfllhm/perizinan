@@ -1,8 +1,72 @@
 # Setup Database di Railway
 
-## 🚂 Langkah-Langkah Update Database v2.0
+## 🚀 Auto-Migration (Otomatis saat Deploy)
 
-### Metode 1: Via Railway CLI (Recommended)
+**GOOD NEWS!** Database sekarang akan otomatis ter-update saat deploy di Railway. Tidak perlu menjalankan script manual lagi!
+
+### Apa yang Terjadi Otomatis:
+✅ Tabel `karyawan` dibuat otomatis  
+✅ Tabel `quota_bulanan` dibuat otomatis  
+✅ Kolom baru di tabel `pengajuan` ditambahkan otomatis  
+✅ Data karyawan di-import otomatis (jika tabel kosong)  
+✅ User admin default dibuat otomatis  
+
+### Cara Kerja:
+Saat Railway deploy backend:
+1. `npm install` → Install dependencies
+2. `npm start` → Server.js dijalankan
+3. Server otomatis cek dan update database sebelum start
+4. Jika tabel karyawan kosong, otomatis import data
+5. Server siap digunakan! 🎉
+
+---
+
+## 📊 Verifikasi Database Berhasil
+
+### Cek Logs Railway
+Setelah deploy, cek logs di Railway Dashboard:
+
+```
+🔄 Initializing database tables...
+✅ Tabel karyawan berhasil dibuat
+✅ Tabel quota_bulanan berhasil dibuat
+✅ Kolom karyawan_id ditambahkan
+✅ Kolom kantor ditambahkan
+✅ Kolom jabatan ditambahkan
+✅ Kolom departemen ditambahkan
+📥 Tabel karyawan kosong, memulai auto-import...
+✅ Auto-import karyawan berhasil
+✅ Database tables initialized successfully!
+🚀 Server berjalan di port 5000
+```
+
+### Cek via Railway MySQL Query
+Buka Railway → MySQL → **Query**:
+
+```sql
+-- Cek semua tabel
+SHOW TABLES;
+
+-- Harus ada: users, pengajuan, karyawan, quota_bulanan
+
+-- Cek jumlah karyawan
+SELECT COUNT(*) FROM karyawan;
+
+-- Harus ada 200+ karyawan
+
+-- Cek struktur pengajuan
+DESCRIBE pengajuan;
+
+-- Harus ada kolom: karyawan_id, kantor, jabatan, departemen
+```
+
+---
+
+## 🔧 Manual Setup (Jika Diperlukan)
+
+Jika auto-migration gagal atau ingin manual setup:
+
+### Metode 1: Via Railway CLI
 
 #### 1. Install Railway CLI
 ```bash
@@ -19,45 +83,16 @@ railway login
 cd backend
 railway link
 ```
-Pilih project "perizinan" atau nama project Anda.
 
 #### 4. Jalankan Update Database
 ```bash
 railway run npm run update-db
-```
-
-Output yang diharapkan:
-```
-🔄 Memulai update database...
-✅ Tabel karyawan berhasil dibuat
-✅ Tabel quota_bulanan berhasil dibuat
-✅ Tabel pengajuan berhasil diupdate
-✅ Update database selesai!
-```
-
-#### 5. Import Data Karyawan
-```bash
 railway run npm run import-karyawan
-```
-
-Output yang diharapkan:
-```
-🔄 Memulai import data karyawan...
-📍 Import karyawan RBM-IWARE SURABAYA...
-📍 Import karyawan SBA-WMP...
-...
-✅ Import selesai!
-📊 Total berhasil: 200+
-```
-
-#### 6. Restart Service (Opsional)
-```bash
-railway restart
 ```
 
 ---
 
-### Metode 2: Via Railway Dashboard (Manual)
+### Metode 2: Via Railway Dashboard
 
 #### 1. Buka Railway Dashboard
 - Login ke https://railway.app
@@ -67,10 +102,9 @@ railway restart
 - Klik service backend
 - Tab **Deployments**
 - Klik deployment terbaru
-- Klik **View Logs** atau **Shell**
+- Klik **Shell**
 
 #### 3. Jalankan Command
-Di shell Railway, jalankan:
 ```bash
 npm run update-db
 npm run import-karyawan
@@ -78,66 +112,22 @@ npm run import-karyawan
 
 ---
 
-### Metode 3: Otomatis saat Deploy (Advanced)
-
-Tambahkan di Railway **Settings** → **Deploy**:
-
-**Build Command:**
-```bash
-npm install
-```
-
-**Start Command:**
-```bash
-npm run setup-db && npm start
-```
-
-⚠️ **Warning:** Ini akan menjalankan setup setiap kali deploy. Hanya gunakan untuk first-time setup, kemudian ganti kembali ke `npm start`.
-
----
-
-## ✅ Verifikasi Database Berhasil
-
-### 1. Cek Tabel Baru
-Buka Railway → MySQL → **Query**:
-
-```sql
-SHOW TABLES;
-```
-
-Harus ada:
-- ✅ `users`
-- ✅ `pengajuan`
-- ✅ `karyawan` ⭐ BARU
-- ✅ `quota_bulanan` ⭐ BARU
-
-### 2. Cek Data Karyawan
-```sql
-SELECT COUNT(*) FROM karyawan;
-```
-
-Harus ada 200+ karyawan.
-
-### 3. Cek Kolom Baru di Pengajuan
-```sql
-DESCRIBE pengajuan;
-```
-
-Harus ada kolom baru:
-- ✅ `karyawan_id`
-- ✅ `kantor`
-- ✅ `jabatan`
-- ✅ `departemen`
-
----
-
 ## 🐛 Troubleshooting
 
-### Error: "Table already exists"
-Artinya tabel sudah dibuat sebelumnya. Skip error ini, lanjut ke import karyawan.
+### Auto-import Gagal
+Jika di logs muncul:
+```
+⚠️  Auto-import karyawan gagal: ...
+💡 Jalankan manual: npm run import-karyawan
+```
+
+Solusi:
+```bash
+railway run npm run import-karyawan
+```
 
 ### Error: "Duplicate entry"
-Artinya data karyawan sudah ada. Script akan skip dan lanjut ke data berikutnya.
+Artinya data sudah ada. Ini normal, skip saja.
 
 ### Error: "Cannot connect to database"
 Cek environment variables di Railway:
@@ -147,8 +137,41 @@ Cek environment variables di Railway:
 - `MYSQLDATABASE`
 - `MYSQLPASSWORD`
 
-### Error: "Command not found"
-Pastikan Anda di folder `backend` saat menjalankan command.
+### Database Tidak Update
+1. Cek logs Railway untuk error
+2. Restart service: `railway restart`
+3. Atau redeploy: push commit baru ke GitHub
+
+---
+
+## 🎯 Testing Setelah Deploy
+
+### 1. Test API Karyawan
+```bash
+curl https://your-app.up.railway.app/api/karyawan
+```
+
+Harus return list karyawan.
+
+### 2. Test Health Check
+```bash
+curl https://your-app.up.railway.app/api/health
+```
+
+Harus return:
+```json
+{
+  "status": "OK",
+  "message": "Server berjalan dengan baik",
+  "database": "MySQL"
+}
+```
+
+### 3. Test Frontend
+- Buka form pengajuan
+- Pilih nama karyawan dari dropdown
+- Submit form
+- Cek di HRD Dashboard
 
 ---
 
@@ -161,6 +184,9 @@ DROP TABLE IF EXISTS quota_bulanan;
 DROP TABLE IF EXISTS karyawan;
 
 ALTER TABLE pengajuan 
+  DROP FOREIGN KEY IF EXISTS fk_pengajuan_karyawan;
+
+ALTER TABLE pengajuan 
   DROP COLUMN IF EXISTS karyawan_id,
   DROP COLUMN IF EXISTS kantor,
   DROP COLUMN IF EXISTS jabatan,
@@ -169,21 +195,48 @@ ALTER TABLE pengajuan
 
 ---
 
-## 🎯 Next Steps Setelah Setup
+## 🔄 Re-import Data Karyawan
 
-1. ✅ Restart Railway service
-2. ✅ Test API endpoint: `https://your-app.up.railway.app/api/karyawan`
-3. ✅ Update Vercel environment variable dengan Railway URL
-4. ✅ Test frontend form pengajuan
-5. ✅ Test HRD Dashboard → Daftar Karyawan
+Jika ingin re-import data karyawan (misalnya ada update):
+
+```bash
+# Via Railway CLI
+railway run npm run import-karyawan
+
+# Atau via Railway Shell
+npm run import-karyawan
+```
+
+Script akan skip data yang sudah ada (berdasarkan unique key: kantor + nama).
 
 ---
 
 ## 📞 Support
 
-Jika ada masalah, cek logs di Railway:
-```bash
-railway logs
-```
+Jika ada masalah:
 
-Atau via dashboard: **Deployments** → **View Logs**
+1. **Cek Logs Railway:**
+   ```bash
+   railway logs
+   ```
+   Atau via dashboard: **Deployments** → **View Logs**
+
+2. **Restart Service:**
+   ```bash
+   railway restart
+   ```
+
+3. **Redeploy:**
+   Push commit baru atau trigger manual deploy di Railway Dashboard.
+
+---
+
+## ✨ Keuntungan Auto-Migration
+
+✅ **Zero Manual Work** - Deploy langsung jalan  
+✅ **Idempotent** - Aman dijalankan berkali-kali  
+✅ **Fast** - Tidak perlu login Railway CLI  
+✅ **Reliable** - Konsisten di semua environment  
+✅ **Developer Friendly** - Logs jelas dan informatif  
+
+Happy deploying! 🚀

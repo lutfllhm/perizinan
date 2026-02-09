@@ -86,6 +86,110 @@ async function initializeTables(db) {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
   `);
   
+  // Create karyawan table (v2.0)
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS karyawan (
+      id INT PRIMARY KEY AUTO_INCREMENT,
+      kantor VARCHAR(100) NOT NULL,
+      nama VARCHAR(100) NOT NULL,
+      jabatan VARCHAR(100) NOT NULL,
+      departemen VARCHAR(100) NOT NULL,
+      no_telp VARCHAR(20),
+      jatah_cuti INT DEFAULT 12,
+      sisa_cuti INT DEFAULT 12,
+      tahun_cuti INT DEFAULT YEAR(CURDATE()),
+      status ENUM('aktif', 'nonaktif') DEFAULT 'aktif',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      UNIQUE KEY unique_karyawan (kantor, nama)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+  `);
+  console.log('✅ Tabel karyawan berhasil dibuat');
+  
+  // Create quota_bulanan table (v2.0)
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS quota_bulanan (
+      id INT PRIMARY KEY AUTO_INCREMENT,
+      karyawan_id INT NOT NULL,
+      bulan INT NOT NULL,
+      tahun INT NOT NULL,
+      pulang_cepat INT DEFAULT 0,
+      datang_terlambat INT DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      UNIQUE KEY unique_quota (karyawan_id, bulan, tahun),
+      FOREIGN KEY (karyawan_id) REFERENCES karyawan(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+  `);
+  console.log('✅ Tabel quota_bulanan berhasil dibuat');
+  
+  // Update pengajuan table - add new columns (v2.0)
+  try {
+    // Check if columns exist first
+    const [columns] = await db.query(`
+      SELECT COLUMN_NAME 
+      FROM INFORMATION_SCHEMA.COLUMNS 
+      WHERE TABLE_SCHEMA = DATABASE() 
+      AND TABLE_NAME = 'pengajuan' 
+      AND COLUMN_NAME IN ('karyawan_id', 'kantor', 'jabatan', 'departemen')
+    `);
+    
+    const existingColumns = columns.map(col => col.COLUMN_NAME);
+    
+    if (!existingColumns.includes('karyawan_id')) {
+      await db.query('ALTER TABLE pengajuan ADD COLUMN karyawan_id INT');
+      console.log('✅ Kolom karyawan_id ditambahkan');
+    }
+    
+    if (!existingColumns.includes('kantor')) {
+      await db.query('ALTER TABLE pengajuan ADD COLUMN kantor VARCHAR(100)');
+      console.log('✅ Kolom kantor ditambahkan');
+    }
+    
+    if (!existingColumns.includes('jabatan')) {
+      await db.query('ALTER TABLE pengajuan ADD COLUMN jabatan VARCHAR(100)');
+      console.log('✅ Kolom jabatan ditambahkan');
+    }
+    
+    if (!existingColumns.includes('departemen')) {
+      await db.query('ALTER TABLE pengajuan ADD COLUMN departemen VARCHAR(100)');
+      console.log('✅ Kolom departemen ditambahkan');
+    }
+    
+    // Add foreign key if not exists
+    const [fks] = await db.query(`
+      SELECT CONSTRAINT_NAME 
+      FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE 
+      WHERE TABLE_SCHEMA = DATABASE() 
+      AND TABLE_NAME = 'pengajuan' 
+      AND COLUMN_NAME = 'karyawan_id' 
+      AND REFERENCED_TABLE_NAME = 'karyawan'
+    `);
+    
+    if (fks.length === 0 && existingColumns.includes('karyawan_id')) {
+      await db.query(`
+        ALTER TABLE pengajuan 
+        ADD CONSTRAINT fk_pengajuan_karyawan 
+        FOREIGN KEY (karyawan_id) REFERENCES karyawan(id) ON DELETE SET NULL
+      `);
+      console.log('✅ Foreign key karyawan_id ditambahkan');
+    }
+  } catch (error) {
+    console.log('⚠️  Update pengajuan table:', error.message);
+  }
+  
+  // Auto-import karyawan data if table is empty
+  const [karyawanCount] = await db.query('SELECT COUNT(*) as count FROM karyawan');
+  if (karyawanCount[0].count === 0) {
+    console.log('📥 Tabel karyawan kosong, memulai auto-import...');
+    try {
+      await autoImportKaryawan(db);
+    } catch (error) {
+      console.log('⚠️  Auto-import karyawan gagal:', error.message);
+      console.log('💡 Jalankan manual: npm run import-karyawan');
+    }
+  }
+  
   // Create default admin user if not exists
   const [users] = await db.query('SELECT * FROM users WHERE username = ?', ['admin']);
   if (users.length === 0) {
@@ -98,6 +202,41 @@ async function initializeTables(db) {
   }
   
   console.log('✅ Database tables initialized successfully!');
+}
+
+async function autoImportKaryawan(db) {
+  const fs = require('fs');
+  const path = require('path');
+  
+  const importScript = path.join(__dirname, 'scripts', 'import-karyawan.js');
+  
+  if (!fs.existsSync(importScript)) {
+    console.log('⚠️  Script import-karyawan.js tidak ditemukan');
+    return;
+  }
+  
+  // Run import inline
+  const { spawn } = require('child_process');
+  
+  return new Promise((resolve, reject) => {
+    const child = spawn('node', [importScript], {
+      stdio: 'inherit',
+      env: process.env
+    });
+    
+    child.on('close', (code) => {
+      if (code === 0) {
+        console.log('✅ Auto-import karyawan berhasil');
+        resolve();
+      } else {
+        reject(new Error(`Import failed with code ${code}`));
+      }
+    });
+    
+    child.on('error', (error) => {
+      reject(error);
+    });
+  });
 }
 
 // Middleware

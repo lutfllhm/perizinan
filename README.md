@@ -20,6 +20,25 @@ Aplikasi Perizinan Cuti/Lembur berbasis React + Express + MySQL
 
 ---
 
+## ☁️ DEPLOY KE RAILWAY (CLOUD)
+
+**Ingin deploy ke cloud dengan auto-migration?** ✨
+
+👉 **[RAILWAY-QUICK-START.md](RAILWAY-QUICK-START.md)** - Quick start guide (5 menit!)
+
+📖 **Detailed Guide:** [RAILWAY-SETUP.md](RAILWAY-SETUP.md)
+
+📋 **Environment Checklist:** [RAILWAY-ENV-CHECKLIST.md](RAILWAY-ENV-CHECKLIST.md)
+
+**Features:**
+- ✅ Auto database migration saat deploy
+- ✅ Auto import data karyawan
+- ✅ Zero manual setup
+- ✅ Free tier available
+- ✅ Auto-deploy dari GitHub
+
+---
+
 ## 🎯 MULAI DI SINI
 
 **Baru pertama kali?** Baca: **[00-MULAI-DISINI.md](00-MULAI-DISINI.md)**

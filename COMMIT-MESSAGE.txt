@@ -1,0 +1,49 @@
+feat: Enable auto-migration for Railway deployment
+
+🚀 Major Changes:
+- Auto database migration saat server start
+- Auto import data karyawan jika tabel kosong
+- Zero manual setup required untuk Railway deployment
+
+✨ Features Added:
+- Auto-create tabel karyawan & quota_bulanan
+- Auto-add kolom baru di tabel pengajuan
+- Smart column checking (idempotent)
+- Foreign key constraints
+- Auto-import karyawan data on first deploy
+
+📝 Files Changed:
+- backend/server.js - Added auto-migration logic
+- backend/package.json - Added postinstall script
+- railway.json - Railway configuration
+- .railwayignore - Deployment optimization
+
+📚 Documentation:
+- RAILWAY-QUICK-START.md - Quick start guide
+- RAILWAY-SETUP.md - Updated with auto-migration
+- RAILWAY-ENV-CHECKLIST.md - Environment variables guide
+- DEPLOYMENT-SUMMARY.md - Complete summary
+- CHANGELOG.md - Version 2.1.0 release notes
+- README.md - Added Railway deployment section
+
+🐛 Fixes:
+- Database tidak otomatis update saat deploy di Railway
+- Manual setup yang ribet dan error-prone
+- Missing tables setelah fresh deployment
+
+🎯 Benefits:
+- Zero manual work
+- Consistent deployment
+- Idempotent & safe
+- Developer friendly
+- Fast deployment
+
+---
+
+How to Deploy:
+1. Push ke GitHub
+2. Railway auto-deploy
+3. Database auto-migrate
+4. Done! ✨
+
+No more manual database setup! 🎉

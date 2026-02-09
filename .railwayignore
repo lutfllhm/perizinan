@@ -1,0 +1,24 @@
+# Frontend files (tidak perlu di backend Railway)
+frontend/
+.git/
+.vscode/
+
+# Documentation
+*.md
+!RAILWAY-SETUP.md
+
+# Local development
+.env.local
+.env.development
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Deployment scripts
+deploy-vps.bat
+deploy-vps.sh
+start-dev.bat
+start-dev.sh
