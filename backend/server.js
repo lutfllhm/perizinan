@@ -264,6 +264,33 @@ app.get('/api/karyawan', async (req, res) => {
   }
 });
 
+// Delete karyawan
+app.delete('/api/karyawan/:id', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const { id } = req.params;
+
+    // Check if karyawan exists
+    const [karyawan] = await db.query('SELECT * FROM karyawan WHERE id = ?', [id]);
+    
+    if (karyawan.length === 0) {
+      return res.status(404).json({ message: 'Karyawan tidak ditemukan' });
+    }
+
+    // Delete karyawan
+    await db.query('DELETE FROM karyawan WHERE id = ?', [id]);
+
+    console.log('✅ Karyawan deleted:', id);
+
+    res.json({ message: 'Karyawan berhasil dihapus' });
+
+  } catch (error) {
+    console.error('❌ Delete karyawan error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Import karyawan data - TEMPORARY ENDPOINT
 app.get('/api/karyawan/import-now', async (req, res) => {
   try {
@@ -274,32 +301,30 @@ app.get('/api/karyawan/import-now', async (req, res) => {
     // Data karyawan dari berbagai kantor
     const karyawanData = [
       // RBM-IWARE SURABAYA
-      { kantor: 'RBM-IWARE SURABAYA', nama: 'ACHMAD FAUZI', jabatan: 'Staff', departemen: 'IT' },
-      { kantor: 'RBM-IWARE SURABAYA', nama: 'AGUS SALIM', jabatan: 'Staff', departemen: 'Finance' },
-      { kantor: 'RBM-IWARE SURABAYA', nama: 'AHMAD YANI', jabatan: 'Manager', departemen: 'Operations' },
-      { kantor: 'RBM-IWARE SURABAYA', nama: 'ANDI WIJAYA', jabatan: 'Staff', departemen: 'HR' },
-      { kantor: 'RBM-IWARE SURABAYA', nama: 'BUDI SANTOSO', jabatan: 'Supervisor', departemen: 'IT' },
+      { kantor: 'RBM-IWARE SURABAYA', nama: 'ACHMAD FAUZI', jabatan: 'Staff', departemen: 'IT', no_telp: '081234567801' },
+      { kantor: 'RBM-IWARE SURABAYA', nama: 'AGUS SALIM', jabatan: 'Staff', departemen: 'Finance', no_telp: '081234567802' },
+      { kantor: 'RBM-IWARE SURABAYA', nama: 'AHMAD YANI', jabatan: 'Manager', departemen: 'Operations', no_telp: '081234567803' },
+      { kantor: 'RBM-IWARE SURABAYA', nama: 'ANDI WIJAYA', jabatan: 'Staff', departemen: 'HR', no_telp: '081234567804' },
+      { kantor: 'RBM-IWARE SURABAYA', nama: 'BUDI SANTOSO', jabatan: 'Supervisor', departemen: 'IT', no_telp: '081234567805' },
+      { kantor: 'RBM-IWARE SURABAYA', nama: 'RUDI HARTONO', jabatan: 'Staff', departemen: 'Operations', no_telp: '081234567806' },
+      { kantor: 'RBM-IWARE SURABAYA', nama: 'SITI NURHALIZA', jabatan: 'Staff', departemen: 'Finance', no_telp: '081234567807' },
       
       // SBA-WMP
-      { kantor: 'SBA-WMP', nama: 'DEDI KURNIAWAN', jabatan: 'Staff', departemen: 'Operations' },
-      { kantor: 'SBA-WMP', nama: 'EKO PRASETYO', jabatan: 'Staff', departemen: 'IT' },
-      { kantor: 'SBA-WMP', nama: 'FAJAR NUGROHO', jabatan: 'Manager', departemen: 'Finance' },
-      { kantor: 'SBA-WMP', nama: 'HADI SUSANTO', jabatan: 'Staff', departemen: 'HR' },
-      { kantor: 'SBA-WMP', nama: 'IMAM SANTOSO', jabatan: 'Supervisor', departemen: 'Operations' },
+      { kantor: 'SBA-WMP', nama: 'DEDI KURNIAWAN', jabatan: 'Staff', departemen: 'Operations', no_telp: '081234567808' },
+      { kantor: 'SBA-WMP', nama: 'EKO PRASETYO', jabatan: 'Staff', departemen: 'IT', no_telp: '081234567809' },
+      { kantor: 'SBA-WMP', nama: 'FAJAR NUGROHO', jabatan: 'Manager', departemen: 'Finance', no_telp: '081234567810' },
+      { kantor: 'SBA-WMP', nama: 'HADI SUSANTO', jabatan: 'Staff', departemen: 'HR', no_telp: '081234567811' },
+      { kantor: 'SBA-WMP', nama: 'IMAM SANTOSO', jabatan: 'Supervisor', departemen: 'Operations', no_telp: '081234567812' },
+      { kantor: 'SBA-WMP', nama: 'TONO SURATNO', jabatan: 'Staff', departemen: 'IT', no_telp: '081234567813' },
+      { kantor: 'SBA-WMP', nama: 'UMAR BAKRI', jabatan: 'Manager', departemen: 'HR', no_telp: '081234567814' },
       
       // RBM-IWARE JAKARTA
-      { kantor: 'RBM-IWARE JAKARTA', nama: 'JOKO WIDODO', jabatan: 'Staff', departemen: 'IT' },
-      { kantor: 'RBM-IWARE JAKARTA', nama: 'KURNIAWAN HADI', jabatan: 'Manager', departemen: 'Operations' },
-      { kantor: 'RBM-IWARE JAKARTA', nama: 'LUKMAN HAKIM', jabatan: 'Staff', departemen: 'Finance' },
-      { kantor: 'RBM-IWARE JAKARTA', nama: 'MUHAMMAD ALI', jabatan: 'Supervisor', departemen: 'IT' },
-      { kantor: 'RBM-IWARE JAKARTA', nama: 'NUGROHO WIBOWO', jabatan: 'Staff', departemen: 'HR' },
-      
-      // Add more sample data
-      { kantor: 'RBM-IWARE SURABAYA', nama: 'RUDI HARTONO', jabatan: 'Staff', departemen: 'Operations' },
-      { kantor: 'RBM-IWARE SURABAYA', nama: 'SITI NURHALIZA', jabatan: 'Staff', departemen: 'Finance' },
-      { kantor: 'SBA-WMP', nama: 'TONO SURATNO', jabatan: 'Staff', departemen: 'IT' },
-      { kantor: 'SBA-WMP', nama: 'UMAR BAKRI', jabatan: 'Manager', departemen: 'HR' },
-      { kantor: 'RBM-IWARE JAKARTA', nama: 'WAWAN SETIAWAN', jabatan: 'Staff', departemen: 'Operations' },
+      { kantor: 'RBM-IWARE JAKARTA', nama: 'JOKO WIDODO', jabatan: 'Staff', departemen: 'IT', no_telp: '081234567815' },
+      { kantor: 'RBM-IWARE JAKARTA', nama: 'KURNIAWAN HADI', jabatan: 'Manager', departemen: 'Operations', no_telp: '081234567816' },
+      { kantor: 'RBM-IWARE JAKARTA', nama: 'LUKMAN HAKIM', jabatan: 'Staff', departemen: 'Finance', no_telp: '081234567817' },
+      { kantor: 'RBM-IWARE JAKARTA', nama: 'MUHAMMAD ALI', jabatan: 'Supervisor', departemen: 'IT', no_telp: '081234567818' },
+      { kantor: 'RBM-IWARE JAKARTA', nama: 'NUGROHO WIBOWO', jabatan: 'Staff', departemen: 'HR', no_telp: '081234567819' },
+      { kantor: 'RBM-IWARE JAKARTA', nama: 'WAWAN SETIAWAN', jabatan: 'Staff', departemen: 'Operations', no_telp: '081234567820' },
     ];
     
     let successCount = 0;
@@ -308,8 +333,8 @@ app.get('/api/karyawan/import-now', async (req, res) => {
     for (const karyawan of karyawanData) {
       try {
         await db.query(
-          'INSERT INTO karyawan (kantor, nama, jabatan, departemen, jatah_cuti, sisa_cuti, status) VALUES (?, ?, ?, ?, 12, 12, "aktif")',
-          [karyawan.kantor, karyawan.nama, karyawan.jabatan, karyawan.departemen]
+          'INSERT INTO karyawan (kantor, nama, jabatan, departemen, no_telp, jatah_cuti, sisa_cuti, status) VALUES (?, ?, ?, ?, ?, 12, 12, "aktif")',
+          [karyawan.kantor, karyawan.nama, karyawan.jabatan, karyawan.departemen, karyawan.no_telp]
         );
         successCount++;
       } catch (err) {
