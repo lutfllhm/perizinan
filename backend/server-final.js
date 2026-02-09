@@ -31,10 +31,136 @@ async function connectDB() {
       queueLimit: 0
     });
     console.log('✅ Database connected');
+    
+    // Auto-create tables
+    await initializeTables();
+    
     return db;
   } catch (error) {
     console.error('❌ Database connection failed:', error.message);
     return null;
+  }
+}
+
+async function initializeTables() {
+  try {
+    console.log('🔄 Initializing database tables...');
+    
+    // Create users table
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        username VARCHAR(50) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        nama VARCHAR(100) NOT NULL,
+        role ENUM('admin', 'hrd') NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+    `);
+    console.log('✅ Table users OK');
+    
+    // Create pengajuan table
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS pengajuan (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        nama VARCHAR(100) NOT NULL,
+        no_telp VARCHAR(20) NOT NULL,
+        jenis_perizinan VARCHAR(50) NOT NULL,
+        tanggal_mulai DATETIME NOT NULL,
+        tanggal_selesai DATETIME NOT NULL,
+        bukti_foto VARCHAR(255),
+        status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+        catatan TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+    `);
+    console.log('✅ Table pengajuan OK');
+    
+    // Create karyawan table
+    const currentYear = new Date().getFullYear();
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS karyawan (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        kantor VARCHAR(100) NOT NULL,
+        nama VARCHAR(100) NOT NULL,
+        jabatan VARCHAR(100) NOT NULL,
+        departemen VARCHAR(100) NOT NULL,
+        no_telp VARCHAR(20),
+        jatah_cuti INT DEFAULT 12,
+        sisa_cuti INT DEFAULT 12,
+        tahun_cuti INT DEFAULT ${currentYear},
+        status ENUM('aktif', 'nonaktif') DEFAULT 'aktif',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_karyawan (kantor, nama)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+    `);
+    console.log('✅ Table karyawan OK');
+    
+    // Create quota_bulanan table
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS quota_bulanan (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        karyawan_id INT NOT NULL,
+        bulan INT NOT NULL,
+        tahun INT NOT NULL,
+        pulang_cepat INT DEFAULT 0,
+        datang_terlambat INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_quota (karyawan_id, bulan, tahun),
+        FOREIGN KEY (karyawan_id) REFERENCES karyawan(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+    `);
+    console.log('✅ Table quota_bulanan OK');
+    
+    // Add columns to pengajuan if not exist
+    const [columns] = await db.query(`
+      SELECT COLUMN_NAME 
+      FROM INFORMATION_SCHEMA.COLUMNS 
+      WHERE TABLE_SCHEMA = DATABASE() 
+      AND TABLE_NAME = 'pengajuan' 
+      AND COLUMN_NAME IN ('karyawan_id', 'kantor', 'jabatan', 'departemen')
+    `);
+    
+    const existingColumns = columns.map(col => col.COLUMN_NAME);
+    
+    if (!existingColumns.includes('karyawan_id')) {
+      await db.query('ALTER TABLE pengajuan ADD COLUMN karyawan_id INT');
+      console.log('✅ Column karyawan_id added');
+    }
+    
+    if (!existingColumns.includes('kantor')) {
+      await db.query('ALTER TABLE pengajuan ADD COLUMN kantor VARCHAR(100)');
+      console.log('✅ Column kantor added');
+    }
+    
+    if (!existingColumns.includes('jabatan')) {
+      await db.query('ALTER TABLE pengajuan ADD COLUMN jabatan VARCHAR(100)');
+      console.log('✅ Column jabatan added');
+    }
+    
+    if (!existingColumns.includes('departemen')) {
+      await db.query('ALTER TABLE pengajuan ADD COLUMN departemen VARCHAR(100)');
+      console.log('✅ Column departemen added');
+    }
+    
+    // Create default admin user if not exists
+    const [users] = await db.query('SELECT * FROM users WHERE username = ?', ['admin']);
+    if (users.length === 0) {
+      const hashedPassword = await bcrypt.hash('admin123', 10);
+      await db.query(
+        'INSERT INTO users (username, password, nama, role) VALUES (?, ?, ?, ?)',
+        ['admin', hashedPassword, 'Administrator', 'admin']
+      );
+      console.log('✅ Default admin user created (admin/admin123)');
+    }
+    
+    console.log('✅ Database initialization complete!');
+    
+  } catch (error) {
+    console.error('❌ Error initializing tables:', error.message);
   }
 }
 
