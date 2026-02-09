@@ -531,13 +531,13 @@ const DaftarPengajuan = () => {
         
         // Tambahkan info quota sesuai jenis perizinan
         if (item.jenis_perizinan === 'cuti') {
-          quotaText = `\n📊 *Sisa Quota Anda:*\n┗━ Sisa Cuti: *${quota.sisa_cuti} hari* (dari ${quota.jatah_cuti} hari)\n`;
+          quotaText = `\n📊 *Sisa Quota Anda:*\n┗━ 🏖️ Sisa Cuti: *${quota.sisa_cuti} hari* (dari ${quota.jatah_cuti} hari)\n`;
         } else if (item.jenis_perizinan === 'pulang_cepat') {
           const sisa = 3 - quota.pulang_cepat;
-          quotaText = `\n📊 *Sisa Quota Anda:*\n┗━ Pulang Cepat: *${sisa}x tersisa* (bulan ini)\n`;
+          quotaText = `\n📊 *Sisa Quota Anda:*\n┗━ 🏃 Pulang Cepat: *${sisa}x tersisa* (bulan ini)\n`;
         } else if (item.jenis_perizinan === 'datang_terlambat') {
           const sisa = 3 - quota.datang_terlambat;
-          quotaText = `\n📊 *Sisa Quota Anda:*\n┗━ Datang Terlambat: *${sisa}x tersisa* (bulan ini)\n`;
+          quotaText = `\n📊 *Sisa Quota Anda:*\n┗━ ⏰ Datang Terlambat: *${sisa}x tersisa* (bulan ini)\n`;
         }
       } catch (error) {
         console.error('Error fetching quota:', error);
@@ -552,11 +552,13 @@ const DaftarPengajuan = () => {
 ║  ✅ *PENGAJUAN DISETUJUI*  ║
 ╚═══════════════════════╝
 
+🎉 *Selamat!* 🎉
+
 Kepada Yth.
-*${item.nama}*
+*${item.nama}* 👤
 
 Dengan hormat,
-Kami informasikan bahwa pengajuan perizinan Anda telah *DISETUJUI* oleh HRD.
+Kami informasikan bahwa pengajuan perizinan Anda telah *DISETUJUI* ✅ oleh HRD.
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃  📋 *DETAIL PENGAJUAN*
@@ -567,24 +569,23 @@ Kami informasikan bahwa pengajuan perizinan Anda telah *DISETUJUI* oleh HRD.
 ┃ ✅ Status: *DISETUJUI*
 ┗━━━━━━━━━━━━━━━━━━━━━━━┛
 ${quotaText}${item.catatan ? `\n💬 *Catatan HRD:*\n${item.catatan}\n` : ''}
-Terima kasih atas perhatian dan kerjasamanya.
+🙏 Terima kasih atas perhatian dan kerjasamanya.
 
 Hormat kami,
-*HRD IWARE*
+*HRD IWARE* 🏢
 
 ━━━━━━━━━━━━━━━━━━━━━
-_Sistem Perizinan IWARE_
-_Pesan otomatis - Mohon tidak membalas_`;
+_Sistem Perizinan IWARE_`;
     } else if (item.status === 'rejected') {
       message = `╔═══════════════════════╗
 ║  ❌ *PENGAJUAN DITOLAK*  ║
 ╚═══════════════════════╝
 
 Kepada Yth.
-*${item.nama}*
+*${item.nama}* 👤
 
 Dengan hormat,
-Kami informasikan bahwa pengajuan perizinan Anda *TIDAK DAPAT DISETUJUI*.
+Kami informasikan bahwa pengajuan perizinan Anda *TIDAK DAPAT DISETUJUI* ❌
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃  📋 *DETAIL PENGAJUAN*
@@ -595,26 +596,25 @@ Kami informasikan bahwa pengajuan perizinan Anda *TIDAK DAPAT DISETUJUI*.
 ┃ ❌ Status: *DITOLAK*
 ┗━━━━━━━━━━━━━━━━━━━━━━━┛
 ${quotaText}${item.catatan ? `\n⚠️ *Alasan Penolakan:*\n${item.catatan}\n` : ''}
-Anda dapat mengajukan kembali dengan melengkapi persyaratan yang diperlukan.
+💡 Anda dapat mengajukan kembali dengan melengkapi persyaratan yang diperlukan.
 
-Terima kasih atas pengertiannya.
+🙏 Terima kasih atas pengertiannya.
 
 Hormat kami,
-*HRD IWARE*
+*HRD IWARE* 🏢
 
 ━━━━━━━━━━━━━━━━━━━━━
-_Sistem Perizinan IWARE_
-_Pesan otomatis - Mohon tidak membalas_`;
+_Sistem Perizinan IWARE_`;
     } else {
       message = `╔═══════════════════════╗
 ║  📢 *NOTIFIKASI PERIZINAN*  ║
 ╚═══════════════════════╝
 
 Kepada Yth.
-*${item.nama}*
+*${item.nama}* 👤
 
 Dengan hormat,
-Status pengajuan perizinan Anda telah diperbarui.
+Status pengajuan perizinan Anda telah diperbarui 🔄
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃  📋 *DETAIL PENGAJUAN*
@@ -625,16 +625,15 @@ Status pengajuan perizinan Anda telah diperbarui.
 ┃ 🔄 Status: *${item.status.toUpperCase()}*
 ┗━━━━━━━━━━━━━━━━━━━━━━━┛
 ${quotaText}${item.catatan ? `\n💬 *Catatan:*\n${item.catatan}\n` : ''}
-Silakan cek aplikasi untuk informasi lebih lanjut.
+📱 Silakan cek aplikasi untuk informasi lebih lanjut.
 
-Terima kasih.
+🙏 Terima kasih.
 
 Hormat kami,
-*HRD IWARE*
+*HRD IWARE* 🏢
 
 ━━━━━━━━━━━━━━━━━━━━━
-_Sistem Perizinan IWARE_
-_Pesan otomatis - Mohon tidak membalas_`;
+_Sistem Perizinan IWARE_`;
     }
     
     // Encode pesan untuk URL
