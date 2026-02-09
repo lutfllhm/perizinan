@@ -264,6 +264,82 @@ app.get('/api/karyawan', async (req, res) => {
   }
 });
 
+// Import karyawan data - TEMPORARY ENDPOINT
+app.get('/api/karyawan/import-now', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    console.log('🔄 Starting karyawan import...');
+    
+    // Data karyawan dari berbagai kantor
+    const karyawanData = [
+      // RBM-IWARE SURABAYA
+      { kantor: 'RBM-IWARE SURABAYA', nama: 'ACHMAD FAUZI', jabatan: 'Staff', departemen: 'IT' },
+      { kantor: 'RBM-IWARE SURABAYA', nama: 'AGUS SALIM', jabatan: 'Staff', departemen: 'Finance' },
+      { kantor: 'RBM-IWARE SURABAYA', nama: 'AHMAD YANI', jabatan: 'Manager', departemen: 'Operations' },
+      { kantor: 'RBM-IWARE SURABAYA', nama: 'ANDI WIJAYA', jabatan: 'Staff', departemen: 'HR' },
+      { kantor: 'RBM-IWARE SURABAYA', nama: 'BUDI SANTOSO', jabatan: 'Supervisor', departemen: 'IT' },
+      
+      // SBA-WMP
+      { kantor: 'SBA-WMP', nama: 'DEDI KURNIAWAN', jabatan: 'Staff', departemen: 'Operations' },
+      { kantor: 'SBA-WMP', nama: 'EKO PRASETYO', jabatan: 'Staff', departemen: 'IT' },
+      { kantor: 'SBA-WMP', nama: 'FAJAR NUGROHO', jabatan: 'Manager', departemen: 'Finance' },
+      { kantor: 'SBA-WMP', nama: 'HADI SUSANTO', jabatan: 'Staff', departemen: 'HR' },
+      { kantor: 'SBA-WMP', nama: 'IMAM SANTOSO', jabatan: 'Supervisor', departemen: 'Operations' },
+      
+      // RBM-IWARE JAKARTA
+      { kantor: 'RBM-IWARE JAKARTA', nama: 'JOKO WIDODO', jabatan: 'Staff', departemen: 'IT' },
+      { kantor: 'RBM-IWARE JAKARTA', nama: 'KURNIAWAN HADI', jabatan: 'Manager', departemen: 'Operations' },
+      { kantor: 'RBM-IWARE JAKARTA', nama: 'LUKMAN HAKIM', jabatan: 'Staff', departemen: 'Finance' },
+      { kantor: 'RBM-IWARE JAKARTA', nama: 'MUHAMMAD ALI', jabatan: 'Supervisor', departemen: 'IT' },
+      { kantor: 'RBM-IWARE JAKARTA', nama: 'NUGROHO WIBOWO', jabatan: 'Staff', departemen: 'HR' },
+      
+      // Add more sample data
+      { kantor: 'RBM-IWARE SURABAYA', nama: 'RUDI HARTONO', jabatan: 'Staff', departemen: 'Operations' },
+      { kantor: 'RBM-IWARE SURABAYA', nama: 'SITI NURHALIZA', jabatan: 'Staff', departemen: 'Finance' },
+      { kantor: 'SBA-WMP', nama: 'TONO SURATNO', jabatan: 'Staff', departemen: 'IT' },
+      { kantor: 'SBA-WMP', nama: 'UMAR BAKRI', jabatan: 'Manager', departemen: 'HR' },
+      { kantor: 'RBM-IWARE JAKARTA', nama: 'WAWAN SETIAWAN', jabatan: 'Staff', departemen: 'Operations' },
+    ];
+    
+    let successCount = 0;
+    let skipCount = 0;
+    
+    for (const karyawan of karyawanData) {
+      try {
+        await db.query(
+          'INSERT INTO karyawan (kantor, nama, jabatan, departemen, jatah_cuti, sisa_cuti, status) VALUES (?, ?, ?, ?, 12, 12, "aktif")',
+          [karyawan.kantor, karyawan.nama, karyawan.jabatan, karyawan.departemen]
+        );
+        successCount++;
+      } catch (err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+          skipCount++;
+        } else {
+          console.error('Error inserting:', karyawan.nama, err.message);
+        }
+      }
+    }
+    
+    console.log(`✅ Import complete: ${successCount} inserted, ${skipCount} skipped`);
+    
+    res.json({
+      success: true,
+      message: 'Import karyawan berhasil',
+      inserted: successCount,
+      skipped: skipCount,
+      total: karyawanData.length
+    });
+    
+  } catch (error) {
+    console.error('❌ Import error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: error.message 
+    });
+  }
+});
+
 // Get pengajuan
 app.get('/api/pengajuan', async (req, res) => {
   try {
