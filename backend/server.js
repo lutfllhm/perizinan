@@ -352,14 +352,30 @@ initDatabaseWithRetry()
     
     // Routes - Load AFTER database initialization
     try {
+      console.log('  → Loading /api/auth...');
       app.use('/api/auth', require('./routes/auth'));
+      console.log('  ✅ /api/auth loaded');
+      
+      console.log('  → Loading /api/pengajuan...');
       app.use('/api/pengajuan', require('./routes/pengajuan'));
+      console.log('  ✅ /api/pengajuan loaded');
+      
+      console.log('  → Loading /api/karyawan...');
       app.use('/api/karyawan', require('./routes/karyawan'));
-      app.use('/api/admin-reset', require('./routes/reset-admin')); // TEMPORARY - Remove after use
-      app.use('/api/simple-reset', require('./routes/simple-reset')); // SIMPLE RESET - Remove after use
-      console.log('✅ Routes loaded successfully');
+      console.log('  ✅ /api/karyawan loaded');
+      
+      console.log('  → Loading /api/admin-reset...');
+      app.use('/api/admin-reset', require('./routes/reset-admin'));
+      console.log('  ✅ /api/admin-reset loaded');
+      
+      console.log('  → Loading /api/simple-reset...');
+      app.use('/api/simple-reset', require('./routes/simple-reset'));
+      console.log('  ✅ /api/simple-reset loaded');
+      
+      console.log('✅ All routes loaded successfully');
     } catch (error) {
       console.error('❌ Error loading routes:', error.message);
+      console.error('❌ Stack trace:', error.stack);
       throw error;
     }
 
@@ -368,6 +384,7 @@ initDatabaseWithRetry()
       app.get('*', (req, res) => {
         res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
       });
+      console.log('✅ Catch-all route configured for production');
     }
 
     // Error handler
@@ -379,13 +396,34 @@ initDatabaseWithRetry()
       });
     });
 
+    // 404 handler for undefined routes
+    app.use((req, res) => {
+      console.log('❌ 404 Not Found:', req.method, req.url);
+      res.status(404).json({
+        status: 'ERROR',
+        message: 'Route not found',
+        path: req.url,
+        method: req.method
+      });
+    });
+
     // Start server
     const server = app.listen(PORT, HOST, () => {
+      console.log('');
+      console.log('='.repeat(50));
       console.log(`🚀 Server berjalan di port ${PORT}`);
       console.log(`📡 API tersedia di http://localhost:${PORT}/api`);
       console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(`💾 Database: MySQL`);
       console.log(`✅ Server ready to accept connections`);
+      console.log('='.repeat(50));
+      console.log('');
+      console.log('Available routes:');
+      console.log('  POST   /api/auth/login');
+      console.log('  GET    /api/health');
+      console.log('  GET    /api/karyawan');
+      console.log('  GET    /api/pengajuan');
+      console.log('');
     });
 
     server.on('error', (err) => {
@@ -395,5 +433,6 @@ initDatabaseWithRetry()
   })
   .catch(err => {
     console.error('❌ Failed to initialize:', err.message);
+    console.error('❌ Stack trace:', err.stack);
     process.exit(1);
   });
