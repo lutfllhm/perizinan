@@ -34,6 +34,7 @@ async function forceMigration() {
     
     // 1. Create karyawan table
     console.log('\n📝 Creating karyawan table...');
+    const currentYear = new Date().getFullYear();
     await connection.query(`
       CREATE TABLE IF NOT EXISTS karyawan (
         id INT PRIMARY KEY AUTO_INCREMENT,
@@ -44,7 +45,7 @@ async function forceMigration() {
         no_telp VARCHAR(20),
         jatah_cuti INT DEFAULT 12,
         sisa_cuti INT DEFAULT 12,
-        tahun_cuti INT DEFAULT YEAR(CURDATE()),
+        tahun_cuti INT DEFAULT ${currentYear},
         status ENUM('aktif', 'nonaktif') DEFAULT 'aktif',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

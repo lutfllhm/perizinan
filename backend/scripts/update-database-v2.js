@@ -14,6 +14,7 @@ async function updateDatabase() {
     console.log('🔄 Memulai update database...');
 
     // 1. Buat tabel karyawan
+    const currentYear = new Date().getFullYear();
     await connection.query(`
       CREATE TABLE IF NOT EXISTS karyawan (
         id INT PRIMARY KEY AUTO_INCREMENT,
@@ -24,7 +25,7 @@ async function updateDatabase() {
         no_telp VARCHAR(20),
         jatah_cuti INT DEFAULT 12,
         sisa_cuti INT DEFAULT 12,
-        tahun_cuti INT DEFAULT YEAR(CURDATE()),
+        tahun_cuti INT DEFAULT ${currentYear},
         status ENUM('aktif', 'nonaktif') DEFAULT 'aktif',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS karyawan (
   no_telp VARCHAR(20),
   jatah_cuti INT DEFAULT 12,
   sisa_cuti INT DEFAULT 12,
-  tahun_cuti INT DEFAULT YEAR(CURDATE()),
+  tahun_cuti INT DEFAULT 2026,
   status ENUM('aktif', 'nonaktif') DEFAULT 'aktif',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
