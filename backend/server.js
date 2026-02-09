@@ -1,66 +1,52 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const mysql = require('mysql2/promise');
 require('dotenv').config();
 
 const app = express();
+const PORT = process.env.PORT || 5000;
 
-console.log('🚀 Starting server...');
-console.log('📍 Environment:', process.env.NODE_ENV || 'development');
-console.log('📍 Port:', process.env.PORT || 5000);
+console.log('🚀 FINAL SERVER STARTING...');
+console.log('📍 Port:', PORT);
 
-// Health check endpoint (before database dependency)
-app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
-  });
-});
+// CORS - allow all
+app.use(cors({ origin: '*', credentials: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Database initialization with retry logic
-async function initDatabaseWithRetry() {
-  const maxRetries = 10;
-  let retries = 0;
-  
-  while (retries < maxRetries) {
-    try {
-      console.log(`🔄 Attempting database connection (${retries + 1}/${maxRetries})...`);
-      
-      const db = require('./config/mysql');
-      
-      // Test connection
-      await db.query('SELECT 1');
-      console.log('✅ Database connection successful!');
-      
-      // Initialize tables
-      await initializeTables(db);
-      return db;
-      
-    } catch (error) {
-      retries++;
-      console.error(`❌ Database connection failed (attempt ${retries}):`, error.message);
-      
-      if (retries >= maxRetries) {
-        console.error('💥 Max retries reached. Exiting...');
-        process.exit(1);
-      }
-      
-      const delay = Math.min(1000 * Math.pow(2, retries), 30000); // Exponential backoff
-      console.log(`⏳ Retrying in ${delay/1000} seconds...`);
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
+// Database connection
+let db;
+async function connectDB() {
+  try {
+    db = await mysql.createPool({
+      host: process.env.MYSQLHOST || process.env.DB_HOST,
+      port: parseInt(process.env.MYSQLPORT || process.env.DB_PORT || '3306'),
+      user: process.env.MYSQLUSER || process.env.DB_USER,
+      password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD,
+      database: process.env.MYSQLDATABASE || process.env.DB_NAME,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0
+    });
+    console.log('✅ Database connected');
+    
+    // Auto-create tables
+    await initializeTables();
+    
+    return db;
+  } catch (error) {
+    console.error('❌ Database connection failed:', error.message);
+    return null;
   }
 }
 
-async function initializeTables(db) {
-  console.log('🔄 Initializing database tables...');
-  console.log('📍 Database:', process.env.MYSQLDATABASE || process.env.DB_NAME);
-  
+async function initializeTables() {
   try {
+    console.log('🔄 Initializing database tables...');
+    
     // Create users table
-    console.log('📝 Creating users table...');
     await db.query(`
       CREATE TABLE IF NOT EXISTS users (
         id INT PRIMARY KEY AUTO_INCREMENT,
@@ -71,10 +57,9 @@ async function initializeTables(db) {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
     `);
-    console.log('✅ Tabel users OK');
+    console.log('✅ Table users OK');
     
     // Create pengajuan table
-    console.log('📝 Creating pengajuan table...');
     await db.query(`
       CREATE TABLE IF NOT EXISTS pengajuan (
         id INT PRIMARY KEY AUTO_INCREMENT,
@@ -90,10 +75,9 @@ async function initializeTables(db) {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
     `);
-    console.log('✅ Tabel pengajuan OK');
+    console.log('✅ Table pengajuan OK');
     
-    // Create karyawan table (v2.0)
-    console.log('📝 Creating karyawan table...');
+    // Create karyawan table
     const currentYear = new Date().getFullYear();
     await db.query(`
       CREATE TABLE IF NOT EXISTS karyawan (
@@ -112,10 +96,9 @@ async function initializeTables(db) {
         UNIQUE KEY unique_karyawan (kantor, nama)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
     `);
-    console.log('✅ Tabel karyawan berhasil dibuat');
+    console.log('✅ Table karyawan OK');
     
-    // Create quota_bulanan table (v2.0)
-    console.log('📝 Creating quota_bulanan table...');
+    // Create quota_bulanan table
     await db.query(`
       CREATE TABLE IF NOT EXISTS quota_bulanan (
         id INT PRIMARY KEY AUTO_INCREMENT,
@@ -130,95 +113,40 @@ async function initializeTables(db) {
         FOREIGN KEY (karyawan_id) REFERENCES karyawan(id) ON DELETE CASCADE
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
     `);
-    console.log('✅ Tabel quota_bulanan berhasil dibuat');
+    console.log('✅ Table quota_bulanan OK');
     
-    // Update pengajuan table - add new columns (v2.0)
-    console.log('📝 Updating pengajuan table with new columns...');
-    try {
-      // Check if columns exist first
-      const [columns] = await db.query(`
-        SELECT COLUMN_NAME 
-        FROM INFORMATION_SCHEMA.COLUMNS 
-        WHERE TABLE_SCHEMA = DATABASE() 
-        AND TABLE_NAME = 'pengajuan' 
-        AND COLUMN_NAME IN ('karyawan_id', 'kantor', 'jabatan', 'departemen')
-      `);
-      
-      const existingColumns = columns.map(col => col.COLUMN_NAME);
-      console.log('📊 Existing columns in pengajuan:', existingColumns);
-      
-      if (!existingColumns.includes('karyawan_id')) {
-        await db.query('ALTER TABLE pengajuan ADD COLUMN karyawan_id INT');
-        console.log('✅ Kolom karyawan_id ditambahkan');
-      } else {
-        console.log('⏭️  Kolom karyawan_id sudah ada');
-      }
-      
-      if (!existingColumns.includes('kantor')) {
-        await db.query('ALTER TABLE pengajuan ADD COLUMN kantor VARCHAR(100)');
-        console.log('✅ Kolom kantor ditambahkan');
-      } else {
-        console.log('⏭️  Kolom kantor sudah ada');
-      }
-      
-      if (!existingColumns.includes('jabatan')) {
-        await db.query('ALTER TABLE pengajuan ADD COLUMN jabatan VARCHAR(100)');
-        console.log('✅ Kolom jabatan ditambahkan');
-      } else {
-        console.log('⏭️  Kolom jabatan sudah ada');
-      }
-      
-      if (!existingColumns.includes('departemen')) {
-        await db.query('ALTER TABLE pengajuan ADD COLUMN departemen VARCHAR(100)');
-        console.log('✅ Kolom departemen ditambahkan');
-      } else {
-        console.log('⏭️  Kolom departemen sudah ada');
-      }
-      
-      // Add foreign key if not exists
-      const [fks] = await db.query(`
-        SELECT CONSTRAINT_NAME 
-        FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE 
-        WHERE TABLE_SCHEMA = DATABASE() 
-        AND TABLE_NAME = 'pengajuan' 
-        AND COLUMN_NAME = 'karyawan_id' 
-        AND REFERENCED_TABLE_NAME = 'karyawan'
-      `);
-      
-      if (fks.length === 0 && existingColumns.includes('karyawan_id')) {
-        await db.query(`
-          ALTER TABLE pengajuan 
-          ADD CONSTRAINT fk_pengajuan_karyawan 
-          FOREIGN KEY (karyawan_id) REFERENCES karyawan(id) ON DELETE SET NULL
-        `);
-        console.log('✅ Foreign key karyawan_id ditambahkan');
-      } else if (fks.length > 0) {
-        console.log('⏭️  Foreign key karyawan_id sudah ada');
-      }
-    } catch (error) {
-      console.log('⚠️  Update pengajuan table error:', error.message);
-      console.log('⚠️  Continuing anyway...');
+    // Add columns to pengajuan if not exist
+    const [columns] = await db.query(`
+      SELECT COLUMN_NAME 
+      FROM INFORMATION_SCHEMA.COLUMNS 
+      WHERE TABLE_SCHEMA = DATABASE() 
+      AND TABLE_NAME = 'pengajuan' 
+      AND COLUMN_NAME IN ('karyawan_id', 'kantor', 'jabatan', 'departemen')
+    `);
+    
+    const existingColumns = columns.map(col => col.COLUMN_NAME);
+    
+    if (!existingColumns.includes('karyawan_id')) {
+      await db.query('ALTER TABLE pengajuan ADD COLUMN karyawan_id INT');
+      console.log('✅ Column karyawan_id added');
     }
     
-    // Auto-import karyawan data if table is empty
-    console.log('📊 Checking karyawan data...');
-    const [karyawanCount] = await db.query('SELECT COUNT(*) as count FROM karyawan');
-    console.log('📊 Current karyawan count:', karyawanCount[0].count);
+    if (!existingColumns.includes('kantor')) {
+      await db.query('ALTER TABLE pengajuan ADD COLUMN kantor VARCHAR(100)');
+      console.log('✅ Column kantor added');
+    }
     
-    if (karyawanCount[0].count === 0) {
-      console.log('📥 Tabel karyawan kosong, memulai auto-import...');
-      try {
-        await autoImportKaryawan(db);
-      } catch (error) {
-        console.log('⚠️  Auto-import karyawan gagal:', error.message);
-        console.log('💡 Jalankan manual: npm run import-karyawan');
-      }
-    } else {
-      console.log('✅ Tabel karyawan sudah berisi data');
+    if (!existingColumns.includes('jabatan')) {
+      await db.query('ALTER TABLE pengajuan ADD COLUMN jabatan VARCHAR(100)');
+      console.log('✅ Column jabatan added');
+    }
+    
+    if (!existingColumns.includes('departemen')) {
+      await db.query('ALTER TABLE pengajuan ADD COLUMN departemen VARCHAR(100)');
+      console.log('✅ Column departemen added');
     }
     
     // Create default admin user if not exists
-    console.log('📝 Checking admin user...');
     const [users] = await db.query('SELECT * FROM users WHERE username = ?', ['admin']);
     if (users.length === 0) {
       const hashedPassword = await bcrypt.hash('admin123', 10);
@@ -227,197 +155,418 @@ async function initializeTables(db) {
         ['admin', hashedPassword, 'Administrator', 'admin']
       );
       console.log('✅ Default admin user created (admin/admin123)');
-    } else {
-      console.log('⏭️  Admin user sudah ada');
     }
     
-    console.log('✅ Database tables initialized successfully!');
+    console.log('✅ Database initialization complete!');
     
   } catch (error) {
-    console.error('❌ Error during table initialization:', error);
-    console.error('❌ Error details:', error.message);
-    console.error('❌ Stack trace:', error.stack);
-    throw error;
+    console.error('❌ Error initializing tables:', error.message);
   }
 }
 
-async function autoImportKaryawan(db) {
-  console.log('🚀 Starting auto-import karyawan...');
-  const fs = require('fs');
-  const path = require('path');
-  
-  const importScript = path.join(__dirname, 'scripts', 'import-karyawan.js');
-  console.log('📂 Import script path:', importScript);
-  
-  if (!fs.existsSync(importScript)) {
-    console.log('❌ Script import-karyawan.js tidak ditemukan di:', importScript);
-    throw new Error('Import script not found');
-  }
-  
-  console.log('✅ Import script found, executing...');
-  
-  // Run import inline
-  const { spawn } = require('child_process');
-  
-  return new Promise((resolve, reject) => {
-    const child = spawn('node', [importScript], {
-      stdio: 'inherit',
-      env: process.env,
-      cwd: __dirname
-    });
-    
-    child.on('close', (code) => {
-      if (code === 0) {
-        console.log('✅ Auto-import karyawan berhasil (exit code 0)');
-        resolve();
-      } else {
-        console.log('❌ Auto-import karyawan gagal (exit code:', code, ')');
-        reject(new Error(`Import failed with code ${code}`));
-      }
-    });
-    
-    child.on('error', (error) => {
-      console.log('❌ Auto-import karyawan error:', error.message);
-      reject(error);
-    });
-    
-    // Timeout after 60 seconds
-    setTimeout(() => {
-      console.log('⏱️  Auto-import timeout after 60s, killing process...');
-      child.kill();
-      reject(new Error('Import timeout'));
-    }, 60000);
-  });
-}
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
 
-// Middleware
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:5000',
-  process.env.FRONTEND_URL,
-  /\.up\.railway\.app$/,
-  /\.vercel\.app$/
-].filter(Boolean);
-
-app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin) return callback(null, true);
-    
-    const isAllowed = allowedOrigins.some(allowed => {
-      if (allowed instanceof RegExp) {
-        return allowed.test(origin);
-      }
-      return allowed === origin;
-    });
-    
-    if (isAllowed || process.env.NODE_ENV !== 'production') {
-      callback(null, true);
-    } else {
-      console.log('❌ CORS blocked origin:', origin);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// API Health check
 app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     message: 'Server berjalan dengan baik',
-    timestamp: new Date().toISOString(),
-    env: process.env.NODE_ENV || 'development',
-    database: 'MySQL'
+    timestamp: new Date().toISOString()
   });
 });
 
-const PORT = process.env.PORT || 5000;
-const HOST = '0.0.0.0';
-
-// Initialize database first, then load routes and start server
-initDatabaseWithRetry()
-  .then(() => {
-    console.log('📝 Loading routes...');
+// LOGIN ROUTE - HARDCODED
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    console.log('🔐 Login attempt:', req.body);
     
-    // Routes - Load AFTER database initialization
-    try {
-      console.log('  → Loading /api/auth...');
-      app.use('/api/auth', require('./routes/auth'));
-      console.log('  ✅ /api/auth loaded');
-      
-      console.log('  → Loading /api/pengajuan...');
-      app.use('/api/pengajuan', require('./routes/pengajuan'));
-      console.log('  ✅ /api/pengajuan loaded');
-      
-      console.log('  → Loading /api/karyawan...');
-      app.use('/api/karyawan', require('./routes/karyawan'));
-      console.log('  ✅ /api/karyawan loaded');
-      
-      console.log('  → Loading /api/admin-reset...');
-      app.use('/api/admin-reset', require('./routes/reset-admin'));
-      console.log('  ✅ /api/admin-reset loaded');
-      
-      console.log('  → Loading /api/simple-reset...');
-      app.use('/api/simple-reset', require('./routes/simple-reset'));
-      console.log('  ✅ /api/simple-reset loaded');
-      
-      console.log('✅ All routes loaded successfully');
-    } catch (error) {
-      console.error('❌ Error loading routes:', error.message);
-      console.error('❌ Stack trace:', error.stack);
-      throw error;
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({ message: 'Username dan password harus diisi' });
     }
 
-    // Error handler
-    app.use((err, req, res, next) => {
-      console.error('❌ Server error:', err);
-      res.status(500).json({ 
-        status: 'ERROR', 
-        message: err.message 
-      });
+    if (!db) {
+      await connectDB();
+    }
+
+    // Get user
+    const [rows] = await db.query('SELECT * FROM users WHERE username = ?', [username]);
+
+    if (rows.length === 0) {
+      console.log('❌ User not found:', username);
+      return res.status(401).json({ message: 'Username atau password salah' });
+    }
+
+    const user = rows[0];
+
+    // Verify password
+    const isValidPassword = await bcrypt.compare(password, user.password);
+
+    if (!isValidPassword) {
+      console.log('❌ Invalid password');
+      return res.status(401).json({ message: 'Username atau password salah' });
+    }
+
+    // Generate token
+    const token = jwt.sign(
+      { id: user.id, username: user.username, role: user.role },
+      process.env.JWT_SECRET || 'default-secret-key',
+      { expiresIn: '24h' }
+    );
+
+    console.log('✅ Login successful:', username);
+
+    res.json({
+      message: 'Login berhasil',
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        nama: user.nama,
+        role: user.role
+      }
     });
 
-    // 404 handler for undefined routes
-    app.use((req, res) => {
-      console.log('❌ 404 Not Found:', req.method, req.url);
-      res.status(404).json({
-        status: 'ERROR',
-        message: 'Route not found',
-        path: req.url,
-        method: req.method
-      });
+  } catch (error) {
+    console.error('❌ Login error:', error);
+    res.status(500).json({ 
+      message: 'Terjadi kesalahan saat login',
+      error: error.message 
+    });
+  }
+});
+
+// Get karyawan
+app.get('/api/karyawan', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const { kantor } = req.query;
+    
+    let query = 'SELECT * FROM karyawan WHERE status = "aktif"';
+    let params = [];
+    
+    if (kantor) {
+      query += ' AND kantor = ?';
+      params.push(kantor);
+    }
+    
+    query += ' ORDER BY nama ASC';
+    
+    const [rows] = await db.query(query, params);
+    res.json(rows);
+  } catch (error) {
+    console.error('❌ Get karyawan error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Import karyawan data - TEMPORARY ENDPOINT
+app.get('/api/karyawan/import-now', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    console.log('🔄 Starting karyawan import...');
+    
+    // Data karyawan dari berbagai kantor
+    const karyawanData = [
+      // RBM-IWARE SURABAYA
+      { kantor: 'RBM-IWARE SURABAYA', nama: 'ACHMAD FAUZI', jabatan: 'Staff', departemen: 'IT' },
+      { kantor: 'RBM-IWARE SURABAYA', nama: 'AGUS SALIM', jabatan: 'Staff', departemen: 'Finance' },
+      { kantor: 'RBM-IWARE SURABAYA', nama: 'AHMAD YANI', jabatan: 'Manager', departemen: 'Operations' },
+      { kantor: 'RBM-IWARE SURABAYA', nama: 'ANDI WIJAYA', jabatan: 'Staff', departemen: 'HR' },
+      { kantor: 'RBM-IWARE SURABAYA', nama: 'BUDI SANTOSO', jabatan: 'Supervisor', departemen: 'IT' },
+      
+      // SBA-WMP
+      { kantor: 'SBA-WMP', nama: 'DEDI KURNIAWAN', jabatan: 'Staff', departemen: 'Operations' },
+      { kantor: 'SBA-WMP', nama: 'EKO PRASETYO', jabatan: 'Staff', departemen: 'IT' },
+      { kantor: 'SBA-WMP', nama: 'FAJAR NUGROHO', jabatan: 'Manager', departemen: 'Finance' },
+      { kantor: 'SBA-WMP', nama: 'HADI SUSANTO', jabatan: 'Staff', departemen: 'HR' },
+      { kantor: 'SBA-WMP', nama: 'IMAM SANTOSO', jabatan: 'Supervisor', departemen: 'Operations' },
+      
+      // RBM-IWARE JAKARTA
+      { kantor: 'RBM-IWARE JAKARTA', nama: 'JOKO WIDODO', jabatan: 'Staff', departemen: 'IT' },
+      { kantor: 'RBM-IWARE JAKARTA', nama: 'KURNIAWAN HADI', jabatan: 'Manager', departemen: 'Operations' },
+      { kantor: 'RBM-IWARE JAKARTA', nama: 'LUKMAN HAKIM', jabatan: 'Staff', departemen: 'Finance' },
+      { kantor: 'RBM-IWARE JAKARTA', nama: 'MUHAMMAD ALI', jabatan: 'Supervisor', departemen: 'IT' },
+      { kantor: 'RBM-IWARE JAKARTA', nama: 'NUGROHO WIBOWO', jabatan: 'Staff', departemen: 'HR' },
+      
+      // Add more sample data
+      { kantor: 'RBM-IWARE SURABAYA', nama: 'RUDI HARTONO', jabatan: 'Staff', departemen: 'Operations' },
+      { kantor: 'RBM-IWARE SURABAYA', nama: 'SITI NURHALIZA', jabatan: 'Staff', departemen: 'Finance' },
+      { kantor: 'SBA-WMP', nama: 'TONO SURATNO', jabatan: 'Staff', departemen: 'IT' },
+      { kantor: 'SBA-WMP', nama: 'UMAR BAKRI', jabatan: 'Manager', departemen: 'HR' },
+      { kantor: 'RBM-IWARE JAKARTA', nama: 'WAWAN SETIAWAN', jabatan: 'Staff', departemen: 'Operations' },
+    ];
+    
+    let successCount = 0;
+    let skipCount = 0;
+    
+    for (const karyawan of karyawanData) {
+      try {
+        await db.query(
+          'INSERT INTO karyawan (kantor, nama, jabatan, departemen, jatah_cuti, sisa_cuti, status) VALUES (?, ?, ?, ?, 12, 12, "aktif")',
+          [karyawan.kantor, karyawan.nama, karyawan.jabatan, karyawan.departemen]
+        );
+        successCount++;
+      } catch (err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+          skipCount++;
+        } else {
+          console.error('Error inserting:', karyawan.nama, err.message);
+        }
+      }
+    }
+    
+    console.log(`✅ Import complete: ${successCount} inserted, ${skipCount} skipped`);
+    
+    res.json({
+      success: true,
+      message: 'Import karyawan berhasil',
+      inserted: successCount,
+      skipped: skipCount,
+      total: karyawanData.length
+    });
+    
+  } catch (error) {
+    console.error('❌ Import error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: error.message 
+    });
+  }
+});
+
+// Get pengajuan
+app.get('/api/pengajuan', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const [rows] = await db.query(`
+      SELECT p.*, k.nama as nama_karyawan, k.kantor, k.jabatan, k.departemen
+      FROM pengajuan p
+      LEFT JOIN karyawan k ON p.karyawan_id = k.id
+      ORDER BY p.created_at DESC
+    `);
+    
+    res.json(rows);
+  } catch (error) {
+    console.error('❌ Get pengajuan error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get statistics
+app.get('/api/pengajuan/stats', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const [stats] = await db.query(`
+      SELECT 
+        COUNT(*) as total,
+        SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+        SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
+        SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected
+      FROM pengajuan
+    `);
+    
+    res.json(stats[0] || { total: 0, pending: 0, approved: 0, rejected: 0 });
+  } catch (error) {
+    console.error('❌ Get stats error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get statistics for dashboard (alias)
+app.get('/api/pengajuan/stats/dashboard', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const [stats] = await db.query(`
+      SELECT 
+        COUNT(*) as total,
+        SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+        SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
+        SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected
+      FROM pengajuan
+    `);
+    
+    res.json(stats[0] || { total: 0, pending: 0, approved: 0, rejected: 0 });
+  } catch (error) {
+    console.error('❌ Get stats error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get users (for admin)
+app.get('/api/auth/users', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const [rows] = await db.query(
+      'SELECT id, username, nama, role, created_at FROM users ORDER BY created_at DESC'
+    );
+    
+    res.json({ users: rows });
+  } catch (error) {
+    console.error('❌ Get users error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Register HRD user
+app.post('/api/auth/register-hrd', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const { username, password, nama } = req.body;
+
+    if (!username || !password || !nama) {
+      return res.status(400).json({ message: 'Username, password, dan nama harus diisi' });
+    }
+
+    // Check if username exists
+    const [existingUsers] = await db.query('SELECT * FROM users WHERE username = ?', [username]);
+
+    if (existingUsers.length > 0) {
+      return res.status(400).json({ message: 'Username sudah digunakan' });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Insert user
+    await db.query(
+      'INSERT INTO users (username, password, nama, role) VALUES (?, ?, ?, ?)',
+      [username, hashedPassword, nama, 'hrd']
+    );
+
+    console.log('✅ HRD registered:', username);
+
+    res.status(201).json({
+      message: 'HRD berhasil didaftarkan',
+      user: { username, nama, role: 'hrd' }
     });
 
-    // Start server
-    const server = app.listen(PORT, HOST, () => {
-      console.log('');
-      console.log('='.repeat(50));
-      console.log(`🚀 Server berjalan di port ${PORT}`);
-      console.log(`📡 API tersedia di http://localhost:${PORT}/api`);
-      console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`💾 Database: MySQL`);
-      console.log(`✅ Server ready to accept connections`);
-      console.log('='.repeat(50));
-      console.log('');
-      console.log('Available routes:');
-      console.log('  POST   /api/auth/login');
-      console.log('  GET    /api/health');
-      console.log('  GET    /api/karyawan');
-      console.log('  GET    /api/pengajuan');
-      console.log('');
-    });
+  } catch (error) {
+    console.error('❌ Register HRD error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
 
-    server.on('error', (err) => {
-      console.error('❌ Server failed to start:', err.message);
-      process.exit(1);
+// Delete user
+app.delete('/api/auth/users/:id', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const userId = req.params.id;
+
+    // Check if user exists
+    const [users] = await db.query('SELECT * FROM users WHERE id = ?', [userId]);
+    
+    if (users.length === 0) {
+      return res.status(404).json({ message: 'User tidak ditemukan' });
+    }
+
+    // Delete user
+    await db.query('DELETE FROM users WHERE id = ?', [userId]);
+
+    console.log('✅ User deleted:', userId);
+
+    res.json({ message: 'User berhasil dihapus' });
+
+  } catch (error) {
+    console.error('❌ Delete user error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Update pengajuan status
+app.put('/api/pengajuan/:id', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const { id } = req.params;
+    const { status, catatan } = req.body;
+
+    await db.query(
+      'UPDATE pengajuan SET status = ?, catatan = ? WHERE id = ?',
+      [status, catatan, id]
+    );
+
+    console.log('✅ Pengajuan updated:', id);
+
+    res.json({ message: 'Status pengajuan berhasil diupdate' });
+
+  } catch (error) {
+    console.error('❌ Update pengajuan error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Create pengajuan
+app.post('/api/pengajuan', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const { karyawan_id, jenis_perizinan, tanggal_mulai, tanggal_selesai, catatan } = req.body;
+    
+    const [result] = await db.query(
+      'INSERT INTO pengajuan (karyawan_id, jenis_perizinan, tanggal_mulai, tanggal_selesai, catatan, status) VALUES (?, ?, ?, ?, ?, ?)',
+      [karyawan_id, jenis_perizinan, tanggal_mulai, tanggal_selesai, catatan, 'pending']
+    );
+    
+    res.status(201).json({ 
+      message: 'Pengajuan berhasil dibuat',
+      id: result.insertId 
     });
-  })
-  .catch(err => {
-    console.error('❌ Failed to initialize:', err.message);
-    console.error('❌ Stack trace:', err.stack);
-    process.exit(1);
+  } catch (error) {
+    console.error('❌ Create pengajuan error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// 404 handler
+app.use((req, res) => {
+  console.log('❌ 404:', req.method, req.url);
+  res.status(404).json({
+    error: 'Not Found',
+    path: req.url,
+    method: req.method,
+    availableRoutes: [
+      'POST /api/auth/login',
+      'GET /api/health',
+      'GET /api/karyawan',
+      'GET /api/pengajuan',
+      'POST /api/pengajuan'
+    ]
   });
+});
+
+// Error handler
+app.use((err, req, res, next) => {
+  console.error('❌ Error:', err);
+  res.status(500).json({ error: err.message });
+});
+
+// Start server
+connectDB().then(() => {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log('');
+    console.log('='.repeat(50));
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`✅ Server ready`);
+    console.log('='.repeat(50));
+    console.log('');
+    console.log('Available routes:');
+    console.log('  POST   /api/auth/login');
+    console.log('  GET    /api/health');
+    console.log('  GET    /api/karyawan');
+    console.log('  GET    /api/pengajuan');
+    console.log('  POST   /api/pengajuan');
+    console.log('');
+  });
+});
