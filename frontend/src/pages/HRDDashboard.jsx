@@ -519,61 +519,122 @@ const DaftarPengajuan = () => {
   };
 
   // Fungsi untuk membuka WhatsApp dengan pesan otomatis
-  const handleSendWhatsApp = (item) => {
+  const handleSendWhatsApp = async (item) => {
     const pegawaiNumber = item.no_telp.replace(/^0/, '62'); // Convert 08xxx ke 628xxx
+    
+    // Fetch quota info jika ada karyawan_id
+    let quotaText = '';
+    if (item.karyawan_id) {
+      try {
+        const response = await karyawanAPI.getQuota(item.karyawan_id);
+        const quota = response.data;
+        
+        // Tambahkan info quota sesuai jenis perizinan
+        if (item.jenis_perizinan === 'cuti') {
+          quotaText = `\n📊 *Sisa Quota Anda:*\n┗━ Sisa Cuti: *${quota.sisa_cuti} hari* (dari ${quota.jatah_cuti} hari)\n`;
+        } else if (item.jenis_perizinan === 'pulang_cepat') {
+          const sisa = 3 - quota.pulang_cepat;
+          quotaText = `\n📊 *Sisa Quota Anda:*\n┗━ Pulang Cepat: *${sisa}x tersisa* (bulan ini)\n`;
+        } else if (item.jenis_perizinan === 'datang_terlambat') {
+          const sisa = 3 - quota.datang_terlambat;
+          quotaText = `\n📊 *Sisa Quota Anda:*\n┗━ Datang Terlambat: *${sisa}x tersisa* (bulan ini)\n`;
+        }
+      } catch (error) {
+        console.error('Error fetching quota:', error);
+      }
+    }
     
     // Buat pesan berdasarkan status
     let message = '';
     
     if (item.status === 'approved') {
-      message = `*PENGAJUAN DISETUJUI* ✅
+      message = `╔═══════════════════════╗
+║  ✅ *PENGAJUAN DISETUJUI*  ║
+╚═══════════════════════╝
 
-Halo *${item.nama}*,
+Kepada Yth.
+*${item.nama}*
 
-Pengajuan perizinan Anda telah *DISETUJUI* oleh HRD.
+Dengan hormat,
+Kami informasikan bahwa pengajuan perizinan Anda telah *DISETUJUI* oleh HRD.
 
-📋 *Detail Pengajuan:*
-• Jenis: ${item.jenis_perizinan}
-• Tanggal: ${new Date(item.tanggal_mulai).toLocaleDateString('id-ID')} - ${new Date(item.tanggal_selesai).toLocaleDateString('id-ID')}
-• Status: DISETUJUI ✅
+┏━━━━━━━━━━━━━━━━━━━━━━━┓
+┃  📋 *DETAIL PENGAJUAN*
+┣━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ 📌 Jenis: *${item.jenis_perizinan.toUpperCase()}*
+┃ 📅 Tanggal Mulai: ${new Date(item.tanggal_mulai).toLocaleDateString('id-ID', { dateStyle: 'long' })}
+┃ 📅 Tanggal Selesai: ${new Date(item.tanggal_selesai).toLocaleDateString('id-ID', { dateStyle: 'long' })}
+┃ ✅ Status: *DISETUJUI*
+┗━━━━━━━━━━━━━━━━━━━━━━━┛
+${quotaText}${item.catatan ? `\n💬 *Catatan HRD:*\n${item.catatan}\n` : ''}
+Terima kasih atas perhatian dan kerjasamanya.
 
-${item.catatan ? `💬 *Catatan HRD:*\n${item.catatan}\n\n` : ''}Terima kasih.
+Hormat kami,
+*HRD IWARE*
 
-_Sistem Perizinan IWARE_`;
+━━━━━━━━━━━━━━━━━━━━━
+_Sistem Perizinan IWARE_
+_Pesan otomatis - Mohon tidak membalas_`;
     } else if (item.status === 'rejected') {
-      message = `*PENGAJUAN DITOLAK* ❌
+      message = `╔═══════════════════════╗
+║  ❌ *PENGAJUAN DITOLAK*  ║
+╚═══════════════════════╝
 
-Halo *${item.nama}*,
+Kepada Yth.
+*${item.nama}*
 
-Mohon maaf, pengajuan perizinan Anda *DITOLAK* oleh HRD.
+Dengan hormat,
+Kami informasikan bahwa pengajuan perizinan Anda *TIDAK DAPAT DISETUJUI*.
 
-📋 *Detail Pengajuan:*
-• Jenis: ${item.jenis_perizinan}
-• Tanggal: ${new Date(item.tanggal_mulai).toLocaleDateString('id-ID')} - ${new Date(item.tanggal_selesai).toLocaleDateString('id-ID')}
-• Status: DITOLAK ❌
+┏━━━━━━━━━━━━━━━━━━━━━━━┓
+┃  📋 *DETAIL PENGAJUAN*
+┣━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ 📌 Jenis: *${item.jenis_perizinan.toUpperCase()}*
+┃ 📅 Tanggal Mulai: ${new Date(item.tanggal_mulai).toLocaleDateString('id-ID', { dateStyle: 'long' })}
+┃ 📅 Tanggal Selesai: ${new Date(item.tanggal_selesai).toLocaleDateString('id-ID', { dateStyle: 'long' })}
+┃ ❌ Status: *DITOLAK*
+┗━━━━━━━━━━━━━━━━━━━━━━━┛
+${quotaText}${item.catatan ? `\n⚠️ *Alasan Penolakan:*\n${item.catatan}\n` : ''}
+Anda dapat mengajukan kembali dengan melengkapi persyaratan yang diperlukan.
 
-${item.catatan ? `💬 *Alasan Penolakan:*\n${item.catatan}\n\n` : ''}Anda dapat mengajukan kembali dengan melengkapi persyaratan yang diperlukan.
+Terima kasih atas pengertiannya.
 
-Terima kasih.
+Hormat kami,
+*HRD IWARE*
 
-_Sistem Perizinan IWARE_`;
+━━━━━━━━━━━━━━━━━━━━━
+_Sistem Perizinan IWARE_
+_Pesan otomatis - Mohon tidak membalas_`;
     } else {
-      message = `*NOTIFIKASI PERIZINAN* 📢
+      message = `╔═══════════════════════╗
+║  📢 *NOTIFIKASI PERIZINAN*  ║
+╚═══════════════════════╝
 
-Halo *${item.nama}*,
+Kepada Yth.
+*${item.nama}*
 
-Status pengajuan perizinan Anda untuk *${item.jenis_perizinan}* telah diupdate.
+Dengan hormat,
+Status pengajuan perizinan Anda telah diperbarui.
 
-📋 *Detail Pengajuan:*
-• Jenis: ${item.jenis_perizinan}
-• Tanggal: ${new Date(item.tanggal_mulai).toLocaleDateString('id-ID')} - ${new Date(item.tanggal_selesai).toLocaleDateString('id-ID')}
-• Status: ${item.status.toUpperCase()}
-
-${item.catatan ? `💬 *Catatan:*\n${item.catatan}\n\n` : ''}Silakan cek aplikasi untuk detail lebih lanjut.
+┏━━━━━━━━━━━━━━━━━━━━━━━┓
+┃  📋 *DETAIL PENGAJUAN*
+┣━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ 📌 Jenis: *${item.jenis_perizinan.toUpperCase()}*
+┃ 📅 Tanggal Mulai: ${new Date(item.tanggal_mulai).toLocaleDateString('id-ID', { dateStyle: 'long' })}
+┃ 📅 Tanggal Selesai: ${new Date(item.tanggal_selesai).toLocaleDateString('id-ID', { dateStyle: 'long' })}
+┃ 🔄 Status: *${item.status.toUpperCase()}*
+┗━━━━━━━━━━━━━━━━━━━━━━━┛
+${quotaText}${item.catatan ? `\n💬 *Catatan:*\n${item.catatan}\n` : ''}
+Silakan cek aplikasi untuk informasi lebih lanjut.
 
 Terima kasih.
 
-_Sistem Perizinan IWARE_`;
+Hormat kami,
+*HRD IWARE*
+
+━━━━━━━━━━━━━━━━━━━━━
+_Sistem Perizinan IWARE_
+_Pesan otomatis - Mohon tidak membalas_`;
     }
     
     // Encode pesan untuk URL
