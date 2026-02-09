@@ -295,7 +295,8 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5000',
   process.env.FRONTEND_URL,
-  /\.up\.railway\.app$/
+  /\.up\.railway\.app$/,
+  /\.vercel\.app$/
 ].filter(Boolean);
 
 app.use(cors({
@@ -341,45 +342,50 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Routes
-try {
-  app.use('/api/auth', require('./routes/auth'));
-  app.use('/api/pengajuan', require('./routes/pengajuan'));
-  app.use('/api/karyawan', require('./routes/karyawan'));
-  app.use('/api/admin-reset', require('./routes/reset-admin')); // TEMPORARY - Remove after use
-  app.use('/api/simple-reset', require('./routes/simple-reset')); // SIMPLE RESET - Remove after use
-  console.log('✅ Routes loaded successfully');
-} catch (error) {
-  console.error('❌ Error loading routes:', error.message);
-}
-
-// Serve React app for all non-API routes (for production)
-if (process.env.NODE_ENV === 'production') {
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
-  });
-}
-
-// Error handler
-app.use((err, req, res, next) => {
-  console.error('❌ Server error:', err);
-  res.status(500).json({ 
-    status: 'ERROR', 
-    message: err.message 
-  });
-});
-
 const PORT = process.env.PORT || 5000;
 const HOST = '0.0.0.0';
 
-// Initialize database first, then start server
+// Initialize database first, then load routes and start server
 initDatabaseWithRetry()
   .then(() => {
+    console.log('📝 Loading routes...');
+    
+    // Routes - Load AFTER database initialization
+    try {
+      app.use('/api/auth', require('./routes/auth'));
+      app.use('/api/pengajuan', require('./routes/pengajuan'));
+      app.use('/api/karyawan', require('./routes/karyawan'));
+      app.use('/api/admin-reset', require('./routes/reset-admin')); // TEMPORARY - Remove after use
+      app.use('/api/simple-reset', require('./routes/simple-reset')); // SIMPLE RESET - Remove after use
+      console.log('✅ Routes loaded successfully');
+    } catch (error) {
+      console.error('❌ Error loading routes:', error.message);
+      throw error;
+    }
+
+    // Serve React app for all non-API routes (for production)
+    if (process.env.NODE_ENV === 'production') {
+      app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
+      });
+    }
+
+    // Error handler
+    app.use((err, req, res, next) => {
+      console.error('❌ Server error:', err);
+      res.status(500).json({ 
+        status: 'ERROR', 
+        message: err.message 
+      });
+    });
+
+    // Start server
     const server = app.listen(PORT, HOST, () => {
       console.log(`🚀 Server berjalan di port ${PORT}`);
       console.log(`📡 API tersedia di http://localhost:${PORT}/api`);
       console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(`💾 Database: MySQL`);
+      console.log(`✅ Server ready to accept connections`);
     });
 
     server.on('error', (err) => {
