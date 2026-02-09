@@ -1,3 +1,4 @@
+// Route untuk manajemen pengajuan perizinan
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
@@ -11,8 +12,8 @@ const storage = multer.diskStorage({
     cb(null, 'uploads/');
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
+    const suffiksUnik = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, suffiksUnik + path.extname(file.originalname));
   }
 });
 
@@ -20,11 +21,11 @@ const upload = multer({
   storage: storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
   fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|pdf/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
+    const tipeYangDiizinkan = /jpeg|jpg|png|pdf/;
+    const ekstensi = tipeYangDiizinkan.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = tipeYangDiizinkan.test(file.mimetype);
 
-    if (mimetype && extname) {
+    if (mimetype && ekstensi) {
       return cb(null, true);
     } else {
       cb(new Error('Hanya file gambar (JPEG, PNG) atau PDF yang diperbolehkan'));
@@ -32,7 +33,10 @@ const upload = multer({
   }
 });
 
-// Get statistics for dashboard (admin/hrd only) - HARUS SEBELUM /:id
+/**
+ * GET /api/pengajuan/stats/dashboard
+ * Ambil statistik untuk dashboard (admin/hrd only)
+ */
 router.get('/stats/dashboard', auth, async (req, res) => {
   try {
     // Cek role user
@@ -43,12 +47,12 @@ router.get('/stats/dashboard', auth, async (req, res) => {
     }
 
     // Total pengajuan
-    const [totalResult] = await db.query(
+    const [hasilTotal] = await db.query(
       'SELECT COUNT(*) as total FROM pengajuan'
     );
 
     // Pengajuan berdasarkan status
-    const [statusResult] = await db.query(
+    const [hasilStatus] = await db.query(
       `SELECT 
         SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
         SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
@@ -57,7 +61,7 @@ router.get('/stats/dashboard', auth, async (req, res) => {
     );
 
     // Pengajuan per bulan (6 bulan terakhir)
-    const [monthlyResult] = await db.query(
+    const [hasilBulanan] = await db.query(
       `SELECT 
         DATE_FORMAT(created_at, '%Y-%m') as bulan,
         COUNT(*) as jumlah
@@ -68,7 +72,7 @@ router.get('/stats/dashboard', auth, async (req, res) => {
     );
 
     // Pengajuan berdasarkan jenis
-    const [typeResult] = await db.query(
+    const [hasilJenis] = await db.query(
       `SELECT 
         jenis_perizinan,
         COUNT(*) as jumlah
@@ -77,16 +81,16 @@ router.get('/stats/dashboard', auth, async (req, res) => {
     );
 
     res.json({
-      total: totalResult[0].total,
-      pending: statusResult[0].pending || 0,
-      approved: statusResult[0].approved || 0,
-      rejected: statusResult[0].rejected || 0,
-      byMonth: monthlyResult,
-      byType: typeResult
+      total: hasilTotal[0].total,
+      pending: hasilStatus[0].pending || 0,
+      approved: hasilStatus[0].approved || 0,
+      rejected: hasilStatus[0].rejected || 0,
+      byMonth: hasilBulanan,
+      byType: hasilJenis
     });
 
   } catch (error) {
-    console.error('❌ Error get stats:', error);
+    console.error('❌ Error ambil statistik:', error);
     res.status(500).json({ 
       message: 'Gagal mengambil statistik',
       error: error.message 
@@ -94,7 +98,10 @@ router.get('/stats/dashboard', auth, async (req, res) => {
   }
 });
 
-// Get report with filters (admin/hrd only) - HARUS SEBELUM /:id
+/**
+ * GET /api/pengajuan/report
+ * Ambil report dengan filter (admin/hrd only)
+ */
 router.get('/report', auth, async (req, res) => {
   try {
     // Cek role user
@@ -131,12 +138,12 @@ router.get('/report', auth, async (req, res) => {
 
     query += ' ORDER BY created_at DESC';
 
-    const [rows] = await db.query(query, params);
+    const [baris] = await db.query(query, params);
 
-    res.json(rows);
+    res.json(baris);
 
   } catch (error) {
-    console.error('❌ Error get report:', error);
+    console.error('❌ Error ambil report:', error);
     res.status(500).json({ 
       message: 'Gagal mengambil report',
       error: error.message 
@@ -144,16 +151,19 @@ router.get('/report', auth, async (req, res) => {
   }
 });
 
-// Get all pengajuan
+/**
+ * GET /api/pengajuan
+ * Ambil semua pengajuan
+ */
 router.get('/', auth, async (req, res) => {
   try {
-    const [rows] = await db.query(
+    const [baris] = await db.query(
       'SELECT * FROM pengajuan ORDER BY created_at DESC'
     );
 
-    res.json(rows);
+    res.json(baris);
   } catch (error) {
-    console.error('❌ Error get pengajuan:', error);
+    console.error('❌ Error ambil pengajuan:', error);
     res.status(500).json({ 
       message: 'Gagal mengambil data pengajuan',
       error: error.message 
@@ -161,21 +171,24 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-// Get pengajuan by ID
+/**
+ * GET /api/pengajuan/:id
+ * Ambil pengajuan berdasarkan ID
+ */
 router.get('/:id', auth, async (req, res) => {
   try {
-    const [rows] = await db.query(
+    const [baris] = await db.query(
       'SELECT * FROM pengajuan WHERE id = ?',
       [req.params.id]
     );
 
-    if (rows.length === 0) {
+    if (baris.length === 0) {
       return res.status(404).json({ message: 'Pengajuan tidak ditemukan' });
     }
 
-    res.json(rows[0]);
+    res.json(baris[0]);
   } catch (error) {
-    console.error('❌ Error get pengajuan by ID:', error);
+    console.error('❌ Error ambil pengajuan by ID:', error);
     res.status(500).json({ 
       message: 'Gagal mengambil data pengajuan',
       error: error.message 
@@ -183,7 +196,10 @@ router.get('/:id', auth, async (req, res) => {
   }
 });
 
-// Create pengajuan
+/**
+ * POST /api/pengajuan
+ * Buat pengajuan baru
+ */
 router.post('/', upload.single('bukti_foto'), async (req, res) => {
   try {
     const { karyawan_id, kantor, nama, jabatan, departemen, no_telp, jenis_perizinan, tanggal_mulai, tanggal_selesai, catatan } = req.body;
@@ -251,22 +267,22 @@ router.post('/', upload.single('bukti_foto'), async (req, res) => {
       }
     }
 
-    const [result] = await db.query(
+    const [hasil] = await db.query(
       `INSERT INTO pengajuan 
        (karyawan_id, kantor, nama, jabatan, departemen, no_telp, jenis_perizinan, tanggal_mulai, tanggal_selesai, bukti_foto, catatan, status) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
       [karyawan_id || null, kantor || null, nama, jabatan || null, departemen || null, no_telp, jenis_perizinan, tanggal_mulai, tanggal_selesai, bukti_foto, catatan || '']
     );
 
-    console.log('✅ Pengajuan created:', result.insertId);
+    console.log('✅ Pengajuan dibuat:', hasil.insertId);
 
     res.status(201).json({
       message: 'Pengajuan berhasil dibuat',
-      id: result.insertId
+      id: hasil.insertId
     });
 
   } catch (error) {
-    console.error('❌ Error create pengajuan:', error);
+    console.error('❌ Error buat pengajuan:', error);
     res.status(500).json({ 
       message: 'Gagal membuat pengajuan',
       error: error.message 
@@ -274,7 +290,10 @@ router.post('/', upload.single('bukti_foto'), async (req, res) => {
   }
 });
 
-// Update status pengajuan (admin/hrd only) - PUT method untuk frontend
+/**
+ * PUT /api/pengajuan/:id
+ * Update status pengajuan (admin/hrd only)
+ */
 router.put('/:id', auth, async (req, res) => {
   try {
     const { status, catatan } = req.body;
@@ -339,7 +358,7 @@ router.put('/:id', auth, async (req, res) => {
       [status, catatan || '', req.params.id]
     );
 
-    console.log('✅ Status updated:', req.params.id, status);
+    console.log('✅ Status diperbarui:', req.params.id, status);
 
     res.json({
       message: 'Status pengajuan berhasil diupdate'
@@ -354,7 +373,10 @@ router.put('/:id', auth, async (req, res) => {
   }
 });
 
-// Update status pengajuan (admin/hrd only) - PATCH method (alternative)
+/**
+ * PATCH /api/pengajuan/:id/status
+ * Update status pengajuan (admin/hrd only) - Alternative method
+ */
 router.patch('/:id/status', auth, async (req, res) => {
   try {
     const { status, catatan } = req.body;
@@ -391,7 +413,7 @@ router.patch('/:id/status', auth, async (req, res) => {
       [status, catatan || '', req.params.id]
     );
 
-    console.log('✅ Status updated:', req.params.id, status);
+    console.log('✅ Status diperbarui:', req.params.id, status);
 
     res.json({
       message: 'Status pengajuan berhasil diupdate'
@@ -406,7 +428,10 @@ router.patch('/:id/status', auth, async (req, res) => {
   }
 });
 
-// Delete pengajuan (admin/hrd only)
+/**
+ * DELETE /api/pengajuan/:id
+ * Hapus pengajuan (admin/hrd only)
+ */
 router.delete('/:id', auth, async (req, res) => {
   try {
     // Cek role user - HRD juga bisa menghapus
@@ -418,14 +443,14 @@ router.delete('/:id', auth, async (req, res) => {
 
     await db.query('DELETE FROM pengajuan WHERE id = ?', [req.params.id]);
 
-    console.log('✅ Pengajuan deleted:', req.params.id);
+    console.log('✅ Pengajuan dihapus:', req.params.id);
 
     res.json({
       message: 'Pengajuan berhasil dihapus'
     });
 
   } catch (error) {
-    console.error('❌ Error delete pengajuan:', error);
+    console.error('❌ Error hapus pengajuan:', error);
     res.status(500).json({ 
       message: 'Gagal menghapus pengajuan',
       error: error.message 

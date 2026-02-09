@@ -1,9 +1,13 @@
+// Route untuk manajemen data karyawan
 const express = require('express');
 const router = express.Router();
 const db = require('../config/mysql');
 const { auth } = require('../middleware/auth');
 
-// Get all karyawan
+/**
+ * GET /api/karyawan
+ * Ambil semua data karyawan
+ */
 router.get('/', auth, async (req, res) => {
   try {
     const { kantor, status = 'aktif' } = req.query;
@@ -18,10 +22,10 @@ router.get('/', auth, async (req, res) => {
     
     query += ' ORDER BY kantor, nama';
     
-    const [rows] = await db.query(query, params);
-    res.json(rows);
+    const [baris] = await db.query(query, params);
+    res.json(baris);
   } catch (error) {
-    console.error('❌ Error get karyawan:', error);
+    console.error('❌ Error ambil karyawan:', error);
     res.status(500).json({ 
       message: 'Gagal mengambil data karyawan',
       error: error.message 
@@ -29,21 +33,24 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-// Get karyawan by ID
+/**
+ * GET /api/karyawan/:id
+ * Ambil data karyawan berdasarkan ID
+ */
 router.get('/:id', auth, async (req, res) => {
   try {
-    const [rows] = await db.query(
+    const [baris] = await db.query(
       'SELECT * FROM karyawan WHERE id = ?',
       [req.params.id]
     );
 
-    if (rows.length === 0) {
+    if (baris.length === 0) {
       return res.status(404).json({ message: 'Karyawan tidak ditemukan' });
     }
 
-    res.json(rows[0]);
+    res.json(baris[0]);
   } catch (error) {
-    console.error('❌ Error get karyawan by ID:', error);
+    console.error('❌ Error ambil karyawan by ID:', error);
     res.status(500).json({ 
       message: 'Gagal mengambil data karyawan',
       error: error.message 
@@ -51,14 +58,17 @@ router.get('/:id', auth, async (req, res) => {
   }
 });
 
-// Get karyawan quota info
+/**
+ * GET /api/karyawan/:id/quota
+ * Ambil informasi quota karyawan (cuti, pulang cepat, datang terlambat)
+ */
 router.get('/:id/quota', auth, async (req, res) => {
   try {
     const karyawanId = req.params.id;
     const bulan = new Date().getMonth() + 1;
     const tahun = new Date().getFullYear();
 
-    // Get karyawan data
+    // Ambil data karyawan
     const [karyawan] = await db.query(
       'SELECT sisa_cuti, tahun_cuti FROM karyawan WHERE id = ?',
       [karyawanId]
@@ -68,7 +78,7 @@ router.get('/:id/quota', auth, async (req, res) => {
       return res.status(404).json({ message: 'Karyawan tidak ditemukan' });
     }
 
-    // Get or create quota bulanan
+    // Ambil atau buat quota bulanan
     let [quota] = await db.query(
       'SELECT * FROM quota_bulanan WHERE karyawan_id = ? AND bulan = ? AND tahun = ?',
       [karyawanId, bulan, tahun]
@@ -90,7 +100,7 @@ router.get('/:id/quota', auth, async (req, res) => {
       bulan_ini: `${bulan}/${tahun}`
     });
   } catch (error) {
-    console.error('❌ Error get quota:', error);
+    console.error('❌ Error ambil quota:', error);
     res.status(500).json({ 
       message: 'Gagal mengambil data quota',
       error: error.message 
@@ -98,7 +108,10 @@ router.get('/:id/quota', auth, async (req, res) => {
   }
 });
 
-// Create karyawan (HRD only)
+/**
+ * POST /api/karyawan
+ * Tambah karyawan baru (HRD only)
+ */
 router.post('/', auth, async (req, res) => {
   try {
     if (req.user.role !== 'admin' && req.user.role !== 'hrd') {
@@ -115,17 +128,17 @@ router.post('/', auth, async (req, res) => {
       });
     }
 
-    const [result] = await db.query(
+    const [hasil] = await db.query(
       `INSERT INTO karyawan (kantor, nama, jabatan, departemen, no_telp, jatah_cuti, sisa_cuti, tahun_cuti) 
        VALUES (?, ?, ?, ?, ?, ?, ?, YEAR(CURDATE()))`,
       [kantor, nama, jabatan, departemen, no_telp, jatah_cuti, jatah_cuti]
     );
 
-    console.log('✅ Karyawan created:', result.insertId);
+    console.log('✅ Karyawan ditambahkan:', hasil.insertId);
 
     res.status(201).json({
       message: 'Karyawan berhasil ditambahkan',
-      id: result.insertId
+      id: hasil.insertId
     });
   } catch (error) {
     if (error.code === 'ER_DUP_ENTRY') {
@@ -133,7 +146,7 @@ router.post('/', auth, async (req, res) => {
         message: 'Karyawan dengan nama yang sama sudah ada di kantor ini' 
       });
     }
-    console.error('❌ Error create karyawan:', error);
+    console.error('❌ Error tambah karyawan:', error);
     res.status(500).json({ 
       message: 'Gagal menambahkan karyawan',
       error: error.message 
@@ -141,7 +154,10 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-// Update karyawan (HRD only)
+/**
+ * PUT /api/karyawan/:id
+ * Update data karyawan (HRD only)
+ */
 router.put('/:id', auth, async (req, res) => {
   try {
     if (req.user.role !== 'admin' && req.user.role !== 'hrd') {
@@ -160,11 +176,11 @@ router.put('/:id', auth, async (req, res) => {
       [kantor, nama, jabatan, departemen, no_telp, jatah_cuti, sisa_cuti, status, req.params.id]
     );
 
-    console.log('✅ Karyawan updated:', req.params.id);
+    console.log('✅ Karyawan diperbarui:', req.params.id);
 
     res.json({ message: 'Data karyawan berhasil diperbarui' });
   } catch (error) {
-    console.error('❌ Error update karyawan:', error);
+    console.error('❌ Error perbarui karyawan:', error);
     res.status(500).json({ 
       message: 'Gagal memperbarui data karyawan',
       error: error.message 
@@ -172,7 +188,10 @@ router.put('/:id', auth, async (req, res) => {
   }
 });
 
-// Reset cuti tahunan (HRD only)
+/**
+ * POST /api/karyawan/:id/reset-cuti
+ * Reset cuti tahunan karyawan (HRD only)
+ */
 router.post('/:id/reset-cuti', auth, async (req, res) => {
   try {
     if (req.user.role !== 'admin' && req.user.role !== 'hrd') {
@@ -190,7 +209,7 @@ router.post('/:id/reset-cuti', auth, async (req, res) => {
       [jatah_cuti, jatah_cuti, req.params.id]
     );
 
-    console.log('✅ Cuti reset for karyawan:', req.params.id);
+    console.log('✅ Cuti direset untuk karyawan:', req.params.id);
 
     res.json({ message: 'Cuti berhasil direset' });
   } catch (error) {
@@ -202,7 +221,10 @@ router.post('/:id/reset-cuti', auth, async (req, res) => {
   }
 });
 
-// Delete karyawan (HRD only)
+/**
+ * DELETE /api/karyawan/:id
+ * Hapus karyawan (HRD only)
+ */
 router.delete('/:id', auth, async (req, res) => {
   try {
     if (req.user.role !== 'admin' && req.user.role !== 'hrd') {
@@ -213,11 +235,11 @@ router.delete('/:id', auth, async (req, res) => {
 
     await db.query('DELETE FROM karyawan WHERE id = ?', [req.params.id]);
 
-    console.log('✅ Karyawan deleted:', req.params.id);
+    console.log('✅ Karyawan dihapus:', req.params.id);
 
     res.json({ message: 'Karyawan berhasil dihapus' });
   } catch (error) {
-    console.error('❌ Error delete karyawan:', error);
+    console.error('❌ Error hapus karyawan:', error);
     res.status(500).json({ 
       message: 'Gagal menghapus karyawan',
       error: error.message 
