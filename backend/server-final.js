@@ -304,6 +304,27 @@ app.get('/api/pengajuan/stats', async (req, res) => {
   }
 });
 
+// Get statistics for dashboard (alias)
+app.get('/api/pengajuan/stats/dashboard', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const [stats] = await db.query(`
+      SELECT 
+        COUNT(*) as total,
+        SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+        SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
+        SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected
+      FROM pengajuan
+    `);
+    
+    res.json(stats[0] || { total: 0, pending: 0, approved: 0, rejected: 0 });
+  } catch (error) {
+    console.error('❌ Get stats error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Get users (for admin)
 app.get('/api/auth/users', async (req, res) => {
   try {
