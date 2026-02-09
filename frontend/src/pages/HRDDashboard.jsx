@@ -51,8 +51,7 @@ const HRDDashboard = () => {
           sidebarOpen ? 'w-72' : 'w-20'
         } bg-gradient-to-b from-gray-800 via-gray-700 to-gray-800 text-white min-h-screen fixed left-0 top-0 transition-all duration-300 z-40 shadow-2xl flex flex-col`}
       >
-        <div className="p-4 flex-1 flex flex-col overflow-y-auto">
-          {/* Header */}
+        <div className="p-4 pb-6 flex-1 flex flex-col overflow-y-auto">{/* Header */}
           <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-600 flex-shrink-0">{sidebarOpen && (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -153,7 +152,7 @@ const HRDDashboard = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="mt-4 flex-shrink-0"
+              className="mt-4 mb-2 flex-shrink-0"
             >
               <div className="p-3 bg-gray-700/50 rounded-xl border border-gray-600">
                 <p className="text-xs text-gray-400 text-center">
