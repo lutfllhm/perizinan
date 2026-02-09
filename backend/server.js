@@ -80,7 +80,7 @@ async function connectDB() {
   }
 }
 
-// Auto-import karyawan data (174 employees from 8 offices)
+// Auto-import karyawan data (173 employees from 8 offices)
 async function autoImportKaryawan() {
   try {
     // Check if karyawan table already has data
@@ -92,10 +92,9 @@ async function autoImportKaryawan() {
     
     console.log('🔄 Auto-importing karyawan data...');
     
-    // Data karyawan LENGKAP (174 karyawan dari 8 kantor)
+    // Data karyawan LENGKAP (173 karyawan dari 8 kantor)
     const dataKaryawan = {
       'RBM-IWARE SURABAYA': [
-        { nama: 'Sugiharto Tjokro', jabatan: 'Owner', departemen: 'Direktur' },
         { nama: 'Djie Tince Muhaji (Tince)', jabatan: 'General Manager', departemen: 'Management' },
         { nama: 'Lisa Israti', jabatan: 'HRD', departemen: 'HRD' },
         { nama: 'Azza Diana Lailatul Afidah', jabatan: 'HR Rekrutmen', departemen: 'HRD' },
@@ -117,21 +116,21 @@ async function autoImportKaryawan() {
         { nama: 'Apsarini Ardiningrum Iswanto', jabatan: 'Sales Support', departemen: 'Sales support' },
         { nama: 'Sindy Chairunisa', jabatan: 'Data Analis', departemen: 'Analis' },
         { nama: 'Lutfillah Masduqi', jabatan: 'Web Developer', departemen: 'IT' },
-        { nama: 'Asep Sugianto', jabatan: 'Admin Sales Online', departemen: 'Online' },
-        { nama: 'Anti Faradyba Putri', jabatan: 'Admin Sales Online', departemen: 'Online' },
-        { nama: 'Mujahidin', jabatan: 'Admin Sales Online', departemen: 'Online' },
+        { nama: 'Asep Sugianto', jabatan: 'E-Commerce spesialist', departemen: 'Online' },
+        { nama: 'Anti Faradyba Putri', jabatan: 'E-Commerce spesialist', departemen: 'Online' },
+        { nama: 'Mujahidin', jabatan: 'Admin E-Commerce spesialist', departemen: 'Online' },
         { nama: 'Rachmat Habiono', jabatan: 'Product Support', departemen: 'Product Support- Teknisi' },
-        { nama: 'Ika Apriyanti', jabatan: 'Admin Sales Online', departemen: 'Admin Online Marketplace' },
-        { nama: 'Rizky Azhari', jabatan: 'Admin Sales Online', departemen: 'Admin Online Marketplace' },
+        { nama: 'Ika Apriyanti', jabatan: 'E-Commerce spesialist', departemen: 'Online' },
+        { nama: 'Rizky Azhari', jabatan: 'E-Commerce spesialist', departemen: 'Online' },
         { nama: 'Rachmad Ardianto', jabatan: 'Design Grafis - Offline', departemen: 'Design Grafis' },
         { nama: 'Dwi Intan Istifadah', jabatan: 'Sosial Media Spesialist', departemen: 'Online' },
         { nama: 'Nurussalamah', jabatan: 'Sosial Media Spesialist', departemen: 'Online' },
         { nama: 'Maratus Sholikhah (Lili)', jabatan: 'Talent/ Host Live Streaming', departemen: 'Online' },
         { nama: 'Adi Ayu Rani', jabatan: 'Design Grafis - Online', departemen: 'Design Grafis' },
         { nama: 'Firman Pradana', jabatan: 'Foto/videografer', departemen: 'Online' },
-        { nama: 'Firman setiawan', jabatan: 'Staff', departemen: 'General' },
-        { nama: 'Adi Wijaya', jabatan: 'Staff', departemen: 'General' },
-        { nama: 'Christoper Hanjaya', jabatan: 'PIC', departemen: 'Digital Marketing' },
+        { nama: 'Firman setiawan', jabatan: 'E-Commerce spesialist', departemen: 'Online' },
+        { nama: 'Adi Wijaya', jabatan: 'E-Commerce spesialist', departemen: 'Online' },
+        { nama: 'Christoper Hanjaya', jabatan: 'PIC Online', departemen: 'Online' },
         { nama: 'Ali Mahfudz', jabatan: 'Product Support- Teknisi', departemen: 'TEKNISI' },
         { nama: 'Tondo Triono', jabatan: 'Talent/ Host Live Streaming', departemen: 'Online' },
         { nama: 'Moch Amin Tian', jabatan: 'Product Support- Teknisi', departemen: 'TEKNISI' },
@@ -145,7 +144,7 @@ async function autoImportKaryawan() {
         { nama: 'Agung Widodo', jabatan: 'Helper', departemen: 'Gudang' },
         { nama: 'Iswie Christyano', jabatan: 'Helper', departemen: 'Gudang' },
         { nama: 'Amin Krestyawan', jabatan: 'Helper', departemen: 'Gudang' },
-        { nama: 'Arif Gunawan', jabatan: 'Admin Gudang', departemen: 'Gudang' },
+        { nama: 'Arif Gunawan', jabatan: 'Kepala Gudang SBY', departemen: 'Gudang' },
         { nama: 'Heri Triwiyono', jabatan: 'Admin GPS', departemen: 'GPS' },
         { nama: 'Rizki Nur Farhan', jabatan: 'Admin Gudang', departemen: 'Gudang' },
         { nama: 'Rohmad Syaifudin', jabatan: 'Helper- As Supir', departemen: 'Helper- Gudang' },
@@ -179,7 +178,7 @@ async function autoImportKaryawan() {
         { nama: 'Ratna', jabatan: 'Admin Import', departemen: 'SBA- WMP Surabaya' },
         { nama: 'Qisha Aulia Habbiballah', jabatan: 'Admin', departemen: 'SBA- WMP Semarang' },
         { nama: 'Andriyanto', jabatan: 'Teknisi Mesin', departemen: 'SBA- WMP Semarang' },
-        { nama: 'Sunaryo', jabatan: 'Leader', departemen: 'SBA- WMP Semarang' },
+        { nama: 'Sunaryo', jabatan: 'Sales', departemen: 'SBA- WMP Semarang' },
         { nama: 'Muhammad LuthfiL KHAKIM', jabatan: 'Teknisi Mesin', departemen: 'SBA- WMP Semarang' },
         { nama: 'M. Wirawansyah', jabatan: 'Sales', departemen: 'SBA- WMP Semarang' },
         { nama: 'Adib Luthfi Adbillah', jabatan: 'Sales', departemen: 'SBA- WMP Semarang' },
