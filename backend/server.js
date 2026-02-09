@@ -904,6 +904,33 @@ app.put('/api/pengajuan/:id', async (req, res) => {
   }
 });
 
+// Delete pengajuan
+app.delete('/api/pengajuan/:id', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const { id } = req.params;
+
+    // Check if pengajuan exists
+    const [pengajuan] = await db.query('SELECT * FROM pengajuan WHERE id = ?', [id]);
+    
+    if (pengajuan.length === 0) {
+      return res.status(404).json({ message: 'Pengajuan tidak ditemukan' });
+    }
+
+    // Delete pengajuan
+    await db.query('DELETE FROM pengajuan WHERE id = ?', [id]);
+
+    console.log('✅ Pengajuan deleted:', id);
+
+    res.json({ message: 'Pengajuan berhasil dihapus' });
+
+  } catch (error) {
+    console.error('❌ Delete pengajuan error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Create pengajuan (with file upload)
 app.post('/api/pengajuan', upload.single('bukti_foto'), async (req, res) => {
   try {
@@ -974,6 +1001,55 @@ app.post('/api/pengajuan', upload.single('bukti_foto'), async (req, res) => {
   }
 });
 
+// Get report pengajuan
+app.get('/api/pengajuan/report', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const { bulan, tahun, status, jenis_perizinan } = req.query;
+    
+    let query = `
+      SELECT p.*, k.kantor, k.jabatan, k.departemen
+      FROM pengajuan p
+      LEFT JOIN karyawan k ON p.karyawan_id = k.id
+      WHERE 1=1
+    `;
+    const params = [];
+    
+    // Filter by month and year
+    if (bulan && bulan !== 'all') {
+      query += ' AND MONTH(p.tanggal_mulai) = ?';
+      params.push(parseInt(bulan));
+    }
+    
+    if (tahun) {
+      query += ' AND YEAR(p.tanggal_mulai) = ?';
+      params.push(parseInt(tahun));
+    }
+    
+    // Filter by status
+    if (status && status !== 'all') {
+      query += ' AND p.status = ?';
+      params.push(status);
+    }
+    
+    // Filter by jenis_perizinan
+    if (jenis_perizinan && jenis_perizinan !== 'all') {
+      query += ' AND p.jenis_perizinan = ?';
+      params.push(jenis_perizinan);
+    }
+    
+    query += ' ORDER BY p.created_at DESC';
+    
+    const [rows] = await db.query(query, params);
+    
+    res.json(rows);
+  } catch (error) {
+    console.error('❌ Get report error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // 404 handler
 app.use((req, res) => {
   console.log('❌ 404:', req.method, req.url);
@@ -986,7 +1062,8 @@ app.use((req, res) => {
       'GET /api/health',
       'GET /api/karyawan',
       'GET /api/pengajuan',
-      'POST /api/pengajuan'
+      'POST /api/pengajuan',
+      'GET /api/pengajuan/report'
     ]
   });
 });
