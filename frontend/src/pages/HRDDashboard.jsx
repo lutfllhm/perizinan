@@ -530,11 +530,11 @@ const DaftarPengajuan = () => {
         const quota = response.data;
         
         // Tambahkan info quota sesuai jenis perizinan
-        if (item.jenis_perizinan === 'cuti') {
+        if (item.jenis_perizinan === 'tidak_masuk_cuti') {
           quotaText = `\n📊 *Sisa Quota Anda:*\n┗━ 🏖️ Sisa Cuti: *${quota.sisa_cuti} hari* (dari ${quota.jatah_cuti} hari)\n`;
-        } else if (item.jenis_perizinan === 'pulang_cepat') {
+        } else if (item.jenis_perizinan === 'pulang_setengah_hari') {
           const sisa = 3 - quota.pulang_cepat;
-          quotaText = `\n📊 *Sisa Quota Anda:*\n┗━ 🏃 Pulang Cepat: *${sisa}x tersisa* (bulan ini)\n`;
+          quotaText = `\n📊 *Sisa Quota Anda:*\n┗━ 🏃 Pulang Setengah Hari: *${sisa}x tersisa* (bulan ini)\n`;
         } else if (item.jenis_perizinan === 'datang_terlambat') {
           const sisa = 3 - quota.datang_terlambat;
           quotaText = `\n📊 *Sisa Quota Anda:*\n┗━ ⏰ Datang Terlambat: *${sisa}x tersisa* (bulan ini)\n`;

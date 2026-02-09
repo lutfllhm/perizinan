@@ -27,7 +27,7 @@ const PengajuanForm = () => {
     jabatan: '',
     departemen: '',
     no_telp: '',
-    jenis_perizinan: 'cuti',
+    jenis_perizinan: 'tidak_masuk_cuti',
     tanggal_mulai: '',
     tanggal_selesai: '',
     bukti_foto: null
@@ -38,13 +38,41 @@ const PengajuanForm = () => {
   const [loadingQuota, setLoadingQuota] = useState(false);
 
   const jenisPerizinan = [
-    { value: 'cuti', label: 'Cuti' },
-    { value: 'lembur', label: 'Lembur' },
-    { value: 'sakit', label: 'Sakit' },
-    { value: 'dinas_luar', label: 'Dinas Luar' },
-    { value: 'pulang_cepat', label: 'Pulang Lebih Awal' },
-    { value: 'datang_terlambat', label: 'Datang Terlambat' },
-    { value: 'lainnya', label: 'Lainnya' }
+    { 
+      value: 'tidak_masuk_cuti', 
+      label: 'Tidak Masuk / Cuti',
+      keterangan: null
+    },
+    { 
+      value: 'sakit', 
+      label: 'Sakit',
+      keterangan: 'Lengkapi dengan Surat Keterangan Dokter'
+    },
+    { 
+      value: 'dinas_luar', 
+      label: 'Dinas Luar/Kelilingan',
+      keterangan: null
+    },
+    { 
+      value: 'pulang_setengah_hari', 
+      label: 'Ijin Pulang Setengah Hari',
+      keterangan: 'Batas Minimal Pulang jam 13.00'
+    },
+    { 
+      value: 'datang_terlambat', 
+      label: 'Ijin Datang Terlambat',
+      keterangan: 'Batas Maksimal Datang Jam 11.00'
+    },
+    { 
+      value: 'ijin_keluar', 
+      label: 'Ijin Meninggalkan Kantor Di Jam Kerja & WAJIB KEMBALI KE KANTOR',
+      keterangan: 'Ijin keluar untuk keperluan pribadi - maximal 2 jam'
+    },
+    { 
+      value: 'absen_manual', 
+      label: 'Absen Manual',
+      keterangan: 'WAJIB Konfirmasi Dahulu'
+    }
   ];
 
   // Fetch karyawan ketika kantor berubah
@@ -140,17 +168,23 @@ const PengajuanForm = () => {
       return;
     }
 
+    // Validasi sakit harus ada foto (surat dokter)
+    if (dataForm.jenis_perizinan === 'sakit' && !dataForm.bukti_foto) {
+      toast.error('Sakit wajib melampirkan Surat Keterangan Dokter');
+      return;
+    }
+
     // Validasi quota
     if (quotaInfo) {
-      if (dataForm.jenis_perizinan === 'pulang_cepat' && quotaInfo.pulang_cepat >= 3) {
-        toast.error('Quota pulang cepat bulan ini sudah habis (maksimal 3x)');
+      if (dataForm.jenis_perizinan === 'pulang_setengah_hari' && quotaInfo.pulang_cepat >= 3) {
+        toast.error('Quota pulang setengah hari bulan ini sudah habis (maksimal 3x)');
         return;
       }
       if (dataForm.jenis_perizinan === 'datang_terlambat' && quotaInfo.datang_terlambat >= 3) {
         toast.error('Quota datang terlambat bulan ini sudah habis (maksimal 3x)');
         return;
       }
-      if (dataForm.jenis_perizinan === 'cuti' && quotaInfo.sisa_cuti <= 0) {
+      if (dataForm.jenis_perizinan === 'tidak_masuk_cuti' && quotaInfo.sisa_cuti <= 0) {
         toast.error('Sisa cuti Anda sudah habis');
         return;
       }
@@ -177,7 +211,7 @@ const PengajuanForm = () => {
   };
 
   // Cek apakah jenis perizinan memerlukan foto wajib
-  const isFotoWajib = dataForm.jenis_perizinan === 'dinas_luar';
+  const isFotoWajib = dataForm.jenis_perizinan === 'dinas_luar' || dataForm.jenis_perizinan === 'sakit';
 
   // Hitung sisa quota
   const sisaPulangCepat = quotaInfo ? 3 - quotaInfo.pulang_cepat : 3;
@@ -309,20 +343,37 @@ const PengajuanForm = () => {
                 ))}
               </select>
 
+              {/* Keterangan Jenis Perizinan */}
+              {jenisPerizinan.find(j => j.value === dataForm.jenis_perizinan)?.keterangan && (
+                <div className="mt-3 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
+                  <div className="flex items-start">
+                    <FiAlertCircle className="text-blue-600 mt-0.5 mr-2 flex-shrink-0" size={18} />
+                    <div>
+                      <p className="text-sm font-semibold text-blue-800 mb-1">
+                        ℹ️ Perhatian
+                      </p>
+                      <p className="text-sm text-blue-700">
+                        {jenisPerizinan.find(j => j.value === dataForm.jenis_perizinan)?.keterangan}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Info Quota */}
               {quotaInfo && !loadingQuota && (
                 <div className="mt-3 space-y-2">
-                  {dataForm.jenis_perizinan === 'cuti' && (
+                  {dataForm.jenis_perizinan === 'tidak_masuk_cuti' && (
                     <div className={`p-3 rounded-lg border ${quotaInfo.sisa_cuti > 0 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
                       <p className="text-sm font-semibold text-gray-700">
                         📅 Sisa Cuti: <span className={quotaInfo.sisa_cuti > 0 ? 'text-green-600' : 'text-red-600'}>{quotaInfo.sisa_cuti} hari</span> (Tahun {quotaInfo.tahun_cuti})
                       </p>
                     </div>
                   )}
-                  {dataForm.jenis_perizinan === 'pulang_cepat' && (
+                  {dataForm.jenis_perizinan === 'pulang_setengah_hari' && (
                     <div className={`p-3 rounded-lg border ${sisaPulangCepat > 0 ? 'bg-blue-50 border-blue-200' : 'bg-red-50 border-red-200'}`}>
                       <p className="text-sm font-semibold text-gray-700">
-                        🏃 Sisa Pulang Cepat Bulan Ini: <span className={sisaPulangCepat > 0 ? 'text-blue-600' : 'text-red-600'}>{sisaPulangCepat}x</span> dari 3x
+                        🏃 Sisa Pulang Setengah Hari Bulan Ini: <span className={sisaPulangCepat > 0 ? 'text-blue-600' : 'text-red-600'}>{sisaPulangCepat}x</span> dari 3x
                       </p>
                     </div>
                   )}
@@ -386,7 +437,7 @@ const PengajuanForm = () => {
               </div>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">Format: JPG, PNG, PDF (Maks 5MB)</p>
               
-              {/* Alert untuk Dinas Luar */}
+              {/* Alert untuk Foto Wajib */}
               {dataForm.jenis_perizinan === 'dinas_luar' && (
                 <div className="mt-3 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
                   <div className="flex items-start">
@@ -396,7 +447,23 @@ const PengajuanForm = () => {
                         ⚠️ Perhatian!
                       </p>
                       <p className="text-sm text-red-700">
-                        Untuk izin Dinas Luar, Anda WAJIB melampirkan bukti foto.
+                        Untuk izin Dinas Luar/Kelilingan, Anda WAJIB melampirkan bukti foto.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {dataForm.jenis_perizinan === 'sakit' && (
+                <div className="mt-3 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
+                  <div className="flex items-start">
+                    <FiAlertCircle className="text-red-600 mt-0.5 mr-2 flex-shrink-0" size={18} />
+                    <div>
+                      <p className="text-sm font-semibold text-red-800 mb-1">
+                        ⚠️ Perhatian!
+                      </p>
+                      <p className="text-sm text-red-700">
+                        Untuk izin Sakit, Anda WAJIB melampirkan Surat Keterangan Dokter.
                       </p>
                     </div>
                   </div>

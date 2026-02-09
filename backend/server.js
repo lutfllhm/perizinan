@@ -832,7 +832,7 @@ app.put('/api/pengajuan/:id', async (req, res) => {
       const currentMonth = new Date().getMonth() + 1;
       const currentYear = new Date().getFullYear();
 
-      if (item.jenis_perizinan === 'cuti') {
+      if (item.jenis_perizinan === 'tidak_masuk_cuti') {
         // Kurangi sisa cuti
         await db.query(
           'UPDATE karyawan SET sisa_cuti = sisa_cuti - 1 WHERE id = ? AND sisa_cuti > 0',
@@ -840,14 +840,14 @@ app.put('/api/pengajuan/:id', async (req, res) => {
         );
         console.log(`✅ Sisa cuti dikurangi untuk karyawan ID: ${item.karyawan_id}`);
       } 
-      else if (item.jenis_perizinan === 'pulang_cepat') {
+      else if (item.jenis_perizinan === 'pulang_setengah_hari') {
         // Tambah counter pulang_cepat
         await db.query(`
           INSERT INTO quota_bulanan (karyawan_id, bulan, tahun, pulang_cepat, datang_terlambat)
           VALUES (?, ?, ?, 1, 0)
           ON DUPLICATE KEY UPDATE pulang_cepat = pulang_cepat + 1
         `, [item.karyawan_id, currentMonth, currentYear]);
-        console.log(`✅ Quota pulang cepat ditambah untuk karyawan ID: ${item.karyawan_id}`);
+        console.log(`✅ Quota pulang setengah hari ditambah untuk karyawan ID: ${item.karyawan_id}`);
       }
       else if (item.jenis_perizinan === 'datang_terlambat') {
         // Tambah counter datang_terlambat
@@ -865,7 +865,7 @@ app.put('/api/pengajuan/:id', async (req, res) => {
       const currentMonth = new Date().getMonth() + 1;
       const currentYear = new Date().getFullYear();
 
-      if (item.jenis_perizinan === 'cuti') {
+      if (item.jenis_perizinan === 'tidak_masuk_cuti') {
         // Kembalikan sisa cuti
         await db.query(
           'UPDATE karyawan SET sisa_cuti = sisa_cuti + 1 WHERE id = ?',
@@ -873,14 +873,14 @@ app.put('/api/pengajuan/:id', async (req, res) => {
         );
         console.log(`✅ Sisa cuti dikembalikan untuk karyawan ID: ${item.karyawan_id}`);
       }
-      else if (item.jenis_perizinan === 'pulang_cepat') {
+      else if (item.jenis_perizinan === 'pulang_setengah_hari') {
         // Kurangi counter pulang_cepat
         await db.query(`
           UPDATE quota_bulanan 
           SET pulang_cepat = GREATEST(pulang_cepat - 1, 0)
           WHERE karyawan_id = ? AND bulan = ? AND tahun = ?
         `, [item.karyawan_id, currentMonth, currentYear]);
-        console.log(`✅ Quota pulang cepat dikurangi untuk karyawan ID: ${item.karyawan_id}`);
+        console.log(`✅ Quota pulang setengah hari dikurangi untuk karyawan ID: ${item.karyawan_id}`);
       }
       else if (item.jenis_perizinan === 'datang_terlambat') {
         // Kurangi counter datang_terlambat
