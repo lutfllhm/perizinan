@@ -3,6 +3,9 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mysql = require('mysql2/promise');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 require('dotenv').config();
 
 const app = express();
@@ -15,6 +18,41 @@ console.log('📍 Port:', PORT);
 app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = path.join(__dirname, 'uploads');
+    // Create uploads directory if it doesn't exist
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'bukti-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: function (req, file, cb) {
+    const allowedTypes = /jpeg|jpg|png|pdf/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Only .png, .jpg, .jpeg and .pdf format allowed!'));
+    }
+  }
+});
 
 // Database connection
 let db;
@@ -695,17 +733,63 @@ app.put('/api/pengajuan/:id', async (req, res) => {
   }
 });
 
-// Create pengajuan
-app.post('/api/pengajuan', async (req, res) => {
+// Create pengajuan (with file upload)
+app.post('/api/pengajuan', upload.single('bukti_foto'), async (req, res) => {
   try {
     if (!db) await connectDB();
     
-    const { karyawan_id, jenis_perizinan, tanggal_mulai, tanggal_selesai, catatan } = req.body;
+    const { 
+      karyawan_id, 
+      nama, 
+      no_telp, 
+      kantor, 
+      jabatan, 
+      departemen, 
+      jenis_perizinan, 
+      tanggal_mulai, 
+      tanggal_selesai, 
+      catatan 
+    } = req.body;
+    
+    // Validasi field wajib
+    if (!nama || !no_telp || !jenis_perizinan || !tanggal_mulai || !tanggal_selesai) {
+      return res.status(400).json({ 
+        message: 'Field wajib tidak lengkap: nama, no_telp, jenis_perizinan, tanggal_mulai, tanggal_selesai' 
+      });
+    }
+    
+    // Validasi dinas luar harus ada foto
+    if (jenis_perizinan === 'dinas_luar' && !req.file) {
+      return res.status(400).json({ 
+        message: 'Dinas luar wajib melampirkan bukti foto' 
+      });
+    }
+    
+    // Get file path if uploaded
+    const bukti_foto = req.file ? `/uploads/${req.file.filename}` : null;
     
     const [result] = await db.query(
-      'INSERT INTO pengajuan (karyawan_id, jenis_perizinan, tanggal_mulai, tanggal_selesai, catatan, status) VALUES (?, ?, ?, ?, ?, ?)',
-      [karyawan_id, jenis_perizinan, tanggal_mulai, tanggal_selesai, catatan, 'pending']
+      `INSERT INTO pengajuan (
+        karyawan_id, nama, no_telp, kantor, jabatan, departemen, 
+        jenis_perizinan, tanggal_mulai, tanggal_selesai, bukti_foto, catatan, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        karyawan_id || null, 
+        nama, 
+        no_telp, 
+        kantor || null, 
+        jabatan || null, 
+        departemen || null, 
+        jenis_perizinan, 
+        tanggal_mulai, 
+        tanggal_selesai, 
+        bukti_foto,
+        catatan || null, 
+        'pending'
+      ]
     );
+    
+    console.log('✅ Pengajuan created:', result.insertId, 'by', nama);
     
     res.status(201).json({ 
       message: 'Pengajuan berhasil dibuat',
@@ -713,7 +797,9 @@ app.post('/api/pengajuan', async (req, res) => {
     });
   } catch (error) {
     console.error('❌ Create pengajuan error:', error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ 
+      message: 'Gagal mengirim pengajuan: ' + error.message 
+    });
   }
 });
 
