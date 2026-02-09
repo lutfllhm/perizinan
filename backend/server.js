@@ -809,12 +809,92 @@ app.put('/api/pengajuan/:id', async (req, res) => {
     const { id } = req.params;
     const { status, catatan } = req.body;
 
+    // Get pengajuan data
+    const [pengajuan] = await db.query(
+      'SELECT * FROM pengajuan WHERE id = ?',
+      [id]
+    );
+
+    if (pengajuan.length === 0) {
+      return res.status(404).json({ message: 'Pengajuan tidak ditemukan' });
+    }
+
+    const item = pengajuan[0];
+    const oldStatus = item.status;
+
+    // Update status pengajuan
     await db.query(
       'UPDATE pengajuan SET status = ?, catatan = ? WHERE id = ?',
       [status, catatan, id]
     );
 
-    console.log('✅ Pengajuan updated:', id);
+    // Jika status berubah dari pending/rejected ke approved, kurangi quota
+    if (status === 'approved' && oldStatus !== 'approved' && item.karyawan_id) {
+      const currentMonth = new Date().getMonth() + 1;
+      const currentYear = new Date().getFullYear();
+
+      if (item.jenis_perizinan === 'cuti') {
+        // Kurangi sisa cuti
+        await db.query(
+          'UPDATE karyawan SET sisa_cuti = sisa_cuti - 1 WHERE id = ? AND sisa_cuti > 0',
+          [item.karyawan_id]
+        );
+        console.log(`✅ Sisa cuti dikurangi untuk karyawan ID: ${item.karyawan_id}`);
+      } 
+      else if (item.jenis_perizinan === 'pulang_cepat') {
+        // Tambah counter pulang_cepat
+        await db.query(`
+          INSERT INTO quota_bulanan (karyawan_id, bulan, tahun, pulang_cepat, datang_terlambat)
+          VALUES (?, ?, ?, 1, 0)
+          ON DUPLICATE KEY UPDATE pulang_cepat = pulang_cepat + 1
+        `, [item.karyawan_id, currentMonth, currentYear]);
+        console.log(`✅ Quota pulang cepat ditambah untuk karyawan ID: ${item.karyawan_id}`);
+      }
+      else if (item.jenis_perizinan === 'datang_terlambat') {
+        // Tambah counter datang_terlambat
+        await db.query(`
+          INSERT INTO quota_bulanan (karyawan_id, bulan, tahun, pulang_cepat, datang_terlambat)
+          VALUES (?, ?, ?, 0, 1)
+          ON DUPLICATE KEY UPDATE datang_terlambat = datang_terlambat + 1
+        `, [item.karyawan_id, currentMonth, currentYear]);
+        console.log(`✅ Quota datang terlambat ditambah untuk karyawan ID: ${item.karyawan_id}`);
+      }
+    }
+
+    // Jika status berubah dari approved ke rejected/pending, kembalikan quota
+    if (oldStatus === 'approved' && status !== 'approved' && item.karyawan_id) {
+      const currentMonth = new Date().getMonth() + 1;
+      const currentYear = new Date().getFullYear();
+
+      if (item.jenis_perizinan === 'cuti') {
+        // Kembalikan sisa cuti
+        await db.query(
+          'UPDATE karyawan SET sisa_cuti = sisa_cuti + 1 WHERE id = ?',
+          [item.karyawan_id]
+        );
+        console.log(`✅ Sisa cuti dikembalikan untuk karyawan ID: ${item.karyawan_id}`);
+      }
+      else if (item.jenis_perizinan === 'pulang_cepat') {
+        // Kurangi counter pulang_cepat
+        await db.query(`
+          UPDATE quota_bulanan 
+          SET pulang_cepat = GREATEST(pulang_cepat - 1, 0)
+          WHERE karyawan_id = ? AND bulan = ? AND tahun = ?
+        `, [item.karyawan_id, currentMonth, currentYear]);
+        console.log(`✅ Quota pulang cepat dikurangi untuk karyawan ID: ${item.karyawan_id}`);
+      }
+      else if (item.jenis_perizinan === 'datang_terlambat') {
+        // Kurangi counter datang_terlambat
+        await db.query(`
+          UPDATE quota_bulanan 
+          SET datang_terlambat = GREATEST(datang_terlambat - 1, 0)
+          WHERE karyawan_id = ? AND bulan = ? AND tahun = ?
+        `, [item.karyawan_id, currentMonth, currentYear]);
+        console.log(`✅ Quota datang terlambat dikurangi untuk karyawan ID: ${item.karyawan_id}`);
+      }
+    }
+
+    console.log('✅ Pengajuan updated:', id, 'Status:', status);
 
     res.json({ message: 'Status pengajuan berhasil diupdate' });
 
