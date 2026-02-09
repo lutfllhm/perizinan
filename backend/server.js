@@ -680,6 +680,7 @@ app.get('/api/pengajuan/stats', async (req, res) => {
   try {
     if (!db) await connectDB();
     
+    // Get basic stats
     const [stats] = await db.query(`
       SELECT 
         COUNT(*) as total,
@@ -689,7 +690,32 @@ app.get('/api/pengajuan/stats', async (req, res) => {
       FROM pengajuan
     `);
     
-    res.json(stats[0] || { total: 0, pending: 0, approved: 0, rejected: 0 });
+    // Get data by month (last 6 months)
+    const [byMonth] = await db.query(`
+      SELECT 
+        DATE_FORMAT(created_at, '%b %Y') as bulan,
+        COUNT(*) as jumlah
+      FROM pengajuan
+      WHERE created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+      GROUP BY DATE_FORMAT(created_at, '%Y-%m')
+      ORDER BY DATE_FORMAT(created_at, '%Y-%m') ASC
+    `);
+    
+    // Get data by type
+    const [byType] = await db.query(`
+      SELECT 
+        jenis_perizinan,
+        COUNT(*) as jumlah
+      FROM pengajuan
+      GROUP BY jenis_perizinan
+      ORDER BY jumlah DESC
+    `);
+    
+    res.json({
+      ...(stats[0] || { total: 0, pending: 0, approved: 0, rejected: 0 }),
+      byMonth: byMonth || [],
+      byType: byType || []
+    });
   } catch (error) {
     console.error('❌ Get stats error:', error);
     res.status(500).json({ message: error.message });
@@ -701,6 +727,7 @@ app.get('/api/pengajuan/stats/dashboard', async (req, res) => {
   try {
     if (!db) await connectDB();
     
+    // Get basic stats
     const [stats] = await db.query(`
       SELECT 
         COUNT(*) as total,
@@ -710,7 +737,32 @@ app.get('/api/pengajuan/stats/dashboard', async (req, res) => {
       FROM pengajuan
     `);
     
-    res.json(stats[0] || { total: 0, pending: 0, approved: 0, rejected: 0 });
+    // Get data by month (last 6 months)
+    const [byMonth] = await db.query(`
+      SELECT 
+        DATE_FORMAT(created_at, '%b %Y') as bulan,
+        COUNT(*) as jumlah
+      FROM pengajuan
+      WHERE created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+      GROUP BY DATE_FORMAT(created_at, '%Y-%m')
+      ORDER BY DATE_FORMAT(created_at, '%Y-%m') ASC
+    `);
+    
+    // Get data by type
+    const [byType] = await db.query(`
+      SELECT 
+        jenis_perizinan,
+        COUNT(*) as jumlah
+      FROM pengajuan
+      GROUP BY jenis_perizinan
+      ORDER BY jumlah DESC
+    `);
+    
+    res.json({
+      ...(stats[0] || { total: 0, pending: 0, approved: 0, rejected: 0 }),
+      byMonth: byMonth || [],
+      byType: byType || []
+    });
   } catch (error) {
     console.error('❌ Get stats error:', error);
     res.status(500).json({ message: error.message });
