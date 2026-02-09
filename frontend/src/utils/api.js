@@ -41,6 +41,7 @@ export const pengajuanAPI = {
 
 export const karyawanAPI = {
   getAll: (params) => api.get('/karyawan', { params }),
+  getAllWithQuota: () => api.get('/karyawan/all/with-quota'),
   getById: (id) => api.get(`/karyawan/${id}`),
   getQuota: (id) => api.get(`/karyawan/${id}/quota`),
   create: (data) => api.post('/karyawan', data),

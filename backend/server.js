@@ -566,6 +566,97 @@ app.delete('/api/karyawan/:id', async (req, res) => {
   }
 });
 
+// Get quota karyawan (cuti, pulang cepat, datang terlambat)
+app.get('/api/karyawan/:id/quota', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const { id } = req.params;
+    const currentMonth = new Date().getMonth() + 1;
+    const currentYear = new Date().getFullYear();
+
+    // Get karyawan data (jatah_cuti, sisa_cuti, tahun_cuti)
+    const [karyawan] = await db.query(
+      'SELECT jatah_cuti, sisa_cuti, tahun_cuti FROM karyawan WHERE id = ?',
+      [id]
+    );
+
+    if (karyawan.length === 0) {
+      return res.status(404).json({ message: 'Karyawan tidak ditemukan' });
+    }
+
+    // Get quota bulanan (pulang_cepat, datang_terlambat)
+    let [quota] = await db.query(
+      'SELECT pulang_cepat, datang_terlambat FROM quota_bulanan WHERE karyawan_id = ? AND bulan = ? AND tahun = ?',
+      [id, currentMonth, currentYear]
+    );
+
+    // If no quota record for this month, create one
+    if (quota.length === 0) {
+      await db.query(
+        'INSERT INTO quota_bulanan (karyawan_id, bulan, tahun, pulang_cepat, datang_terlambat) VALUES (?, ?, ?, 0, 0)',
+        [id, currentMonth, currentYear]
+      );
+      quota = [{ pulang_cepat: 0, datang_terlambat: 0 }];
+    }
+
+    res.json({
+      jatah_cuti: karyawan[0].jatah_cuti,
+      sisa_cuti: karyawan[0].sisa_cuti,
+      tahun_cuti: karyawan[0].tahun_cuti,
+      pulang_cepat: quota[0].pulang_cepat,
+      datang_terlambat: quota[0].datang_terlambat,
+      bulan: currentMonth,
+      tahun: currentYear
+    });
+
+  } catch (error) {
+    console.error('❌ Get quota error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get all karyawan with quota (untuk HRD Dashboard)
+app.get('/api/karyawan/all/with-quota', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const currentMonth = new Date().getMonth() + 1;
+    const currentYear = new Date().getFullYear();
+
+    // Get all karyawan with their quota
+    const [karyawan] = await db.query(`
+      SELECT 
+        k.id,
+        k.kantor,
+        k.nama,
+        k.jabatan,
+        k.departemen,
+        k.jatah_cuti,
+        k.sisa_cuti,
+        k.tahun_cuti,
+        COALESCE(q.pulang_cepat, 0) as pulang_cepat,
+        COALESCE(q.datang_terlambat, 0) as datang_terlambat
+      FROM karyawan k
+      LEFT JOIN quota_bulanan q ON k.id = q.karyawan_id 
+        AND q.bulan = ? 
+        AND q.tahun = ?
+      WHERE k.status = 'aktif'
+      ORDER BY k.kantor, k.nama
+    `, [currentMonth, currentYear]);
+
+    res.json({
+      karyawan,
+      bulan: currentMonth,
+      tahun: currentYear
+    });
+
+  } catch (error) {
+    console.error('❌ Get all karyawan with quota error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Get pengajuan
 app.get('/api/pengajuan', async (req, res) => {
   try {

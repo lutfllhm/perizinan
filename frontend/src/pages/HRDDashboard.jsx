@@ -33,6 +33,7 @@ const HRDDashboard = () => {
       { path: '/hrd', icon: FiHome, label: 'Dashboard', exact: true },
       { path: '/hrd/pengajuan', icon: FiFileText, label: 'Daftar Pengajuan' },
       { path: '/hrd/karyawan', icon: FiUser, label: 'Daftar Karyawan' },
+      { path: '/hrd/quota', icon: FiClock, label: 'Quota Karyawan' },
       { path: '/hrd/report', icon: FiBarChart2, label: 'Report' },
       { path: '/hrd/profile', icon: FiSettings, label: 'Manajemen Akun' },
     ];
@@ -180,6 +181,7 @@ const HRDDashboard = () => {
             <Route path="/" element={<Dashboard />} />
             <Route path="/pengajuan" element={<DaftarPengajuan />} />
             <Route path="/karyawan" element={<DaftarKaryawan />} />
+            <Route path="/quota" element={<QuotaKaryawan />} />
             <Route path="/report" element={<Report />} />
             <Route path="/profile" element={<ManajemenAkun />} />
           </Routes>
@@ -1623,6 +1625,230 @@ const DaftarKaryawan = () => {
           </motion.div>
         </div>
       )}
+    </div>
+  );
+};
+
+// Komponen Quota Karyawan - Lihat semua sisa cuti & izin karyawan
+const QuotaKaryawan = () => {
+  const [karyawanList, setKaryawanList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [bulan, setBulan] = useState(0);
+  const [tahun, setTahun] = useState(0);
+  const [filterKantor, setFilterKantor] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    fetchKaryawanQuota();
+  }, []);
+
+  const fetchKaryawanQuota = async () => {
+    setLoading(true);
+    try {
+      const response = await karyawanAPI.getAllWithQuota();
+      setKaryawanList(response.data.karyawan);
+      setBulan(response.data.bulan);
+      setTahun(response.data.tahun);
+    } catch (error) {
+      console.error('Error fetching karyawan quota:', error);
+      toast.error('Gagal memuat data quota karyawan');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filter karyawan
+  const filteredKaryawan = karyawanList.filter(k => {
+    const matchKantor = !filterKantor || k.kantor === filterKantor;
+    const matchSearch = !searchTerm || 
+      k.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      k.jabatan.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      k.departemen.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchKantor && matchSearch;
+  });
+
+  // Get unique kantor list
+  const kantorList = [...new Set(karyawanList.map(k => k.kantor))];
+
+  const namaBulan = [
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+  ];
+
+  return (
+    <div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-6"
+      >
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">Quota Karyawan</h1>
+        <p className="text-gray-600">
+          Lihat sisa cuti dan izin semua karyawan - Bulan {namaBulan[bulan - 1]} {tahun}
+        </p>
+      </motion.div>
+
+      {/* Filter & Search */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-xl shadow-lg p-6 mb-6"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Filter Kantor
+            </label>
+            <select
+              value={filterKantor}
+              onChange={(e) => setFilterKantor(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Semua Kantor</option>
+              {kantorList.map(kantor => (
+                <option key={kantor} value={kantor}>{kantor}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Cari Karyawan
+            </label>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Cari nama, jabatan, atau departemen..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center justify-between">
+          <p className="text-sm text-gray-600">
+            Menampilkan {filteredKaryawan.length} dari {karyawanList.length} karyawan
+          </p>
+          <button
+            onClick={fetchKaryawanQuota}
+            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          >
+            <FiRefreshCw />
+            <span>Refresh</span>
+          </button>
+        </div>
+      </motion.div>
+
+      {/* Table */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-xl shadow-lg overflow-hidden"
+      >
+        {loading ? (
+          <SkeletonTable rows={10} />
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white">
+                <tr>
+                  <th className="px-6 py-4 text-left text-sm font-semibold">No</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold">Kantor</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold">Nama</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold">Jabatan</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold">Departemen</th>
+                  <th className="px-6 py-4 text-center text-sm font-semibold">Sisa Cuti</th>
+                  <th className="px-6 py-4 text-center text-sm font-semibold">Pulang Cepat</th>
+                  <th className="px-6 py-4 text-center text-sm font-semibold">Datang Terlambat</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {filteredKaryawan.length === 0 ? (
+                  <tr>
+                    <td colSpan="8" className="px-6 py-8 text-center text-gray-500">
+                      Tidak ada data karyawan
+                    </td>
+                  </tr>
+                ) : (
+                  filteredKaryawan.map((karyawan, index) => (
+                    <tr key={karyawan.id} className="hover:bg-gray-50 transition">
+                      <td className="px-6 py-4 text-sm text-gray-900">{index + 1}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900">{karyawan.kantor}</td>
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900">{karyawan.nama}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{karyawan.jabatan}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{karyawan.departemen}</td>
+                      <td className="px-6 py-4 text-center">
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${
+                          karyawan.sisa_cuti > 5 
+                            ? 'bg-green-100 text-green-800' 
+                            : karyawan.sisa_cuti > 0 
+                            ? 'bg-yellow-100 text-yellow-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {karyawan.sisa_cuti} hari
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${
+                          karyawan.pulang_cepat < 3 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {karyawan.pulang_cepat}/3x
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${
+                          karyawan.datang_terlambat < 3 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {karyawan.datang_terlambat}/3x
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </motion.div>
+
+      {/* Legend */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-6"
+      >
+        <h3 className="text-lg font-semibold text-blue-900 mb-4">Keterangan:</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+          <div>
+            <p className="font-semibold text-gray-700 mb-2">Sisa Cuti:</p>
+            <ul className="space-y-1 text-gray-600">
+              <li>• <span className="text-green-600 font-semibold">&gt; 5 hari</span> - Aman</li>
+              <li>• <span className="text-yellow-600 font-semibold">1-5 hari</span> - Perhatian</li>
+              <li>• <span className="text-red-600 font-semibold">0 hari</span> - Habis</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-semibold text-gray-700 mb-2">Pulang Cepat:</p>
+            <ul className="space-y-1 text-gray-600">
+              <li>• Maksimal <span className="font-semibold">3x per bulan</span></li>
+              <li>• <span className="text-green-600 font-semibold">&lt; 3x</span> - Masih bisa</li>
+              <li>• <span className="text-red-600 font-semibold">3x</span> - Quota habis</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-semibold text-gray-700 mb-2">Datang Terlambat:</p>
+            <ul className="space-y-1 text-gray-600">
+              <li>• Maksimal <span className="font-semibold">3x per bulan</span></li>
+              <li>• <span className="text-green-600 font-semibold">&lt; 3x</span> - Masih bisa</li>
+              <li>• <span className="text-red-600 font-semibold">3x</span> - Quota habis</li>
+            </ul>
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 };

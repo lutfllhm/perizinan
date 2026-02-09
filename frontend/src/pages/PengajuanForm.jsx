@@ -98,7 +98,7 @@ const PengajuanForm = () => {
     }
   };
 
-  // Auto-fill data ketika karyawan dipilih
+  // Auto-fill data ketika karyawan dipilih (TANPA no_telp)
   const handleKaryawanChange = (karyawanId) => {
     const karyawan = daftarKaryawan.find(k => k.id === parseInt(karyawanId));
     if (karyawan) {
@@ -107,8 +107,8 @@ const PengajuanForm = () => {
         karyawan_id: karyawan.id,
         nama: karyawan.nama,
         jabatan: karyawan.jabatan,
-        departemen: karyawan.departemen,
-        no_telp: karyawan.no_telp || prev.no_telp
+        departemen: karyawan.departemen
+        // no_telp TIDAK auto-fill, user harus input manual
       }));
     }
   };
