@@ -711,14 +711,28 @@ app.get('/api/pengajuan/stats', async (req, res) => {
       ORDER BY jumlah DESC
     `);
     
-    res.json({
-      ...(stats[0] || { total: 0, pending: 0, approved: 0, rejected: 0 }),
+    const result = {
+      total: stats[0]?.total || 0,
+      pending: stats[0]?.pending || 0,
+      approved: stats[0]?.approved || 0,
+      rejected: stats[0]?.rejected || 0,
       byMonth: byMonth || [],
       byType: byType || []
-    });
+    };
+    
+    console.log('✅ Stats fetched:', result);
+    res.json(result);
   } catch (error) {
     console.error('❌ Get stats error:', error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ 
+      message: error.message,
+      total: 0,
+      pending: 0,
+      approved: 0,
+      rejected: 0,
+      byMonth: [],
+      byType: []
+    });
   }
 });
 
@@ -758,14 +772,28 @@ app.get('/api/pengajuan/stats/dashboard', async (req, res) => {
       ORDER BY jumlah DESC
     `);
     
-    res.json({
-      ...(stats[0] || { total: 0, pending: 0, approved: 0, rejected: 0 }),
+    const result = {
+      total: stats[0]?.total || 0,
+      pending: stats[0]?.pending || 0,
+      approved: stats[0]?.approved || 0,
+      rejected: stats[0]?.rejected || 0,
       byMonth: byMonth || [],
       byType: byType || []
-    });
+    };
+    
+    console.log('✅ Dashboard stats fetched:', result);
+    res.json(result);
   } catch (error) {
-    console.error('❌ Get stats error:', error);
-    res.status(500).json({ message: error.message });
+    console.error('❌ Get dashboard stats error:', error);
+    res.status(500).json({ 
+      message: error.message,
+      total: 0,
+      pending: 0,
+      approved: 0,
+      rejected: 0,
+      byMonth: [],
+      byType: []
+    });
   }
 });
 

@@ -264,7 +264,17 @@ const AdminHome = () => {
       const response = await pengajuanAPI.getStats();
       setStats(response.data);
     } catch (error) {
-      toast.error('Gagal memuat statistik');
+      console.error('Error fetching stats:', error);
+      // Set default empty stats instead of showing error
+      setStats({
+        total: 0,
+        pending: 0,
+        approved: 0,
+        rejected: 0,
+        byMonth: [],
+        byType: []
+      });
+      toast.error('Gagal memuat statistik: ' + (error.response?.data?.message || error.message));
     } finally {
       setLoading(false);
     }
