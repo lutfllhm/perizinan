@@ -4,7 +4,8 @@
   "description": "Backend API untuk Aplikasi Perizinan IWARE",
   "main": "server.js",
   "scripts": {
-    "start": "node test-server.js",
+    "start": "node server-final.js",
+    "start:test": "node test-server.js",
     "start:old": "node server.js",
     "start:simple": "node server-simple.js",
     "dev": "nodemon server.js",
