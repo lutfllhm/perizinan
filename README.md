@@ -41,6 +41,20 @@ Aplikasi Perizinan Cuti/Lembur berbasis React + Express + MySQL
 
 ---
 
+## 🌐 DEPLOY FRONTEND KE VERCEL
+
+**Deploy frontend React ke Vercel:**
+
+👉 **[VERCEL-ENV-SETUP.md](VERCEL-ENV-SETUP.md)** - Environment variables setup
+
+**Quick Setup:**
+1. Connect GitHub repo ke Vercel
+2. Set root directory: `frontend`
+3. Add environment variable: `REACT_APP_API_URL=https://your-backend.up.railway.app`
+4. Deploy!
+
+---
+
 ## 🎯 MULAI DI SINI
 
 **Baru pertama kali?** Baca: **[00-MULAI-DISINI.md](00-MULAI-DISINI.md)**
