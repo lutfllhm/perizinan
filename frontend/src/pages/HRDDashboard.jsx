@@ -8,7 +8,7 @@ import {
   FiClock, FiCheckCircle, FiXCircle, FiEye, FiTrash2, FiSettings, FiUser, FiSend, FiEdit, FiPlus, FiRefreshCw
 } from 'react-icons/fi';
 import { 
-  LineChart, Line, PieChart, Pie, Cell,
+  BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
 } from 'recharts';
 import LazyImage from '../components/LazyImage';
@@ -226,8 +226,6 @@ const Dashboard = () => {
     );
   }
 
-  const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
-
   return (
     <div className="space-y-8">
       {/* Header dengan Gradient */}
@@ -418,14 +416,14 @@ const Dashboard = () => {
         >
           <h3 className="text-xl font-bold text-gray-800 mb-4">Pengajuan per Bulan</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={stats?.byMonth || []}>
+            <BarChart data={stats?.byMonth || []}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="bulan" />
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="jumlah" stroke="#3b82f6" strokeWidth={2} />
-            </LineChart>
+              <Bar dataKey="jumlah" fill="#3b82f6" name="Jumlah Pengajuan" />
+            </BarChart>
           </ResponsiveContainer>
         </motion.div>
 
@@ -436,23 +434,14 @@ const Dashboard = () => {
         >
           <h3 className="text-xl font-bold text-gray-800 mb-4">Jenis Perizinan</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={stats?.byType || []}
-                dataKey="jumlah"
-                nameKey="jenis_perizinan"
-                cx="50%"
-                cy="50%"
-                outerRadius={100}
-                label
-              >
-                {(stats?.byType || []).map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
+            <BarChart data={stats?.byType || []}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="jenis_perizinan" angle={-45} textAnchor="end" height={100} />
+              <YAxis />
               <Tooltip />
               <Legend />
-            </PieChart>
+              <Bar dataKey="jumlah" fill="#10b981" name="Jumlah" />
+            </BarChart>
           </ResponsiveContainer>
         </motion.div>
       </div>

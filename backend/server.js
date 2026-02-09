@@ -690,15 +690,15 @@ app.get('/api/pengajuan/stats', async (req, res) => {
       FROM pengajuan
     `);
     
-    // Get data by month (last 6 months)
+    // Get data by month (last 6 months) - FIXED GROUP BY
     const [byMonth] = await db.query(`
       SELECT 
         DATE_FORMAT(created_at, '%b %Y') as bulan,
         COUNT(*) as jumlah
       FROM pengajuan
       WHERE created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
-      GROUP BY DATE_FORMAT(created_at, '%Y-%m')
-      ORDER BY DATE_FORMAT(created_at, '%Y-%m') ASC
+      GROUP BY YEAR(created_at), MONTH(created_at), DATE_FORMAT(created_at, '%b %Y')
+      ORDER BY YEAR(created_at) ASC, MONTH(created_at) ASC
     `);
     
     // Get data by type
@@ -751,15 +751,15 @@ app.get('/api/pengajuan/stats/dashboard', async (req, res) => {
       FROM pengajuan
     `);
     
-    // Get data by month (last 6 months)
+    // Get data by month (last 6 months) - FIXED GROUP BY
     const [byMonth] = await db.query(`
       SELECT 
         DATE_FORMAT(created_at, '%b %Y') as bulan,
         COUNT(*) as jumlah
       FROM pengajuan
       WHERE created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
-      GROUP BY DATE_FORMAT(created_at, '%Y-%m')
-      ORDER BY DATE_FORMAT(created_at, '%Y-%m') ASC
+      GROUP BY YEAR(created_at), MONTH(created_at), DATE_FORMAT(created_at, '%b %Y')
+      ORDER BY YEAR(created_at) ASC, MONTH(created_at) ASC
     `);
     
     // Get data by type
