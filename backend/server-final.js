@@ -283,6 +283,133 @@ app.get('/api/pengajuan', async (req, res) => {
   }
 });
 
+// Get statistics
+app.get('/api/pengajuan/stats', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const [stats] = await db.query(`
+      SELECT 
+        COUNT(*) as total,
+        SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+        SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
+        SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected
+      FROM pengajuan
+    `);
+    
+    res.json(stats[0] || { total: 0, pending: 0, approved: 0, rejected: 0 });
+  } catch (error) {
+    console.error('❌ Get stats error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get users (for admin)
+app.get('/api/auth/users', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const [rows] = await db.query(
+      'SELECT id, username, nama, role, created_at FROM users ORDER BY created_at DESC'
+    );
+    
+    res.json({ users: rows });
+  } catch (error) {
+    console.error('❌ Get users error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Register HRD user
+app.post('/api/auth/register-hrd', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const { username, password, nama } = req.body;
+
+    if (!username || !password || !nama) {
+      return res.status(400).json({ message: 'Username, password, dan nama harus diisi' });
+    }
+
+    // Check if username exists
+    const [existingUsers] = await db.query('SELECT * FROM users WHERE username = ?', [username]);
+
+    if (existingUsers.length > 0) {
+      return res.status(400).json({ message: 'Username sudah digunakan' });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Insert user
+    await db.query(
+      'INSERT INTO users (username, password, nama, role) VALUES (?, ?, ?, ?)',
+      [username, hashedPassword, nama, 'hrd']
+    );
+
+    console.log('✅ HRD registered:', username);
+
+    res.status(201).json({
+      message: 'HRD berhasil didaftarkan',
+      user: { username, nama, role: 'hrd' }
+    });
+
+  } catch (error) {
+    console.error('❌ Register HRD error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Delete user
+app.delete('/api/auth/users/:id', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const userId = req.params.id;
+
+    // Check if user exists
+    const [users] = await db.query('SELECT * FROM users WHERE id = ?', [userId]);
+    
+    if (users.length === 0) {
+      return res.status(404).json({ message: 'User tidak ditemukan' });
+    }
+
+    // Delete user
+    await db.query('DELETE FROM users WHERE id = ?', [userId]);
+
+    console.log('✅ User deleted:', userId);
+
+    res.json({ message: 'User berhasil dihapus' });
+
+  } catch (error) {
+    console.error('❌ Delete user error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Update pengajuan status
+app.put('/api/pengajuan/:id', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const { id } = req.params;
+    const { status, catatan } = req.body;
+
+    await db.query(
+      'UPDATE pengajuan SET status = ?, catatan = ? WHERE id = ?',
+      [status, catatan, id]
+    );
+
+    console.log('✅ Pengajuan updated:', id);
+
+    res.json({ message: 'Status pengajuan berhasil diupdate' });
+
+  } catch (error) {
+    console.error('❌ Update pengajuan error:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Create pengajuan
 app.post('/api/pengajuan', async (req, res) => {
   try {
