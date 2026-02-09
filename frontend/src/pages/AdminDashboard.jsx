@@ -7,6 +7,10 @@ import {
   FiHome, FiUsers, FiUserPlus, FiLogOut, FiMenu, FiX, FiTrash2, FiSettings,
   FiFileText, FiClock, FiCheckCircle, FiXCircle, FiAlertCircle, FiUser
 } from 'react-icons/fi';
+import { 
+  LineChart, Line, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
+} from 'recharts';
 import { useIsMobile } from '../hooks/useMediaQuery';
 import BottomNavigation from '../components/BottomNavigation';
 import MobileCard, { MobileCardRow, MobileCardBadge, MobileCardActions } from '../components/MobileCard';
@@ -524,6 +528,57 @@ const AdminHome = () => {
               </div>
             </div>
           </div>
+        </motion.div>
+      </div>
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="bg-white p-6 rounded-xl shadow-lg"
+        >
+          <h3 className="text-xl font-bold text-gray-800 mb-4">Pengajuan per Bulan</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={stats?.byMonth || []}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="bulan" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="jumlah" stroke="#3b82f6" strokeWidth={2} />
+            </LineChart>
+          </ResponsiveContainer>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.9 }}
+          className="bg-white p-6 rounded-xl shadow-lg"
+        >
+          <h3 className="text-xl font-bold text-gray-800 mb-4">Jenis Perizinan</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={stats?.byType || []}
+                dataKey="jumlah"
+                nameKey="jenis_perizinan"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                label
+              >
+                {(stats?.byType || []).map((entry, index) => {
+                  const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4'];
+                  return <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />;
+                })}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
         </motion.div>
       </div>
     </div>
