@@ -457,10 +457,19 @@ const DaftarPengajuan = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [quotaInfo, setQuotaInfo] = useState(null);
+  const [loadingQuota, setLoadingQuota] = useState(false);
 
   useEffect(() => {
     fetchPengajuan();
   }, []);
+
+  // Fetch quota when modal opens
+  useEffect(() => {
+    if (showDetailModal && selectedItem && selectedItem.karyawan_id) {
+      fetchQuotaInfo(selectedItem.karyawan_id);
+    }
+  }, [showDetailModal, selectedItem]);
 
   const fetchPengajuan = async () => {
     try {
@@ -470,6 +479,19 @@ const DaftarPengajuan = () => {
       toast.error('Gagal memuat data pengajuan');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchQuotaInfo = async (karyawanId) => {
+    setLoadingQuota(true);
+    try {
+      const response = await karyawanAPI.getQuota(karyawanId);
+      setQuotaInfo(response.data);
+    } catch (error) {
+      console.error('Error fetching quota:', error);
+      setQuotaInfo(null);
+    } finally {
+      setLoadingQuota(false);
     }
   };
 
@@ -784,6 +806,56 @@ _Sistem Perizinan IWARE_`;
                   <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">No. Telepon/WhatsApp</label>
                   <p className="text-lg font-semibold text-gray-800 mt-1">{selectedItem.no_telp}</p>
                 </div>
+
+                {/* Info Quota Karyawan */}
+                {quotaInfo && !loadingQuota && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.25 }}
+                    className="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-xl border-2 border-blue-200"
+                  >
+                    <label className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-3 block">
+                      📊 Info Quota Karyawan
+                    </label>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div className="bg-white p-3 rounded-lg border border-blue-100">
+                        <p className="text-xs text-gray-600 mb-1">Sisa Cuti</p>
+                        <p className={`text-2xl font-bold ${
+                          quotaInfo.sisa_cuti > 5 ? 'text-green-600' : 
+                          quotaInfo.sisa_cuti > 0 ? 'text-yellow-600' : 'text-red-600'
+                        }`}>
+                          {quotaInfo.sisa_cuti} hari
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">dari {quotaInfo.jatah_cuti} hari</p>
+                      </div>
+                      <div className="bg-white p-3 rounded-lg border border-blue-100">
+                        <p className="text-xs text-gray-600 mb-1">Pulang Cepat</p>
+                        <p className={`text-2xl font-bold ${
+                          quotaInfo.pulang_cepat < 3 ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                          {quotaInfo.pulang_cepat}/3x
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">bulan ini</p>
+                      </div>
+                      <div className="bg-white p-3 rounded-lg border border-blue-100">
+                        <p className="text-xs text-gray-600 mb-1">Datang Terlambat</p>
+                        <p className={`text-2xl font-bold ${
+                          quotaInfo.datang_terlambat < 3 ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                          {quotaInfo.datang_terlambat}/3x
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">bulan ini</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {loadingQuota && (
+                  <div className="bg-gray-50 p-4 rounded-xl text-center">
+                    <p className="text-sm text-gray-600">Memuat info quota...</p>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="bg-green-50 p-4 rounded-xl border border-green-200">
