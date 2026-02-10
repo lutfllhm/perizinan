@@ -9,9 +9,20 @@ dist/
 
 # Environment files
 .env
+.env.*
+!.env.example
 .env.local
 .env.production
+.env.vps
 backend/.env
+backend/.env.*
+!backend/.env.example
+backend/.env.production
+backend/.env.vps
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+frontend/.env.production
 
 # Logs
 logs/

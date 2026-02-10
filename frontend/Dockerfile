@@ -2,18 +2,15 @@ FROM node:18-alpine as build
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies
-RUN npm install
-
-# Copy application files
+# Copy all files first
 COPY . .
 
 # Set build-time environment variable
 ARG REACT_APP_API_URL=https://www.iwareid.com/api
 ENV REACT_APP_API_URL=$REACT_APP_API_URL
+
+# Install dependencies
+RUN npm install
 
 # Build application
 RUN npm run build
