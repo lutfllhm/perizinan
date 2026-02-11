@@ -2,21 +2,27 @@ FROM node:18-alpine as build
 
 WORKDIR /app
 
-# Copy all files first
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --production=false
+
+# Copy application files
 COPY . .
 
 # Set build-time environment variable
-ARG REACT_APP_API_URL=https://www.iwareid.com/api
+ARG REACT_APP_API_URL=https://iwareid.com
 ENV REACT_APP_API_URL=$REACT_APP_API_URL
-
-# Install dependencies
-RUN npm install
 
 # Build application
 RUN npm run build
 
 # Production stage
 FROM nginx:alpine
+
+# Copy custom nginx config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy build files
 COPY --from=build /app/build /usr/share/nginx/html
