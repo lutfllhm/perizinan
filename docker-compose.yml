@@ -35,7 +35,7 @@ services:
     depends_on:
       - mysql
     volumes:
-      - ./backend/uploads:/app/uploads
+      - uploads_data:/app/uploads
     networks:
       - iware-network
 
@@ -55,6 +55,7 @@ services:
 
 volumes:
   mysql_data:
+  uploads_data:
 
 networks:
   iware-network:
