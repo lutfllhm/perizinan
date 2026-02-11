@@ -243,9 +243,9 @@ git clone https://username:token@github.com/username/repo-name.git .
 ```bash
 # Dari komputer lokal (bukan di VPS)
 scp -r /path/to/your/project/* root@[IP-VPS]:/var/www/aplikasi/
-```
+```    
 
-### 4.3 Verifikasi Upload
+### 4.3 Verifikasi Upload      
 
 ```bash
 # Cek isi folder
@@ -266,7 +266,7 @@ ls -la /var/www/aplikasi
 cd /var/www/aplikasi
 
 # Edit file .env backend
-nano backend/.env
+ nano backend/.env
 ```
 
 **Isi file `backend/.env`:**
@@ -310,7 +310,7 @@ Copy output-nya dan paste ke `JWT_SECRET` di file `.env`
 ### 5.3 Setup Frontend Environment
 
 ```bash
-# Edit file .env frontend
+# Edit file .env frnontend
 nano frontend/.env
 ```
 
@@ -408,7 +408,7 @@ services:
 volumes:
   mysql_data:
 
-networks:
+network s:
   app-network:
     driver: bridge
 ```
@@ -520,9 +520,54 @@ server {
 # Pastikan di folder /var/www/aplikasi
 cd /var/www/aplikasi
 
-# Build dan jalankan semua container
+# Verifikasi file docker-compose.yml ada
+ls -la docker-compose.yml
+
+# Jika file ada, build dan jalankan semua container
 docker-compose up -d --build
 ```
+
+**⚠️ TROUBLESHOOTING: Error "no configuration file provided: not found"**
+
+Ini error paling umum saat deployment. Berikut solusinya:
+
+```bash
+# 1. CEK LOKASI - Pastikan kamu di folder yang benar
+pwd
+# Output harus: /var/www/aplikasi atau /root/perizinan
+
+# 2. CEK FILE ADA - Lihat apakah docker-compose.yml ada
+ls -la docker-compose.yml
+
+# 3. JIKA FILE TIDAK ADA - Cek semua file
+ls -la
+
+# 4. CEK NAMA FILE - Mungkin ada typo atau spasi
+ls -la | grep -i docker
+
+# 5. JIKA NAMA FILE SALAH - Rename
+mv "docker-compose .yml" docker-compose.yml
+mv docker-compose.yaml docker-compose.yml
+
+# 6. JIKA FILE BENAR-BENAR TIDAK ADA - Upload ulang
+# Gunakan FileZilla atau git pull
+
+# 7. VERIFIKASI ISI FILE
+cat docker-compose.yml
+
+# 8. COBA LAGI dengan path eksplisit
+docker-compose -f docker-compose.yml up -d --build
+
+# 9. ATAU gunakan docker compose (tanpa dash)
+docker compose up -d --build
+```
+
+**Penyebab Umum:**
+- ❌ Tidak berada di folder yang benar
+- ❌ File tidak ter-upload ke VPS
+- ❌ Nama file salah (ada spasi atau typo)
+- ❌ File ada di folder lain
+- ❌ Menggunakan `docker-compose` tapi yang terinstall `docker compose`
 
 **Proses ini akan:**
 1. Download image MySQL
@@ -737,9 +782,9 @@ Harus resolve ke IP VPS kamu.
 
 ```bash
 # Install certificate
-certbot --nginx -d yourdomain.com -d www.yourdomain.com
+certbot --nginx -d iwareid.com -d www.iwareid.com
 ```
-
+pembaruan
 **Ikuti instruksi:**
 1. Masukkan email kamu
 2. Agree to terms: ketik `Y`
@@ -1639,24 +1684,4 @@ Selamat! 🎉 Aplikasi kamu sekarang sudah live di VPS Hostinger.
 - 💾 **Backup database** secara rutin
 - 🔒 **Update password** secara berkala
 - 📊 **Monitor resource** VPS (CPU, RAM, Disk)
-- 🔄 **Update sistem** secara berkala (`apt update && apt upgrade`)
-- 📝 **Cek logs** jika ada masalah
-- 🛡️ **Keep security** up to date
-
----
-
-**Dibuat dengan ❤️ untuk deployment di VPS Hostinger**  
-**Versi: 1.0 - Februari 2026**
-
----
-
-## 📞 Need Help?
-
-Jika ada masalah atau pertanyaan:
-
-1. Cek section **FAQ & Common Issues** (Section 15)
-2. Lihat **logs** untuk error details
-3. Cek **Troubleshooting** (Section 10.3)
-4. Hubungi support Hostinger jika masalah VPS
-
-**Good luck! 🚀**
+- 🔄 **Update sistem** secara berkala (`apt update &&
