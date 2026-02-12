@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { pengajuanAPI, authAPI, API_URL, karyawanAPI } from '../utils/api';
 import { 
   FiHome, FiFileText, FiBarChart2, FiLogOut, FiMenu, FiX,
-  FiClock, FiCheckCircle, FiXCircle, FiEye, FiTrash2, FiSettings, FiUser, FiSend, FiEdit, FiPlus, FiRefreshCw
+  FiClock, FiCheckCircle, FiXCircle, FiEye, FiTrash2, FiSettings, FiUser, FiSend, FiEdit, FiPlus, FiRefreshCw, FiSearch
 } from 'react-icons/fi';
 import { 
   BarChart, Bar,
@@ -1361,6 +1361,7 @@ const DaftarKaryawan = () => {
   const [karyawan, setKaryawan] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterKantor, setFilterKantor] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('add');
   const [selectedKaryawan, setSelectedKaryawan] = useState(null);
@@ -1439,6 +1440,13 @@ const DaftarKaryawan = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validasi data
+    if (!formData.kantor || !formData.nama || !formData.jabatan || !formData.departemen) {
+      toast.error('Mohon lengkapi semua field yang wajib diisi');
+      return;
+    }
+
     try {
       if (modalMode === 'add') {
         await karyawanAPI.create(formData);
@@ -1450,6 +1458,7 @@ const DaftarKaryawan = () => {
       handleCloseModal();
       fetchKaryawan();
     } catch (error) {
+      console.error('Error submit:', error);
       toast.error(error.response?.data?.message || 'Gagal menyimpan data karyawan');
     }
   };
@@ -1495,20 +1504,11 @@ const DaftarKaryawan = () => {
         <div>
           <h2 className="text-2xl font-bold text-gray-800">Daftar Karyawan</h2>
           <p className="text-sm text-gray-600 mt-1">
-            Total: <span className="font-bold text-primary-600">{karyawan.length}</span> karyawan
+            Total: <span className="font-bold text-primary-600">{filteredKaryawan.length}</span> karyawan
+            {searchTerm && ` (dari ${karyawan.length} total)`}
           </p>
         </div>
         <div className="flex gap-3 w-full sm:w-auto">
-          <select
-            value={filterKantor}
-            onChange={(e) => setFilterKantor(e.target.value)}
-            className="flex-1 sm:flex-none px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="">Semua Kantor</option>
-            {daftarKantor.map(kantor => (
-              <option key={kantor} value={kantor}>{kantor}</option>
-            ))}
-          </select>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -1519,6 +1519,37 @@ const DaftarKaryawan = () => {
             <span className="hidden sm:inline">Tambah</span>
           </motion.button>
         </div>
+      </motion.div>
+
+      {/* Filter dan Search */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="flex flex-col sm:flex-row gap-3"
+      >
+        <div className="flex-1">
+          <div className="relative">
+            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Cari nama, jabatan, atau departemen..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+        <select
+          value={filterKantor}
+          onChange={(e) => setFilterKantor(e.target.value)}
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+        >
+          <option value="">Semua Kantor</option>
+          {daftarKantor.map(kantor => (
+            <option key={kantor} value={kantor}>{kantor}</option>
+          ))}
+        </select>
       </motion.div>
 
       <motion.div
@@ -1542,7 +1573,8 @@ const DaftarKaryawan = () => {
             </thead>
             <tbody className="divide-y divide-gray-200">
               <AnimatePresence>
-                {karyawan.map((item, index) => (
+                {filteredKaryawan.length > 0 ? (
+                  filteredKaryawan.map((item, index) => (
                   <motion.tr
                     key={item.id}
                     initial={{ opacity: 0, x: -20 }}
@@ -1603,7 +1635,14 @@ const DaftarKaryawan = () => {
                       </div>
                     </td>
                   </motion.tr>
-                ))}
+                ))
+                ) : (
+                  <tr>
+                    <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
+                      {searchTerm || filterKantor ? 'Tidak ada karyawan yang sesuai dengan filter' : 'Belum ada data karyawan'}
+                    </td>
+                  </tr>
+                )}
               </AnimatePresence>
             </tbody>
           </table>
