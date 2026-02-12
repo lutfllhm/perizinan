@@ -886,6 +886,52 @@ docker exec -i iware-mysql mysql -u root -p[PASSWORD] iware_perizinan < backup-2
 
 ## 🔧 TROUBLESHOOTING
 
+### Error: npm ci - Missing package-lock.json
+
+Jika muncul error seperti ini saat build:
+```
+npm error code EUSAGE
+npm error `npm ci` can only install packages when your package.json and package-lock.json are in sync
+```
+
+**Solusi:**
+Dockerfile sudah diupdate untuk otomatis fallback ke `npm install` jika `npm ci` gagal. Cukup jalankan ulang:
+
+```bash
+cd /var/www/iwareid
+./deploy-vps.sh
+```
+
+Atau manual rebuild:
+```bash
+docker-compose down
+docker-compose up -d --build
+```
+
+### Error: .env.production file not found
+
+Jika muncul error `cp: cannot stat '.env.production': No such file or directory`:
+
+**Solusi 1 - Upload file .env.production:**
+```bash
+# Dari komputer lokal
+scp backend/.env.production root@[IP-VPS]:/var/www/iwareid/backend/.env
+scp frontend/.env.production root@[IP-VPS]:/var/www/iwareid/frontend/.env
+```
+
+**Solusi 2 - Buat manual di VPS:**
+```bash
+# Backend
+cd /var/www/iwareid/backend
+nano .env
+# Copy isi dari backend/.env.production lokal, lalu Ctrl+X, Y, Enter
+
+# Frontend
+cd /var/www/iwareid/frontend
+nano .env
+# Copy isi dari frontend/.env.production lokal, lalu Ctrl+X, Y, Enter
+```
+
 ### Container Tidak Start
 
 ```bash

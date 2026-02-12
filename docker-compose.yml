@@ -5,7 +5,7 @@ services:
   mysql:
     image: mysql:8.0
     container_name: iware-mysql
-    restart: unless-stopped
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-Jasadenam66/}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-iware_perizinan}
@@ -14,7 +14,6 @@ services:
       TZ: Asia/Jakarta
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./mysql-init:/docker-entrypoint-initdb.d
     networks:
       - iware-network
     ports:
@@ -25,18 +24,14 @@ services:
       - --collation-server=utf8mb4_unicode_ci
       - --max_connections=200
       - --innodb_buffer_pool_size=256M
+      - --wait_timeout=28800
+      - --interactive_timeout=28800
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-Jasadenam66/}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p$${MYSQL_ROOT_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 40s
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-        reservations:
-          memory: 512M
+      start_period: 60s
 
   # Backend API
   backend:
@@ -44,7 +39,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: iware-backend
-    restart: unless-stopped
+    restart: always
     environment:
       PORT: ${BACKEND_PORT:-5000}
       NODE_ENV: ${NODE_ENV:-production}
@@ -68,17 +63,11 @@ services:
     networks:
       - iware-network
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5000/api/health", "||", "exit", "1"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 60s
-    deploy:
-      resources:
-        limits:
-          memory: 768M
-        reservations:
-          memory: 256M
+      start_period: 120s
 
   # Frontend React
   frontend:
@@ -88,28 +77,21 @@ services:
       args:
         REACT_APP_API_URL: ${REACT_APP_API_URL:-https://iwareid.com/api}
     container_name: iware-frontend
-    restart: unless-stopped
+    restart: always
     environment:
       TZ: Asia/Jakarta
     ports:
       - "3000:80"
     depends_on:
-      backend:
-        condition: service_healthy
+      - backend
     networks:
       - iware-network
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80", "||", "exit", "1"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 30s
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-        reservations:
-          memory: 128M
+      start_period: 60s
 
 volumes:
   mysql_data:
