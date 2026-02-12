@@ -1394,11 +1394,15 @@ const DaftarKaryawan = () => {
 
   const fetchKaryawan = async () => {
     try {
+      setLoading(true);
       const params = filterKantor ? { kantor: filterKantor } : {};
       const response = await karyawanAPI.getAll(params);
-      setKaryawan(response.data);
+      console.log('Response karyawan:', response.data);
+      setKaryawan(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
-      toast.error('Gagal memuat data karyawan');
+      console.error('Error fetch karyawan:', error);
+      toast.error(error.response?.data?.message || 'Gagal memuat data karyawan');
+      setKaryawan([]);
     } finally {
       setLoading(false);
     }
@@ -1456,7 +1460,7 @@ const DaftarKaryawan = () => {
         toast.success('Data karyawan berhasil diperbarui');
       }
       handleCloseModal();
-      fetchKaryawan();
+      await fetchKaryawan();
     } catch (error) {
       console.error('Error submit:', error);
       toast.error(error.response?.data?.message || 'Gagal menyimpan data karyawan');
@@ -1469,9 +1473,10 @@ const DaftarKaryawan = () => {
     try {
       await karyawanAPI.resetCuti(id, { jatah_cuti: 12 });
       toast.success('Cuti berhasil direset');
-      fetchKaryawan();
+      await fetchKaryawan();
     } catch (error) {
-      toast.error('Gagal mereset cuti');
+      console.error('Error reset cuti:', error);
+      toast.error(error.response?.data?.message || 'Gagal mereset cuti');
     }
   };
 
@@ -1481,9 +1486,10 @@ const DaftarKaryawan = () => {
     try {
       await karyawanAPI.delete(id);
       toast.success('Karyawan berhasil dihapus');
-      fetchKaryawan();
+      await fetchKaryawan();
     } catch (error) {
-      toast.error('Gagal menghapus karyawan');
+      console.error('Error delete karyawan:', error);
+      toast.error(error.response?.data?.message || 'Gagal menghapus karyawan');
     }
   };
 

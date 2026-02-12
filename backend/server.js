@@ -538,6 +538,106 @@ app.get('/api/karyawan', async (req, res) => {
   }
 });
 
+// Create karyawan
+app.post('/api/karyawan', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const { kantor, nama, jabatan, departemen, no_telp, jatah_cuti = 12, sisa_cuti = 12, status = 'aktif' } = req.body;
+
+    if (!kantor || !nama || !jabatan || !departemen) {
+      return res.status(400).json({ 
+        message: 'Kantor, nama, jabatan, dan departemen wajib diisi' 
+      });
+    }
+
+    const [result] = await db.query(
+      `INSERT INTO karyawan (kantor, nama, jabatan, departemen, no_telp, jatah_cuti, sisa_cuti, tahun_cuti, status) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, YEAR(CURDATE()), ?)`,
+      [kantor, nama, jabatan, departemen, no_telp, jatah_cuti, sisa_cuti, status]
+    );
+
+    console.log('✅ Karyawan created:', result.insertId);
+
+    res.status(201).json({
+      message: 'Karyawan berhasil ditambahkan',
+      id: result.insertId
+    });
+  } catch (error) {
+    console.error('❌ Create karyawan error:', error);
+    res.status(500).json({ 
+      message: 'Gagal menambahkan karyawan: ' + error.message 
+    });
+  }
+});
+
+// Update karyawan
+app.put('/api/karyawan/:id', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const { id } = req.params;
+    const { kantor, nama, jabatan, departemen, no_telp, jatah_cuti, sisa_cuti, status } = req.body;
+
+    // Check if karyawan exists
+    const [karyawan] = await db.query('SELECT * FROM karyawan WHERE id = ?', [id]);
+    
+    if (karyawan.length === 0) {
+      return res.status(404).json({ message: 'Karyawan tidak ditemukan' });
+    }
+
+    await db.query(
+      `UPDATE karyawan 
+       SET kantor = ?, nama = ?, jabatan = ?, departemen = ?, no_telp = ?, 
+           jatah_cuti = ?, sisa_cuti = ?, status = ?
+       WHERE id = ?`,
+      [kantor, nama, jabatan, departemen, no_telp, jatah_cuti, sisa_cuti, status, id]
+    );
+
+    console.log('✅ Karyawan updated:', id);
+
+    res.json({ message: 'Data karyawan berhasil diperbarui' });
+  } catch (error) {
+    console.error('❌ Update karyawan error:', error);
+    res.status(500).json({ 
+      message: 'Gagal memperbarui data karyawan: ' + error.message 
+    });
+  }
+});
+
+// Reset cuti karyawan
+app.post('/api/karyawan/:id/reset-cuti', async (req, res) => {
+  try {
+    if (!db) await connectDB();
+    
+    const { id } = req.params;
+    const { jatah_cuti = 12 } = req.body;
+
+    // Check if karyawan exists
+    const [karyawan] = await db.query('SELECT * FROM karyawan WHERE id = ?', [id]);
+    
+    if (karyawan.length === 0) {
+      return res.status(404).json({ message: 'Karyawan tidak ditemukan' });
+    }
+
+    await db.query(
+      `UPDATE karyawan 
+       SET sisa_cuti = ?, jatah_cuti = ?, tahun_cuti = YEAR(CURDATE())
+       WHERE id = ?`,
+      [jatah_cuti, jatah_cuti, id]
+    );
+
+    console.log('✅ Cuti reset for karyawan:', id);
+
+    res.json({ message: 'Cuti berhasil direset' });
+  } catch (error) {
+    console.error('❌ Reset cuti error:', error);
+    res.status(500).json({ 
+      message: 'Gagal mereset cuti: ' + error.message 
+    });
+  }
+});
+
 // Delete karyawan
 app.delete('/api/karyawan/:id', async (req, res) => {
   try {
@@ -1140,6 +1240,10 @@ app.use((req, res) => {
       'POST /api/auth/login',
       'GET /api/health',
       'GET /api/karyawan',
+      'POST /api/karyawan',
+      'PUT /api/karyawan/:id',
+      'DELETE /api/karyawan/:id',
+      'POST /api/karyawan/:id/reset-cuti',
       'GET /api/pengajuan',
       'POST /api/pengajuan',
       'GET /api/pengajuan/report'
