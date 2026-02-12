@@ -32,6 +32,7 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
+backend/logs/
 
 # PM2
 .pm2/
@@ -43,6 +44,18 @@ pids/
 # Uploads
 backend/uploads/*
 !backend/uploads/.gitkeep
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Backups
+*.backup
+*.bak
+*.sql
+*.tar.gz
+*.zip
+backup-*/
 
 # OS files
 .DS_Store
@@ -65,3 +78,4 @@ coverage/
 .cache/
 .temp/
 tmp/
+
