@@ -1487,6 +1487,16 @@ const DaftarKaryawan = () => {
     }
   };
 
+  // Filter karyawan berdasarkan kantor dan search
+  const filteredKaryawan = karyawan.filter(item => {
+    const matchKantor = !filterKantor || item.kantor === filterKantor;
+    const matchSearch = !searchTerm || 
+      item.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.jabatan.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.departemen.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchKantor && matchSearch;
+  });
+
   if (loading) return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-gray-800">Daftar Karyawan</h2>
