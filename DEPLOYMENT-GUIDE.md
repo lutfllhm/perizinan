@@ -54,7 +54,7 @@ nano deploy.sh
 ```
 
 ### 5. Jalankan Deployment Script
-
+sdadadadasd
 ```bash
 # Berikan permission
 chmod +x deploy.sh
