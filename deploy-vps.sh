@@ -17,7 +17,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Configuration
-DEPLOY_DIR="/var/www/backend"
+DEPLOY_DIR="/var/www/perizinan"
 COMPOSE_FILE="docker-compose.yml"
 
 # Check if running as root
