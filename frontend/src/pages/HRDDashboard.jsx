@@ -49,9 +49,9 @@ const HRDDashboard = () => {
         animate={{ x: 0 }}
         className={`${
           sidebarOpen ? 'w-72' : 'w-20'
-        } bg-gradient-to-b from-gray-800 via-gray-700 to-gray-800 text-white min-h-screen fixed left-0 top-0 transition-all duration-300 z-40 shadow-2xl flex flex-col overflow-hidden`}
+        } bg-gradient-to-b from-gray-800 via-gray-700 to-gray-800 text-white min-h-screen fixed left-0 top-0 transition-all duration-300 z-40 shadow-2xl overflow-y-auto dark-scrollbar`}
       >
-        <div className="p-4 flex-1 flex flex-col overflow-y-auto">
+        <div className="p-4 pb-24">
           {/* Header */}
           <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-600 flex-shrink-0">{sidebarOpen && (
               <motion.div

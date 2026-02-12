@@ -78,12 +78,12 @@ const AdminDashboard = () => {
           exit={{ x: -300 }}
           className={`${
             isMobile ? 'w-72' : sidebarOpen ? 'w-72' : 'w-20'
-          } bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white min-h-screen fixed left-0 top-0 transition-all duration-300 z-40 shadow-2xl`}
+          } bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white min-h-screen fixed left-0 top-0 transition-all duration-300 z-40 shadow-2xl overflow-y-auto dark-scrollbar`}
         >
-        <div className="p-4">
+        <div className="p-4 pb-24">
           {/* Header */}
           <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-700">
-            {(sidebarOpen || !isMobile) && (
+            {sidebarOpen && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -117,7 +117,7 @@ const AdminDashboard = () => {
           </div>
 
           {/* User Info */}
-          {(sidebarOpen || !isMobile) && (
+          {sidebarOpen && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -154,12 +154,12 @@ const AdminDashboard = () => {
                     }`}
                   >
                     <Icon size={20} className={active ? 'text-white' : 'text-gray-400'} />
-                    {(sidebarOpen || !isMobile) && (
+                    {sidebarOpen && (
                       <span className={`font-medium ${active ? 'text-white' : 'text-gray-300'}`}>
                         {item.label}
                       </span>
                     )}
-                    {active && (sidebarOpen || !isMobile) && (
+                    {active && sidebarOpen && (
                       <motion.div
                         layoutId="activeIndicator"
                         className="ml-auto w-2 h-2 bg-white rounded-full"
@@ -184,12 +184,12 @@ const AdminDashboard = () => {
               className="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-red-600 hover:translate-x-1 transition-all duration-200 group"
             >
               <FiLogOut size={20} className="text-gray-400 group-hover:text-white" />
-              {(sidebarOpen || !isMobile) && <span className="font-medium text-gray-300 group-hover:text-white">Logout</span>}
+              {sidebarOpen && <span className="font-medium text-gray-300 group-hover:text-white">Logout</span>}
             </motion.button>
           </nav>
 
           {/* Footer */}
-          {(sidebarOpen || !isMobile) && (
+          {sidebarOpen && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
