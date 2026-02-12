@@ -1,5 +1,26 @@
 # Changelog
 
+## [2.2.0] - 2026-02-12
+
+### 🐛 Bug Fixes
+- **Fixed: Edit, Create, dan Reset Cuti karyawan tidak berfungsi**
+- Tambah endpoint `POST /api/karyawan` untuk create karyawan baru
+- Tambah endpoint `PUT /api/karyawan/:id` untuk edit data karyawan
+- Tambah endpoint `POST /api/karyawan/:id/reset-cuti` untuk reset cuti tahunan
+- Perbaiki error handling di frontend HRDDashboard
+- Tambah console.log untuk debugging
+
+### 🔧 Backend Changes
+- Tambah 3 endpoint baru di `server.js` untuk CRUD karyawan
+- Validasi data karyawan sebelum insert/update
+- Better error messages untuk debugging
+
+### 💻 Frontend Changes
+- Perbaiki `fetchKaryawan()` dengan error handling yang lebih baik
+- Tambah `await` pada pemanggilan `fetchKaryawan()` setelah operasi CRUD
+- Tambah console.log untuk tracking response data
+- Perbaiki handling array response dari API
+
 ## [2.1.0] - 2026-02-09
 
 ### 🚀 Auto-Migration Feature
