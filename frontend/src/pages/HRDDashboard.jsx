@@ -51,20 +51,20 @@ const HRDDashboard = () => {
           sidebarOpen ? 'w-72' : 'w-20'
         } bg-gradient-to-b from-gray-800 via-gray-700 to-gray-800 text-white min-h-screen fixed left-0 top-0 transition-all duration-300 z-40 shadow-2xl overflow-y-auto dark-scrollbar`}
       >
-        <div className="p-4 pb-24">
+        <div className="p-3 pb-20">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-600">
+          <div className="flex items-center justify-between mb-6 pb-3 border-b border-gray-600">
             {sidebarOpen && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="flex items-center space-x-3"
+                className="flex items-center space-x-2"
               >
-                <div className="bg-gradient-to-br from-blue-500 to-cyan-600 p-2 rounded-xl">
-                  <FiFileText className="text-2xl" />
+                <div className="bg-gradient-to-br from-blue-500 to-cyan-600 p-2 rounded-lg">
+                  <FiFileText className="text-xl" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold">HRD Panel</h2>
+                  <h2 className="text-lg font-bold">HRD Panel</h2>
                   <p className="text-xs text-gray-400">Sistem Perizinan</p>
                 </div>
               </motion.div>
@@ -73,7 +73,7 @@ const HRDDashboard = () => {
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="p-2 hover:bg-gray-600 rounded-lg transition-colors"
             >
-              {sidebarOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+              {sidebarOpen ? <FiX size={20} /> : <FiMenu size={20} />}
             </button>
           </div>
 
@@ -82,11 +82,11 @@ const HRDDashboard = () => {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-6 p-4 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 rounded-xl border border-blue-500/30"
+              className="mb-4 p-3 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 rounded-lg border border-blue-500/30"
             >
-              <div className="flex items-center space-x-3">
-                <div className="bg-gradient-to-br from-blue-500 to-cyan-600 p-3 rounded-full">
-                  <FiUser className="text-xl" />
+              <div className="flex items-center space-x-2">
+                <div className="bg-gradient-to-br from-blue-500 to-cyan-600 p-2 rounded-full">
+                  <FiUser className="text-lg" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold truncate">{nama}</p>
@@ -97,7 +97,7 @@ const HRDDashboard = () => {
           )}
 
           {/* Navigation Menu */}
-          <nav className="space-y-2 mb-4">
+          <nav className="space-y-1 mb-3">
             {menuItems.map((item, index) => {
               const Icon = item.icon;
               const active = isActive(item.path, item.exact);
@@ -108,22 +108,22 @@ const HRDDashboard = () => {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${
+                    className={`flex items-center space-x-2 p-2.5 rounded-lg transition-all duration-200 ${
                       active
                         ? 'bg-gradient-to-r from-blue-600 to-cyan-600 shadow-lg shadow-blue-500/50'
                         : 'hover:bg-gray-700 hover:translate-x-1'
                     }`}
                   >
-                    <Icon size={20} className={active ? 'text-white' : 'text-gray-400'} />
+                    <Icon size={18} className={active ? 'text-white' : 'text-gray-400'} />
                     {sidebarOpen && (
-                      <span className={`font-medium ${active ? 'text-white' : 'text-gray-300'}`}>
+                      <span className={`text-sm font-medium ${active ? 'text-white' : 'text-gray-300'}`}>
                         {item.label}
                       </span>
                     )}
                     {active && sidebarOpen && (
                       <motion.div
                         layoutId="activeIndicator"
-                        className="ml-auto w-2 h-2 bg-white rounded-full"
+                        className="ml-auto w-1.5 h-1.5 bg-white rounded-full"
                       />
                     )}
                   </motion.div>
@@ -133,7 +133,7 @@ const HRDDashboard = () => {
           </nav>
 
           {/* Divider */}
-          <div className="py-3">
+          <div className="py-2">
             <div className="border-t border-gray-600"></div>
           </div>
 
@@ -143,10 +143,10 @@ const HRDDashboard = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
             onClick={handleLogout}
-            className="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-red-600 hover:translate-x-1 transition-all duration-200 group"
+            className="w-full flex items-center space-x-2 p-2.5 rounded-lg hover:bg-red-600 hover:translate-x-1 transition-all duration-200 group"
           >
-            <FiLogOut size={20} className="text-gray-400 group-hover:text-white" />
-            {sidebarOpen && <span className="font-medium text-gray-300 group-hover:text-white">Logout</span>}
+            <FiLogOut size={18} className="text-gray-400 group-hover:text-white" />
+            {sidebarOpen && <span className="text-sm font-medium text-gray-300 group-hover:text-white">Logout</span>}
           </motion.button>
 
           {/* Footer */}
@@ -155,13 +155,13 @@ const HRDDashboard = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="mt-4"
+              className="mt-3"
             >
-              <div className="p-3 bg-gray-700/50 rounded-xl border border-gray-600">
+              <div className="p-2 bg-gray-700/50 rounded-lg border border-gray-600">
                 <p className="text-xs text-gray-400 text-center">
                   © 2024 IWARE
                 </p>
-                <p className="text-xs text-gray-500 text-center mt-1">
+                <p className="text-xs text-gray-500 text-center mt-0.5">
                   v1.0.0
                 </p>
               </div>

@@ -80,20 +80,20 @@ const AdminDashboard = () => {
             isMobile ? 'w-72' : sidebarOpen ? 'w-72' : 'w-20'
           } bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white min-h-screen fixed left-0 top-0 transition-all duration-300 z-40 shadow-2xl overflow-y-auto dark-scrollbar`}
         >
-        <div className="p-4 pb-24">
+        <div className="p-3 pb-20">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-700">
+          <div className="flex items-center justify-between mb-6 pb-3 border-b border-gray-700">
             {sidebarOpen && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="flex items-center space-x-3"
+                className="flex items-center space-x-2"
               >
-                <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-2 rounded-xl">
-                  <FiUsers className="text-2xl" />
+                <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-2 rounded-lg">
+                  <FiUsers className="text-xl" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold">Admin Panel</h2>
+                  <h2 className="text-lg font-bold">Admin Panel</h2>
                   <p className="text-xs text-gray-400">Sistem Perizinan</p>
                 </div>
               </motion.div>
@@ -103,7 +103,7 @@ const AdminDashboard = () => {
                 onClick={() => setSidebarOpen(!sidebarOpen)}
                 className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
               >
-                {sidebarOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+                {sidebarOpen ? <FiX size={20} /> : <FiMenu size={20} />}
               </button>
             )}
             {isMobile && (
@@ -111,7 +111,7 @@ const AdminDashboard = () => {
                 onClick={() => setSidebarOpen(false)}
                 className="p-2 hover:bg-gray-700 rounded-lg transition-colors ml-auto"
               >
-                <FiX size={24} />
+                <FiX size={20} />
               </button>
             )}
           </div>
@@ -121,11 +121,11 @@ const AdminDashboard = () => {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-6 p-4 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 rounded-xl border border-purple-500/30"
+              className="mb-4 p-3 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 rounded-lg border border-purple-500/30"
             >
-              <div className="flex items-center space-x-3">
-                <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-3 rounded-full">
-                  <FiUser className="text-xl" />
+              <div className="flex items-center space-x-2">
+                <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-2 rounded-full">
+                  <FiUser className="text-lg" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold truncate">{nama}</p>
@@ -136,7 +136,7 @@ const AdminDashboard = () => {
           )}
 
           {/* Navigation Menu */}
-          <nav className="space-y-2">
+          <nav className="space-y-1">
             {menuItems.map((item, index) => {
               const Icon = item.icon;
               const active = isActive(item.path, item.exact);
@@ -147,22 +147,22 @@ const AdminDashboard = () => {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${
+                    className={`flex items-center space-x-2 p-2.5 rounded-lg transition-all duration-200 ${
                       active
                         ? 'bg-gradient-to-r from-purple-600 to-indigo-600 shadow-lg shadow-purple-500/50'
                         : 'hover:bg-gray-800 hover:translate-x-1'
                     }`}
                   >
-                    <Icon size={20} className={active ? 'text-white' : 'text-gray-400'} />
+                    <Icon size={18} className={active ? 'text-white' : 'text-gray-400'} />
                     {sidebarOpen && (
-                      <span className={`font-medium ${active ? 'text-white' : 'text-gray-300'}`}>
+                      <span className={`text-sm font-medium ${active ? 'text-white' : 'text-gray-300'}`}>
                         {item.label}
                       </span>
                     )}
                     {active && sidebarOpen && (
                       <motion.div
                         layoutId="activeIndicator"
-                        className="ml-auto w-2 h-2 bg-white rounded-full"
+                        className="ml-auto w-1.5 h-1.5 bg-white rounded-full"
                       />
                     )}
                   </motion.div>
@@ -181,10 +181,10 @@ const AdminDashboard = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4 }}
               onClick={handleLogout}
-              className="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-red-600 hover:translate-x-1 transition-all duration-200 group"
+              className="w-full flex items-center space-x-2 p-2.5 rounded-lg hover:bg-red-600 hover:translate-x-1 transition-all duration-200 group"
             >
-              <FiLogOut size={20} className="text-gray-400 group-hover:text-white" />
-              {sidebarOpen && <span className="font-medium text-gray-300 group-hover:text-white">Logout</span>}
+              <FiLogOut size={18} className="text-gray-400 group-hover:text-white" />
+              {sidebarOpen && <span className="text-sm font-medium text-gray-300 group-hover:text-white">Logout</span>}
             </motion.button>
           </nav>
 
@@ -196,11 +196,11 @@ const AdminDashboard = () => {
               transition={{ delay: 0.5 }}
               className="absolute bottom-4 left-4 right-4"
             >
-              <div className="p-3 bg-gray-800/50 rounded-xl border border-gray-700">
+              <div className="p-2 bg-gray-800/50 rounded-lg border border-gray-700">
                 <p className="text-xs text-gray-400 text-center">
                   © 2024 IWARE
                 </p>
-                <p className="text-xs text-gray-500 text-center mt-1">
+                <p className="text-xs text-gray-500 text-center mt-0.5">
                   v1.0.0
                 </p>
               </div>
