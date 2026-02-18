@@ -547,89 +547,87 @@ const DaftarPengajuan = () => {
     let message = '';
     
     if (item.status === 'approved') {
-      message = `╔═══════════════════════╗
-║  ✅ *PENGAJUAN DISETUJUI*  ║
-╚═══════════════════════╝
-
-🎉 *Selamat!* 🎉
+      message = `╔═══════════════════════════╗
+║  PENGAJUAN DISETUJUI  ║
+╚═══════════════════════════╝
 
 Kepada Yth.
-*${item.nama}* 👤
+*${item.nama}*
 
 Dengan hormat,
-Kami informasikan bahwa pengajuan perizinan Anda telah *DISETUJUI* ✅ oleh HRD.
+Kami informasikan bahwa pengajuan perizinan Anda telah *DISETUJUI* oleh HRD.
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━┓
-┃  📋 *DETAIL PENGAJUAN*
+┃  DETAIL PENGAJUAN
 ┣━━━━━━━━━━━━━━━━━━━━━━━┫
-┃ 📌 Jenis: *${item.jenis_perizinan.toUpperCase()}*
-┃ 📅 Tanggal Mulai: ${new Date(item.tanggal_mulai).toLocaleDateString('id-ID', { dateStyle: 'long' })}
-┃ 📅 Tanggal Selesai: ${new Date(item.tanggal_selesai).toLocaleDateString('id-ID', { dateStyle: 'long' })}
-┃ ✅ Status: *DISETUJUI*
+┃ Jenis: *${item.jenis_perizinan.toUpperCase()}*
+┃ Tanggal Mulai: ${new Date(item.tanggal_mulai).toLocaleDateString('id-ID', { dateStyle: 'long' })}
+┃ Tanggal Selesai: ${new Date(item.tanggal_selesai).toLocaleDateString('id-ID', { dateStyle: 'long' })}
+┃ Status: *DISETUJUI*
 ┗━━━━━━━━━━━━━━━━━━━━━━━┛
-${quotaText}${item.catatan ? `\n💬 *Catatan HRD:*\n${item.catatan}\n` : ''}
-🙏 Terima kasih atas perhatian dan kerjasamanya.
+${quotaText}${item.catatan ? `\n*Catatan HRD:*\n${item.catatan}\n` : ''}
+Terima kasih atas perhatian dan kerjasamanya.
 
 Hormat kami,
-*HRD IWARE* 🏢
+*HRD IWARE*
 
 ━━━━━━━━━━━━━━━━━━━━━
 _Sistem Perizinan IWARE_`;
     } else if (item.status === 'rejected') {
-      message = `╔═══════════════════════╗
-║  ❌ *PENGAJUAN DITOLAK*  ║
-╚═══════════════════════╝
+      message = `╔═══════════════════════════╗
+║  PENGAJUAN DITOLAK  ║
+╚═══════════════════════════╝
 
 Kepada Yth.
-*${item.nama}* 👤
+*${item.nama}*
 
 Dengan hormat,
-Kami informasikan bahwa pengajuan perizinan Anda *TIDAK DAPAT DISETUJUI* ❌
+Kami informasikan bahwa pengajuan perizinan Anda *TIDAK DAPAT DISETUJUI*.
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━┓
-┃  📋 *DETAIL PENGAJUAN*
+┃  DETAIL PENGAJUAN
 ┣━━━━━━━━━━━━━━━━━━━━━━━┫
-┃ 📌 Jenis: *${item.jenis_perizinan.toUpperCase()}*
-┃ 📅 Tanggal Mulai: ${new Date(item.tanggal_mulai).toLocaleDateString('id-ID', { dateStyle: 'long' })}
-┃ 📅 Tanggal Selesai: ${new Date(item.tanggal_selesai).toLocaleDateString('id-ID', { dateStyle: 'long' })}
-┃ ❌ Status: *DITOLAK*
+┃ Jenis: *${item.jenis_perizinan.toUpperCase()}*
+┃ Tanggal Mulai: ${new Date(item.tanggal_mulai).toLocaleDateString('id-ID', { dateStyle: 'long' })}
+┃ Tanggal Selesai: ${new Date(item.tanggal_selesai).toLocaleDateString('id-ID', { dateStyle: 'long' })}
+┃ Status: *DITOLAK*
 ┗━━━━━━━━━━━━━━━━━━━━━━━┛
-${quotaText}${item.catatan ? `\n⚠️ *Alasan Penolakan:*\n${item.catatan}\n` : ''}
-💡 Anda dapat mengajukan kembali dengan melengkapi persyaratan yang diperlukan.
+${quotaText}${item.catatan ? `\n*Alasan Penolakan:*\n${item.catatan}\n` : ''}
+Anda dapat mengajukan kembali dengan melengkapi persyaratan yang diperlukan.
 
-🙏 Terima kasih atas pengertiannya.
+Terima kasih atas pengertiannya.
 
 Hormat kami,
-*HRD IWARE* 🏢
+*HRD IWARE*
 
 ━━━━━━━━━━━━━━━━━━━━━
 _Sistem Perizinan IWARE_`;
     } else {
-      message = `╔═══════════════════════╗
-║  📢 *NOTIFIKASI PERIZINAN*  ║
-╚═══════════════════════╝
+      message = `╔═══════════════════════════╗
+║  NOTIFIKASI PERIZINAN  ║
+╚═══════════════════════════╝
 
 Kepada Yth.
-*${item.nama}* 👤
+*${item.nama}*
 
 Dengan hormat,
-Status pengajuan perizinan Anda telah diperbarui 🔄
+Status pengajuan perizinan Anda telah diperbarui.
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━┓
-┃  📋 *DETAIL PENGAJUAN*
+┃  DETAIL PENGAJUAN
 ┣━━━━━━━━━━━━━━━━━━━━━━━┫
-┃ 📌 Jenis: *${item.jenis_perizinan.toUpperCase()}*
-┃ 📅 Tanggal Mulai: ${new Date(item.tanggal_mulai).toLocaleDateString('id-ID', { dateStyle: 'long' })}
-┃ 📅 Tanggal Selesai: ${new Date(item.tanggal_selesai).toLocaleDateString('id-ID', { dateStyle: 'long' })}
-┃ 🔄 Status: *${item.status.toUpperCase()}*
+┃ Jenis: *${item.jenis_perizinan.toUpperCase()}*
+┃ Tanggal Mulai: ${new Date(item.tanggal_mulai).toLocaleDateString('id-ID', { dateStyle: 'long' })}
+┃ Tanggal Selesai: ${new Date(item.tanggal_selesai).toLocaleDateString('id-ID', { dateStyle: 'long' })}
+┃ Status: *${item.status.toUpperCase()}*
 ┗━━━━━━━━━━━━━━━━━━━━━━━┛
-${quotaText}${item.catatan ? `\n💬 *Catatan:*\n${item.catatan}\n` : ''}
-📱 Silakan cek aplikasi untuk informasi lebih lanjut.
+${quotaText}${item.catatan ? `\n*Catatan:*\n${item.catatan}\n` : ''}
+Silakan cek aplikasi untuk informasi lebih lanjut.
 
-🙏 Terima kasih.
+Terima kasih.
 
 Hormat kami,
-*HRD IWARE* 🏢
+*HRD IWARE*
 
 ━━━━━━━━━━━━━━━━━━━━━
 _Sistem Perizinan IWARE_`;
@@ -765,10 +763,10 @@ _Sistem Perizinan IWARE_`;
                             whileTap={{ scale: 0.95 }}
                             onClick={() => handleSendWhatsApp(item)}
                             className="flex items-center space-x-1 px-3 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:shadow-lg transition-all text-sm font-medium"
-                            title="Kirim via WhatsApp"
+                            title="Kirim Notifikasi via WhatsApp"
                           >
                             <FiSend />
-                            <span>Kirim WA</span>
+                            <span>Kirim Notifikasi</span>
                           </motion.button>
                         )}
                         <motion.button
@@ -1010,7 +1008,7 @@ _Sistem Perizinan IWARE_`;
                     className="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:shadow-lg font-semibold transition-all flex items-center justify-center space-x-2"
                   >
                     <FiSend />
-                    <span>📱 Kirim via WhatsApp</span>
+                    <span>Kirim Notifikasi</span>
                   </motion.button>
                 )}
                 <motion.button

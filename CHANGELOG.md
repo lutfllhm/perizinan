@@ -10,6 +10,13 @@
 - Perbaiki error handling di frontend HRDDashboard
 - Tambah console.log untuk debugging
 
+### 💼 UI/UX Improvements
+- **Formalisasi teks notifikasi WhatsApp**
+- Ubah "Kirim WA" menjadi "Kirim Notifikasi" (lebih formal)
+- Hapus semua emoji dari template pesan WhatsApp
+- Format pesan WhatsApp lebih profesional dan formal
+- Pesan tetap terstruktur dengan box drawing characters
+
 ### 🔧 Backend Changes
 - Tambah 3 endpoint baru di `server.js` untuk CRUD karyawan
 - Validasi data karyawan sebelum insert/update
@@ -20,6 +27,7 @@
 - Tambah `await` pada pemanggilan `fetchKaryawan()` setelah operasi CRUD
 - Tambah console.log untuk tracking response data
 - Perbaiki handling array response dari API
+- Update button text menjadi lebih formal
 
 ## [2.1.0] - 2026-02-09
 
