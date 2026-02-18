@@ -53,7 +53,8 @@ const HRDDashboard = () => {
       >
         <div className="p-4 pb-24">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-600 flex-shrink-0">{sidebarOpen && (
+          <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-600">
+            {sidebarOpen && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -81,7 +82,7 @@ const HRDDashboard = () => {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-6 p-4 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 rounded-xl border border-blue-500/30 flex-shrink-0"
+              className="mb-6 p-4 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 rounded-xl border border-blue-500/30"
             >
               <div className="flex items-center space-x-3">
                 <div className="bg-gradient-to-br from-blue-500 to-cyan-600 p-3 rounded-full">
@@ -95,8 +96,9 @@ const HRDDashboard = () => {
             </motion.div>
           )}
 
-          {/* Navigation Menu - Flex grow to push logout to bottom */}
-          <nav className="space-y-2 flex-1">{menuItems.map((item, index) => {
+          {/* Navigation Menu */}
+          <nav className="space-y-2 mb-4">
+            {menuItems.map((item, index) => {
               const Icon = item.icon;
               const active = isActive(item.path, item.exact);
               
@@ -131,7 +133,7 @@ const HRDDashboard = () => {
           </nav>
 
           {/* Divider */}
-          <div className="py-3 flex-shrink-0">
+          <div className="py-3">
             <div className="border-t border-gray-600"></div>
           </div>
 
@@ -141,7 +143,7 @@ const HRDDashboard = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
             onClick={handleLogout}
-            className="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-red-600 hover:translate-x-1 transition-all duration-200 group flex-shrink-0"
+            className="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-red-600 hover:translate-x-1 transition-all duration-200 group"
           >
             <FiLogOut size={20} className="text-gray-400 group-hover:text-white" />
             {sidebarOpen && <span className="font-medium text-gray-300 group-hover:text-white">Logout</span>}
@@ -153,7 +155,7 @@ const HRDDashboard = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="mt-4 pb-4 flex-shrink-0"
+              className="mt-4"
             >
               <div className="p-3 bg-gray-700/50 rounded-xl border border-gray-600">
                 <p className="text-xs text-gray-400 text-center">
