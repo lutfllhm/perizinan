@@ -728,16 +728,15 @@ _Sistem Perizinan IWARE_`;
                       </motion.span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex space-x-2">
+                      <div className="flex flex-wrap gap-2">
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => handleShowDetail(item)}
-                          className="flex items-center space-x-1 px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:shadow-lg transition-all text-sm font-medium"
+                          className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
                           title="Lihat Detail"
                         >
-                          <FiEye />
-                          <span>Detail</span>
+                          <FiEye size={16} />
                         </motion.button>
                         {item.status === 'pending' && (
                           <>
@@ -745,17 +744,19 @@ _Sistem Perizinan IWARE_`;
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={() => handleUpdateStatus(item.id, 'approved')}
-                              className="px-3 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:shadow-lg transition-all text-sm font-medium"
+                              className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all"
+                              title="Setujui"
                             >
-                              Setuju
+                              <FiCheckCircle size={16} />
                             </motion.button>
                             <motion.button
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={() => handleUpdateStatus(item.id, 'rejected')}
-                              className="px-3 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:shadow-lg transition-all text-sm font-medium"
+                              className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all"
+                              title="Tolak"
                             >
-                              Tolak
+                              <FiXCircle size={16} />
                             </motion.button>
                           </>
                         )}
@@ -764,22 +765,20 @@ _Sistem Perizinan IWARE_`;
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => handleSendWhatsApp(item)}
-                            className="flex items-center space-x-1 px-3 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:shadow-lg transition-all text-sm font-medium"
-                            title="Kirim Notifikasi via WhatsApp"
+                            className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all"
+                            title="Kirim Notifikasi WhatsApp"
                           >
-                            <FiSend />
-                            <span>Kirim Notifikasi</span>
+                            <FiSend size={16} />
                           </motion.button>
                         )}
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => handleDelete(item.id)}
-                          className="flex items-center space-x-1 px-3 py-2 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-lg hover:shadow-lg transition-all text-sm font-medium"
-                          title="Hapus Pengajuan"
+                          className="p-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all"
+                          title="Hapus"
                         >
-                          <FiTrash2 />
-                          <span>Hapus</span>
+                          <FiTrash2 size={16} />
                         </motion.button>
                       </div>
                     </td>
