@@ -1,12 +1,18 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar.jsx';
+import FloatingParticles from '../components/FloatingParticles.jsx';
+import ScrollProgress from '../components/ScrollProgress.jsx';
+import AnimatedCounter from '../components/AnimatedCounter.jsx';
 
 const Home = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const featuresRef = useRef(null);
   const [featuresVisible, setFeaturesVisible] = useState(false);
+  const statsRef = useRef(null);
+  const [statsVisible, setStatsVisible] = useState(false);
 
   useEffect(() => {
     // Detect mobile device
@@ -21,7 +27,7 @@ const Home = () => {
     const timer = setTimeout(() => setIsVisible(true), 100);
 
     // Intersection Observer for features
-    const observer = new IntersectionObserver(
+    const featuresObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
@@ -32,241 +38,439 @@ const Home = () => {
       { threshold: 0.1 }
     );
 
+    // Intersection Observer for stats
+    const statsObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setStatsVisible(true);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
     const currentFeaturesRef = featuresRef.current;
+    const currentStatsRef = statsRef.current;
+    
     if (currentFeaturesRef) {
-      observer.observe(currentFeaturesRef);
+      featuresObserver.observe(currentFeaturesRef);
+    }
+    
+    if (currentStatsRef) {
+      statsObserver.observe(currentStatsRef);
     }
 
     return () => {
       clearTimeout(timer);
       window.removeEventListener('resize', checkMobile);
       if (currentFeaturesRef) {
-        observer.unobserve(currentFeaturesRef);
+        featuresObserver.unobserve(currentFeaturesRef);
+      }
+      if (currentStatsRef) {
+        statsObserver.unobserve(currentStatsRef);
       }
     };
   }, []);
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Animated Background Gradient */}
-      <div 
-        className="fixed inset-0 z-0 bg-cover bg-center"
-        style={{ 
-          backgroundImage: 'url(/img/bg.jpeg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/95 via-slate-800/90 to-slate-900/95" />
-        
-        {/* Animated Gradient Orbs - Simplified for mobile */}
-        {!isMobile && (
-          <>
-            <div 
-              className="absolute w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"
-              style={{
-                top: '20%',
-                left: '20%'
-              }}
-            />
-            <div 
-              className="absolute w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse"
-              style={{
-                bottom: '20%',
-                right: '20%',
-                animationDelay: '1s'
-              }}
-            />
-          </>
-        )}
-      </div>
+      {/* Scroll Progress */}
+      <ScrollProgress />
+      
+      {/* Subtle Floating Particles */}
+      {!isMobile && <FloatingParticles count={15} />}
+          
+          {/* Professional Background - Lighter */}
+          <div 
+            className="fixed inset-0 z-0 bg-cover bg-center"
+            style={{ 
+              backgroundImage: 'url(/img/bg.jpeg)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          >
+            {/* Light overlay untuk readability */}
+            <div className="absolute inset-0 bg-black/30" />
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-gray-900/40 to-slate-900/50" />
+            
+            {/* Subtle Grid Pattern */}
+            <div className="absolute inset-0 opacity-[0.02]" style={{
+              backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+              backgroundSize: '50px 50px'
+            }} />
+          </div>
 
       {/* Navbar */}
       <div className="relative z-50">
         <Navbar />
       </div>
 
-      {/* Hero Section */}
-      <section className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 pt-16">
-        <div className="relative max-w-5xl mx-auto text-center">
-          <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <div 
-              className={`inline-flex items-center px-3 py-2 sm:px-4 bg-blue-500/20 backdrop-blur-sm border border-blue-500/30 rounded-full text-blue-300 text-xs sm:text-sm font-medium mb-6 sm:mb-8 hover:bg-blue-500/30 transition-all duration-300 cursor-pointer ${!isMobile ? 'hover:scale-105 animate-float' : ''}`}
-            >
-              <span className="w-2 h-2 bg-blue-400 rounded-full mr-2 animate-pulse"></span>
-              Sistem Perizinan Digital
-            </div>
-            
-            <h1 
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-4 sm:mb-6 leading-tight px-2 animate-fade-in-up"
-            >
-              Sistem Perizinan
-              <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 animate-gradient">
-                Cuti & Lembur
-              </span>
-            </h1>
-            
-            <p 
-              className="text-base sm:text-lg md:text-xl text-slate-200 mb-8 sm:mb-12 max-w-2xl mx-auto leading-relaxed px-4"
-            >
-              Ajukan dan kelola izin cuti serta lembur dengan mudah, cepat, dan transparan
-            </p>
+      {/* Hero Section - Professional */}
+      <section className="relative z-10 min-h-screen flex items-center px-4 sm:px-6 pt-24">
+        <div className="relative max-w-6xl mx-auto">
+          <div className={`grid gap-10 lg:gap-16 lg:grid-cols-2 items-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            {/* Left: Text & CTA */}
+            <div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.8 }}
+                className="mb-4"
+              >
+                <p className="inline-flex items-center rounded-full bg-white/10 border border-white/15 px-3 py-1 text-xs sm:text-sm text-slate-200 backdrop-blur-sm">
+                  <span className="mr-2 h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                  Sistem perizinan karyawan berbasis web
+                </p>
+              </motion.div>
 
-            {/* CTA Buttons */}
-            <div 
-              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-12 sm:mb-16 px-4"
-            >
-              <Link to="/pengajuan-form" className="w-full sm:w-auto">
-                <button className={`group relative w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl font-semibold shadow-lg transition-all duration-300 overflow-hidden active:scale-95 ${!isMobile ? 'hover:shadow-2xl hover:shadow-blue-500/50 hover:scale-110 hover:-translate-y-1' : ''}`}>
-                  <span className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                  <span className="relative z-10 flex items-center justify-center">
-                    Ajukan Perizinan
-                    <svg className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+              >
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold text-white mb-4 leading-tight">
+                  Sistem Perizinan
+                  <span className="block text-4xl sm:text-5xl md:text-6xl font-bold text-red-500">
+                    Cuti & Lembur
                   </span>
-                </button>
-              </Link>
-              <Link to="/login" className="w-full sm:w-auto">
-                <button className={`group w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white/10 backdrop-blur-sm border border-white/30 text-white rounded-2xl font-semibold transition-all duration-300 relative overflow-hidden active:scale-95 ${!isMobile ? 'hover:bg-white/20 hover:border-white/40 hover:scale-110 hover:-translate-y-1' : ''}`}>
-                  <span className="absolute inset-0 bg-white/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
-                  <span className="relative z-10">Login Staff</span>
-                </button>
-              </Link>
+                </h1>
+                <p className="text-sm sm:text-base md:text-lg text-slate-300 max-w-xl leading-relaxed">
+                  Kelola pengajuan cuti dan lembur secara terukur, transparan, dan terdokumentasi dengan baik.
+                  Dirancang untuk memenuhi standar operasional perusahaan modern.
+                </p>
+              </motion.div>
+
+              {/* CTA Buttons */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.8 }}
+                className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4"
+              >
+                <Link to="/pengajuan-form" className="w-full sm:w-auto">
+                  <button className={`w-full sm:w-auto px-8 py-3.5 bg-red-600 text-white rounded-lg font-medium text-base transition-all duration-200 shadow-sm ${!isMobile ? 'hover:bg-red-700 hover:shadow-md' : ''}`}>
+                    Ajukan Perizinan
+                  </button>
+                </Link>
+                <Link to="/login" className="w-full sm:w-auto">
+                  <button className={`w-full sm:w-auto px-8 py-3.5 bg-transparent border border-white/25 text-white rounded-lg font-medium text-base transition-all duration-200 ${!isMobile ? 'hover:bg-white/5 hover:border-white/40' : ''}`}>
+                    Login Staff
+                  </button>
+                </Link>
+              </motion.div>
             </div>
 
-            {/* Stats */}
-            <div 
-              className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 max-w-3xl mx-auto px-4"
+            {/* Right: Highlight Card & Stats */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.8 }}
+              className="lg:justify-self-end"
             >
-              <div className={`group bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 transition-all duration-300 cursor-pointer active:scale-95 ${!isMobile ? 'hover:bg-white/15 hover:border-white/30 hover:scale-105 hover:-translate-y-2' : ''}`}>
-                <div className={`text-xl sm:text-2xl mb-2 transition-transform duration-300 ${!isMobile ? 'group-hover:scale-125 group-hover:rotate-12' : ''}`}>⚡</div>
-                <div className="text-lg sm:text-2xl font-bold text-white mb-1">Cepat</div>
-                <div className="text-xs sm:text-sm text-slate-300">Proses Instan</div>
+              <div className="rounded-2xl bg-slate-900/70 border border-white/10 backdrop-blur-md p-6 sm:p-8 shadow-xl">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-400 mb-4">
+                  Ringkasan Kinerja
+                </p>
+
+                <div 
+                  ref={statsRef}
+                  className="grid grid-cols-1 sm:grid-cols-3 gap-6"
+                >
+                  {[
+                    { label: 'Pengajuan / bulan', value: 1200, suffix: '+', desc: 'Rata-rata permohonan yang diproses' },
+                    { label: 'Waktu proses', value: 5, suffix: ' mnt', desc: 'Rata-rata dari pengajuan ke persetujuan' },
+                    { label: 'Pengurangan manual', value: 80, suffix: '%', desc: 'Penurunan pekerjaan administratif' }
+                  ].map((stat, index) => (
+                    <motion.div
+                      key={stat.label}
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={statsVisible ? { opacity: 1, y: 0 } : {}}
+                      transition={{ delay: 0.2 + index * 0.1, duration: 0.6 }}
+                      className="text-left"
+                    >
+                      <div className="text-xs font-medium uppercase tracking-wide text-slate-400 mb-1">
+                        {stat.label}
+                      </div>
+                      <div className="text-2xl sm:text-3xl font-semibold text-white mb-1">
+                        <AnimatedCounter value={stat.value} duration={1.4} suffix={stat.suffix} />
+                      </div>
+                      <p className="text-xs text-slate-400 leading-relaxed">
+                        {stat.desc}
+                      </p>
+                    </motion.div>
+                  ))}
+                </div>
+
+                <div className="mt-6 border-t border-white/10 pt-4 flex items-center gap-3 text-xs text-slate-400">
+                  <div className="flex -space-x-2">
+                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-semibold border border-emerald-400/40">
+                      HR
+                    </span>
+                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-sky-500/20 text-sky-300 text-[10px] font-semibold border border-sky-400/40">
+                      GA
+                    </span>
+                  </div>
+                  <span>
+                    Digunakan oleh tim HR & General Affair untuk monitoring perizinan harian.
+                  </span>
+                </div>
               </div>
-              <div className={`group bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 transition-all duration-300 cursor-pointer active:scale-95 ${!isMobile ? 'hover:bg-white/15 hover:border-white/30 hover:scale-105 hover:-translate-y-2' : ''}`}>
-                <div className={`text-xl sm:text-2xl mb-2 transition-transform duration-300 ${!isMobile ? 'group-hover:scale-125 group-hover:rotate-12' : ''}`}>📱</div>
-                <div className="text-lg sm:text-2xl font-bold text-white mb-1">Mudah</div>
-                <div className="text-xs sm:text-sm text-slate-300">User Friendly</div>
-              </div>
-              <div className={`group bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 transition-all duration-300 cursor-pointer col-span-2 md:col-span-1 active:scale-95 ${!isMobile ? 'hover:bg-white/15 hover:border-white/30 hover:scale-105 hover:-translate-y-2' : ''}`}>
-                <div className={`text-xl sm:text-2xl mb-2 transition-transform duration-300 ${!isMobile ? 'group-hover:scale-125 group-hover:rotate-12' : ''}`}>🔔</div>
-                <div className="text-lg sm:text-2xl font-bold text-white mb-1">Real-Time</div>
-                <div className="text-xs sm:text-sm text-slate-300">Notifikasi Langsung</div>
-              </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section ref={featuresRef} className="relative z-10 py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-black/20 backdrop-blur-sm">
-        <div className="max-w-5xl mx-auto">
-          <div className={`text-center mb-12 sm:mb-16 transition-all duration-1000 ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 sm:mb-6 px-4">
-              Fitur <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 animate-gradient">Unggulan</span>
+      {/* Features Section - Clean & Professional */}
+      <section ref={featuresRef} className="relative z-10 py-20 sm:py-24 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className={`text-center mb-16 transition-all duration-1000 ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
+              Fitur Utama
             </h2>
-            <p className="text-base sm:text-lg md:text-xl text-slate-200 max-w-2xl mx-auto px-4">
-              Semua yang Anda butuhkan untuk mengelola perizinan
+            <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto">
+              Kelola perizinan karyawan dengan lebih efisien
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 px-4 sm:px-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: '📝', title: 'Pengajuan Cuti', desc: 'Ajukan cuti tahunan, sakit, atau izin khusus dengan mudah. Sistem akan otomatis menghitung sisa kuota cuti Anda.', gradient: 'from-blue-500 to-cyan-500', delay: '0s' },
-              { icon: '⏰', title: 'Pengajuan Lembur', desc: 'Catat jam lembur Anda dengan akurat. Sistem akan menghitung kompensasi sesuai dengan kebijakan perusahaan.', gradient: 'from-purple-500 to-pink-500', delay: '0.1s' },
-              { icon: '✅', title: 'Tracking Status', desc: 'Pantau status pengajuan Anda secara real-time. Dapatkan notifikasi instant saat ada update.', gradient: 'from-green-500 to-emerald-500', delay: '0.2s' },
-              { icon: '📊', title: 'Riwayat Lengkap', desc: 'Akses riwayat pengajuan Anda kapan saja. Semua data tersimpan dengan aman dan terorganisir.', gradient: 'from-orange-500 to-red-500', delay: '0.3s' }
+              { title: 'Pengajuan Cuti', desc: 'Ajukan dan kelola cuti dengan sistem otomatis penghitungan kuota', delay: 0 },
+              { title: 'Pengajuan Lembur', desc: 'Catat jam lembur dan hitung kompensasi secara akurat', delay: 0.1 },
+              { title: 'Tracking Real-time', desc: 'Pantau status pengajuan dan terima notifikasi instant', delay: 0.2 },
+              { title: 'Riwayat Lengkap', desc: 'Akses semua data perizinan yang tersimpan dengan aman', delay: 0.3 }
             ].map((feature, index) => (
-              <div 
+              <motion.div
                 key={index}
-                className={`group bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-6 sm:p-8 transition-all duration-300 cursor-pointer active:scale-95 ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'} ${!isMobile ? 'hover:bg-white/15 hover:border-white/30 hover:scale-105 hover:-translate-y-2' : ''}`}
-                style={{ 
-                  transitionDelay: featuresVisible ? feature.delay : '0s'
-                }}
+                initial={{ opacity: 0, y: 30 }}
+                animate={featuresVisible ? { opacity: 1, y: 0 } : {}}
+                transition={{ delay: feature.delay, duration: 0.5 }}
               >
-                <div className={`w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-r ${feature.gradient} rounded-2xl flex items-center justify-center text-xl sm:text-2xl mb-4 sm:mb-6 transition-all duration-300 shadow-lg ${!isMobile ? 'group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-2xl' : ''}`}>
-                  <span className={`transition-transform duration-300 ${!isMobile ? 'group-hover:scale-125' : ''}`}>{feature.icon}</span>
+                <div className={`bg-white/5 border border-white/10 rounded-lg p-6 h-full transition-all duration-300 ${!isMobile ? 'hover:bg-white/[0.08] hover:border-white/20 hover:shadow-lg hover:shadow-white/5' : ''}`}>
+                  <h3 className="text-lg font-semibold text-white mb-3">
+                    {feature.title}
+                  </h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">
+                    {feature.desc}
+                  </p>
                 </div>
-                <h3 className={`text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4 transition-all duration-300 ${!isMobile ? 'group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400' : ''}`}>
-                  {feature.title}
-                </h3>
-                <p className={`text-sm sm:text-base text-slate-200 leading-relaxed transition-colors duration-300 ${!isMobile ? 'group-hover:text-white' : ''}`}>
-                  {feature.desc}
-                </p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="relative z-10 py-16 sm:py-24 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className={`group bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-8 sm:p-12 transition-all duration-300 ${!isMobile ? 'hover:bg-white/15 hover:border-white/30 hover:scale-105' : ''}`}>
-            <div className={`text-4xl sm:text-5xl mb-4 sm:mb-6 transition-all duration-300 inline-block ${!isMobile ? 'group-hover:scale-125 group-hover:rotate-12' : ''}`}>🚀</div>
-            <h2 className={`text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 sm:mb-6 transition-all duration-300 ${!isMobile ? 'group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400' : ''}`}>
-              Siap Mengajukan Perizinan?
+      {/* Divider */}
+      <div className="relative z-10 max-w-6xl mx-auto px-4">
+        <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+      </div>
+
+      {/* Why Choose Us Section */}
+      <section className="relative z-10 py-20 sm:py-24 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
+              Mengapa Memilih Kami
             </h2>
-            <p className={`text-lg sm:text-xl text-slate-200 mb-6 sm:mb-8 transition-colors duration-300 ${!isMobile ? 'group-hover:text-white' : ''}`}>
-              Proses cepat dan mudah, hanya butuh beberapa menit
+            <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto">
+              Solusi terpercaya untuk manajemen perizinan perusahaan Anda
             </p>
-            <Link to="/pengajuan-form">
-              <button className={`group/btn relative px-8 sm:px-10 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl font-semibold shadow-lg transition-all duration-300 overflow-hidden active:scale-95 ${!isMobile ? 'hover:shadow-2xl hover:shadow-blue-500/50 hover:scale-110 hover:-translate-y-2' : ''}`}>
-                <span className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></span>
-                <span className="relative z-10 flex items-center justify-center">
-                  Mulai Sekarang
-                  <svg className="w-5 h-5 ml-2 group-hover/btn:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { 
+                icon: (
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
-                </span>
-              </button>
-            </Link>
+                ),
+                title: 'Efisiensi Tinggi', 
+                desc: 'Proses pengajuan yang cepat dan otomatis menghemat waktu hingga 70%'
+              },
+              { 
+                icon: (
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                ),
+                title: 'Keamanan Terjamin', 
+                desc: 'Data terenkripsi dengan standar keamanan tingkat enterprise'
+              },
+              { 
+                icon: (
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                ),
+                title: 'Laporan Lengkap', 
+                desc: 'Dashboard analytics untuk monitoring dan pelaporan yang komprehensif'
+              }
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
+              >
+                <div className={`text-center transition-all duration-300 ${!isMobile ? 'hover:-translate-y-2' : ''}`}>
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-red-600/10 border border-red-600/20 rounded-xl text-red-500 mb-4">
+                    {item.icon}
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-3">
+                    {item.title}
+                  </h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="relative z-10 py-8 sm:py-12 px-4 bg-black/40 backdrop-blur-sm border-t border-white/20">
+      {/* Divider */}
+      <div className="relative z-10 max-w-6xl mx-auto px-4">
+        <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+      </div>
+
+      {/* How It Works Section */}
+      <section className="relative z-10 py-20 sm:py-24 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 mb-6 sm:mb-8">
-            <div className="group text-center sm:text-left">
-              <h3 className={`text-xl sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mb-3 sm:mb-4 transition-transform duration-300 inline-block ${!isMobile ? 'group-hover:scale-105' : ''}`}>
-                IWARE
-              </h3>
-              <p className={`text-sm sm:text-base text-slate-300 leading-relaxed transition-colors duration-300 ${!isMobile ? 'group-hover:text-white' : ''}`}>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
+              Cara Kerja
+            </h2>
+            <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto">
+              Proses sederhana dalam 4 langkah mudah
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
+            {/* Connection Line */}
+            {!isMobile && (
+              <div className="absolute top-12 left-0 right-0 h-0.5 bg-gradient-to-r from-red-600/20 via-red-600/40 to-red-600/20 hidden md:block"></div>
+            )}
+            
+            {[
+              { step: '01', title: 'Daftar/Login', desc: 'Akses sistem dengan akun perusahaan Anda' },
+              { step: '02', title: 'Ajukan Perizinan', desc: 'Isi form pengajuan cuti atau lembur' },
+              { step: '03', title: 'Menunggu Approval', desc: 'Atasan akan mereview pengajuan Anda' },
+              { step: '04', title: 'Selesai', desc: 'Terima notifikasi hasil persetujuan' }
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
+                className="relative"
+              >
+                <div className="text-center">
+                  <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-red-600 to-red-700 rounded-full text-white font-bold text-2xl mb-4 shadow-lg shadow-red-600/30 relative z-10">
+                    {item.step}
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-2">
+                    {item.title}
+                  </h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Divider */}
+      <div className="relative z-10 max-w-6xl mx-auto px-4">
+        <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+      </div>
+
+      {/* CTA Section - Minimal */}
+      <section className="relative z-10 py-20 sm:py-24 px-4">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+            Mulai Kelola Perizinan Anda
+          </h2>
+          <p className="text-base sm:text-lg text-slate-400 mb-8">
+            Sistem digital yang memudahkan proses pengajuan dan persetujuan
+          </p>
+          <Link to="/pengajuan-form">
+            <button className={`px-10 py-4 bg-red-600 text-white rounded-lg font-medium text-base transition-colors duration-200 ${!isMobile ? 'hover:bg-red-700' : ''}`}>
+              Ajukan Sekarang
+            </button>
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer - Professional */}
+      <footer className="relative z-10 py-10 sm:py-12 px-4 bg-slate-900/50 backdrop-blur-sm border-t border-white/10">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+            {/* Company Info */}
+            <div className="col-span-1 sm:col-span-2 md:col-span-1">
+              <div className="flex items-center space-x-2 mb-4">
+                <img src="/img/lg.png" alt="IWARE Logo" className="h-8 w-auto" onError={(e) => {
+                  e.target.style.display = 'none';
+                }} />
+                <h3 className="text-xl font-semibold text-white">IWARE</h3>
+              </div>
+              <p className="text-sm text-slate-400 leading-relaxed">
                 Sistem perizinan digital untuk manajemen cuti dan lembur yang efisien dan transparan.
               </p>
             </div>
 
-            <div className="group text-center sm:text-left">
-              <h4 className={`text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 transition-colors duration-300 ${!isMobile ? 'group-hover:text-blue-400' : ''}`}>Fitur</h4>
-              <ul className="space-y-2 text-sm sm:text-base text-slate-300">
-                <li className={`transition-all duration-300 cursor-pointer ${!isMobile ? 'hover:text-white hover:translate-x-2' : ''}`}>→ Pengajuan Cuti</li>
-                <li className={`transition-all duration-300 cursor-pointer ${!isMobile ? 'hover:text-white hover:translate-x-2' : ''}`}>→ Pengajuan Lembur</li>
-                <li className={`transition-all duration-300 cursor-pointer ${!isMobile ? 'hover:text-white hover:translate-x-2' : ''}`}>→ Tracking Status</li>
-                <li className={`transition-all duration-300 cursor-pointer ${!isMobile ? 'hover:text-white hover:translate-x-2' : ''}`}>→ Riwayat Perizinan</li>
+            {/* Fitur */}
+            <div>
+              <h4 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Fitur</h4>
+              <ul className="space-y-2.5 text-sm text-slate-400">
+                <li className="hover:text-white transition-colors duration-200 cursor-pointer">Pengajuan Cuti</li>
+                <li className="hover:text-white transition-colors duration-200 cursor-pointer">Pengajuan Lembur</li>
+                <li className="hover:text-white transition-colors duration-200 cursor-pointer">Tracking Status</li>
+                <li className="hover:text-white transition-colors duration-200 cursor-pointer">Riwayat Perizinan</li>
               </ul>
             </div>
 
-            <div className="group text-center sm:text-left">
-              <h4 className={`text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 transition-colors duration-300 ${!isMobile ? 'group-hover:text-blue-400' : ''}`}>Kontak</h4>
-              <ul className="space-y-2 text-sm sm:text-base text-slate-300">
-                <li className={`transition-all duration-300 cursor-pointer ${!isMobile ? 'hover:text-white hover:translate-x-2' : ''}`}>
-                  <span className="block text-xs sm:text-sm">📧 Email</span>
-                  <span className="text-xs sm:text-sm">support@iware.id</span>
+            {/* Perusahaan */}
+            <div>
+              <h4 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Perusahaan</h4>
+              <ul className="space-y-2.5 text-sm text-slate-400">
+                <li className="hover:text-white transition-colors duration-200 cursor-pointer">Tentang Kami</li>
+                <li className="hover:text-white transition-colors duration-200 cursor-pointer">Kebijakan Privasi</li>
+                <li className="hover:text-white transition-colors duration-200 cursor-pointer">Syarat & Ketentuan</li>
+                <li className="hover:text-white transition-colors duration-200 cursor-pointer">FAQ</li>
+              </ul>
+            </div>
+
+            {/* Kontak */}
+            <div>
+              <h4 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Kontak</h4>
+              <ul className="space-y-3 text-sm text-slate-400">
+                <li>
+                  <span className="block text-xs text-slate-500 mb-1">Email</span>
+                  <a href="mailto:support@iware.id" className="hover:text-white transition-colors duration-200">support@iware.id</a>
                 </li>
-                <li className={`transition-all duration-300 cursor-pointer ${!isMobile ? 'hover:text-white hover:translate-x-2' : ''}`}>
-                  <span className="block text-xs sm:text-sm">📞 Telepon</span>
-                  <span className="text-xs sm:text-sm">+62 21 1234 5678</span>
+                <li>
+                  <span className="block text-xs text-slate-500 mb-1">Telepon</span>
+                  <a href="tel:+622112345678" className="hover:text-white transition-colors duration-200">+62 21 1234 5678</a>
                 </li>
               </ul>
             </div>
           </div>
 
-          <div className="border-t border-white/20 pt-6 sm:pt-8 text-center text-slate-400">
-            <p className={`text-xs sm:text-sm transition-colors duration-300 ${!isMobile ? 'hover:text-white' : ''}`}>&copy; 2026 IWARE. Sistem Perizinan Digital.</p>
+          {/* Bottom Bar */}
+          <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p className="text-xs sm:text-sm text-slate-500">
+              &copy; 2026 IWARE. All rights reserved.
+            </p>
+            <div className="flex items-center space-x-6 text-xs sm:text-sm text-slate-500">
+              <a href="#" className="hover:text-white transition-colors duration-200">Privacy Policy</a>
+              <a href="#" className="hover:text-white transition-colors duration-200">Terms of Service</a>
+            </div>
           </div>
         </div>
       </footer>

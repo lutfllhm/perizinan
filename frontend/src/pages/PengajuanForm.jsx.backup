@@ -17,253 +17,126 @@ const daftarKantor = [
   'RBM-IWARE JOGJA'
 ];
 
-// Data Master Karyawan per Kantor
-const dataKaryawan = {
-    'RBM-IWARE SURABAYA': [
-      { nama: 'Sugiharto Tjokro', jabatan: 'Owner', departemen: 'Direktur' },
-      { nama: 'Djie Tince Muhaji (Tince)', jabatan: 'General Manager', departemen: 'Management' },
-      { nama: 'Lisa Israti', jabatan: 'HRD', departemen: 'HRD' },
-      { nama: 'Azza Diana Lailatul Afidah', jabatan: 'HR Rekrutmen', departemen: 'HRD' },
-      { nama: 'Cahyo Novianto', jabatan: 'GA- Surabaya', departemen: 'GA' },
-      { nama: 'Dewi Ambarwati', jabatan: 'Kasir', departemen: 'F.A.T. IWARE SURABAYA' },
-      { nama: 'Junestia Vianjaningrum', jabatan: 'Taxx', departemen: 'F.A.T. IWARE SURABAYA' },
-      { nama: 'Mei Cahyaningtyas', jabatan: 'Admin Pajak', departemen: 'F.A.T. IWARE SURABAYA' },
-      { nama: 'Inge Kartika Sari', jabatan: 'Pembayaran Offline', departemen: 'F.A.T. IWARE SURABAYA' },
-      { nama: 'Masbita Rusdiana Yunaini', jabatan: 'Accounting Tax', departemen: 'F.A.T. IWARE SURABAYA' },
-      { nama: 'Dina Wijayanti', jabatan: 'Controller FAT', departemen: 'F.A.T. IWARE SURABAYA' },
-      { nama: 'Aprillia Dwi Prastiwi', jabatan: 'Admin Import', departemen: 'Admin Import' },
-      { nama: 'Anisa Nur Hidayati', jabatan: 'Accounting Tax Cakra & iLumindo', departemen: 'Accounting Tax ILUMINDO' },
-      { nama: 'Astypuri Wijayanti', jabatan: 'Penagihan', departemen: 'Accounting' },
-      { nama: 'Akhla Lailatus Shurur', jabatan: 'Tax', departemen: 'Accounting Tax' },
-      { nama: 'Citra Utami', jabatan: 'Accounting Tax Temon', departemen: 'Accounting Tax WMP' },
-      { nama: 'Agus Purnomo', jabatan: 'Sales Offline', departemen: 'Sales Offline' },
-      { nama: 'Jimmy Matheus Pietrajaua S', jabatan: 'Sales Offline', departemen: 'Sales Offline' },
-      { nama: 'Yudy Setiawan', jabatan: 'Sales Offline', departemen: 'Sales Offline' },
-      { nama: 'Apsarini Ardiningrum Iswanto', jabatan: 'Sales Support', departemen: 'Sales support' },
-      { nama: 'Sindy Chairunisa', jabatan: 'Data Analis', departemen: 'Analis' },
-      { nama: 'Lutfillah Masduqi', jabatan: 'Web Developer', departemen: 'IT' },
-      { nama: 'Asep Sugianto', jabatan: 'Admin Sales Online', departemen: 'Online' },
-      { nama: 'Anti Faradyba Putri', jabatan: 'Admin Sales Online', departemen: 'Online' },
-      { nama: 'Mujahidin', jabatan: 'Admin Sales Online', departemen: 'Online' },
-      { nama: 'Rachmat Habiono', jabatan: 'Product Support', departemen: 'Product Support- Teknisi' },
-      { nama: 'Ika Apriyanti', jabatan: 'Admin Sales Online', departemen: 'Admin Online Marketplace' },
-      { nama: 'Rizky Azhari', jabatan: 'Admin Sales Online', departemen: 'Admin Online Marketplace' },
-      { nama: 'Rachmad Ardianto', jabatan: 'Design Grafis - Offline', departemen: 'Design Grafis' },
-      { nama: 'Dwi Intan Istifadah', jabatan: 'Sosial Media Spesialist', departemen: 'Online' },
-      { nama: 'Nurussalamah', jabatan: 'Sosial Media Spesialist', departemen: 'Online' },
-      { nama: 'Maratus Sholikhah (Lili)', jabatan: 'Talent/ Host Live Streaming', departemen: 'Online' },
-      { nama: 'Adi Ayu Rani', jabatan: 'Design Grafis - Online', departemen: 'Design Grafis' },
-      { nama: 'Firman Pradana', jabatan: 'Foto/videografer', departemen: 'Online' },
-      { nama: 'Firman setiawan', jabatan: 'Staff', departemen: 'General' },
-      { nama: 'Adi Wijaya', jabatan: 'Staff', departemen: 'General' },
-      { nama: 'Christoper Hanjaya', jabatan: 'PIC', departemen: 'Digital Marketing' },
-      { nama: 'Ali Mahfudz', jabatan: 'Product Support- Teknisi', departemen: 'TEKNISI' },
-      { nama: 'Tondo Triono', jabatan: 'Talent/ Host Live Streaming', departemen: 'Online' },
-      { nama: 'Moch Amin Tian', jabatan: 'Product Support- Teknisi', departemen: 'TEKNISI' },
-      { nama: 'Dedy Setiawan', jabatan: 'Senior Teknisi', departemen: 'Product Support- Teknisi' },
-      { nama: 'Muhammad Fatihul Huda', jabatan: 'Teknisi', departemen: 'Teknisi' },
-      { nama: 'Devy Haryansari', jabatan: 'Admin Service', departemen: 'Teknisi' },
-      { nama: 'El Nusa Putra Pratama', jabatan: 'Teknisi', departemen: 'Teknisi' },
-      { nama: 'Sherly', jabatan: 'Admin Service', departemen: 'Teknisi' },
-      { nama: 'Musyadi', jabatan: 'Teknisi GPS', departemen: 'GPS' },
-      { nama: 'Aditya Pria Anggara', jabatan: 'Supir- Helper', departemen: 'Gudang' },
-      { nama: 'Agung Widodo', jabatan: 'Helper', departemen: 'Gudang' },
-      { nama: 'Iswie Christyano', jabatan: 'Helper', departemen: 'Gudang' },
-      { nama: 'Amin Krestyawan', jabatan: 'Helper', departemen: 'Gudang' },
-      { nama: 'Arif Gunawan', jabatan: 'Admin Gudang', departemen: 'Gudang' },
-      { nama: 'Heri Triwiyono', jabatan: 'Admin GPS', departemen: 'GPS' },
-      { nama: 'Rizki Nur Farhan', jabatan: 'Admin Gudang', departemen: 'Gudang' },
-      { nama: 'Rohmad Syaifudin', jabatan: 'Helper- As Supir', departemen: 'Helper- Gudang' },
-      { nama: 'Sarwo', jabatan: 'Helper', departemen: 'Helper- Gudang' },
-      { nama: 'Samsul Mariono', jabatan: 'Helper', departemen: 'Gudang' },
-      { nama: 'Kurniawan', jabatan: 'Helper', departemen: 'Gudang' },
-      { nama: 'Mohammad Anas Marzuki', jabatan: 'Helper', departemen: 'Gudang' },
-      { nama: 'Ricky Defteransyah', jabatan: 'Admin Gudang', departemen: 'GUudang- Admin Gudang' },
-      { nama: 'Adenan Khohar', jabatan: 'Supir-Helper', departemen: 'Gudang' },
-      { nama: 'Rahmad Anggi Noval Ariyanto', jabatan: 'Helper', departemen: 'Gudang' },
-      { nama: 'Ardiansyah Fatkhurrohman', jabatan: 'Helper', departemen: 'Gudang' },
-      { nama: 'Fahmi Rizal', jabatan: 'Helper', departemen: 'Gudang' },
-      { nama: 'Syahrul Avis', jabatan: 'Helper', departemen: 'Gudang' },
-      { nama: 'Saifudin Hikam', jabatan: 'Admin Gudang', departemen: 'Gudang' },
-      { nama: 'Muchammad Harris', jabatan: 'Helper', departemen: 'Gudang' },
-      { nama: 'Iful Yusro', jabatan: 'Admin Retur-Gudang', departemen: 'Gudang' },
-      { nama: 'Ivan Dwi Saputra', jabatan: 'Helper', departemen: 'Gudang' },
-      { nama: 'Nurul Farida', jabatan: 'Admin Nota', departemen: 'Gudang Surabaya' },
-      { nama: 'Ong Erni Erawati', jabatan: 'Admin Nota', departemen: 'Gudang Surabaya' },
-      { nama: 'Lucki Nata Aprilia', jabatan: 'Admin Nota', departemen: 'Gudang Surabaya' },
-      { nama: 'Thomas Puji Adi Wiyarja', jabatan: 'Marketing Toko', departemen: 'Marketing' },
-      { nama: 'Anjani Kusuma Wardani', jabatan: 'Admin Toko', departemen: 'Admin' },
-      { nama: 'Umam', jabatan: 'Cleaning', departemen: 'Cleaning Service' },
-      { nama: 'Saeful', jabatan: 'Cleaning', departemen: 'Cleaning Service' }
-    ],
-    'SBA-WMP': [
-      { nama: 'Ali Usman', jabatan: 'Teknisi Mesin', departemen: 'SBA- WMP Surabaya' },
-      { nama: 'Susanti', jabatan: 'Admin', departemen: 'SBA- WMP Surabaya' },
-      { nama: 'Rika Rahayu', jabatan: 'Accounting Tax WMP', departemen: 'SBA- WMP Surabaya' },
-      { nama: 'Wahyu Adji P.', jabatan: 'Marketing Online', departemen: 'SBA- WMP Surabaya' },
-      { nama: 'Ratna', jabatan: 'Admin Import', departemen: 'SBA- WMP Surabaya' },
-      { nama: 'Qisha Aulia Habbiballah', jabatan: 'Admin', departemen: 'SBA- WMP Semarang' },
-      { nama: 'Andriyanto', jabatan: 'Teknisi Mesin', departemen: 'SBA- WMP Semarang' },
-      { nama: 'Sunaryo', jabatan: 'Leader', departemen: 'SBA- WMP Semarang' },
-      { nama: 'Muhammad LuthfiL KHAKIM', jabatan: 'Teknisi Mesin', departemen: 'SBA- WMP Semarang' },
-      { nama: 'M. Wirawansyah', jabatan: 'Sales', departemen: 'SBA- WMP Semarang' },
-      { nama: 'Adib Luthfi Adbillah', jabatan: 'Sales', departemen: 'SBA- WMP Semarang' },
-      { nama: 'Abdullah Ubaid', jabatan: 'Admin Gudang', departemen: 'SBA- WMP Legundi' },
-      { nama: 'Liem Sandra Salim', jabatan: 'Asisten Manager', departemen: 'SBA- WMP Legundi' },
-      { nama: 'Ifmawan Arnanto', jabatan: 'Helper WMP', departemen: 'SBA- WMP Bumi Maspion' },
-      { nama: 'Yachya', jabatan: 'Kepala Gudang', departemen: 'SBA- WMP Legundi' },
-      { nama: 'Evelyne Greselda', jabatan: 'Admin', departemen: 'SBA- WMP Surabaya' },
-      { nama: 'Ho Ming Hie', jabatan: 'Staff', departemen: 'SBA- WMP' },
-      { nama: 'Hadi Siswanto', jabatan: 'Helper WMP', departemen: 'SBA- WMP Bumi Maspion' }
-    ],
-    'RBM-IWARE JAKARTA': [
-      { nama: 'M. Hatob', jabatan: 'Driver', departemen: 'Gudang' },
-      { nama: 'Robby', jabatan: 'TL Branch', departemen: 'Management' },
-      { nama: 'Onan Dopong Duru', jabatan: 'Admin Gudang', departemen: 'Gudang' },
-      { nama: 'Orlin Irma Dolinda Tnunai', jabatan: 'Admin Online', departemen: 'Admin' },
-      { nama: 'Marliase Ismayassa', jabatan: 'Admin Online', departemen: 'Admin' },
-      { nama: 'Budi Ansyah', jabatan: 'Admin Pengiriman', departemen: 'Admin' },
-      { nama: 'Muhammad Purwanto', jabatan: 'Packing', departemen: 'Gudang' },
-      { nama: "Saepul Ma'ruf", jabatan: 'Admin - Gudang', departemen: 'Gudang' },
-      { nama: "Nur'aini", jabatan: 'Admin Online', departemen: 'Gudang' },
-      { nama: 'Rizky Ramdhani', jabatan: 'Helper-Packing', departemen: 'Gudang' },
-      { nama: 'Dimas Purwanto', jabatan: 'Helper-Packing', departemen: 'Gudang' },
-      { nama: 'Preti Erriani', jabatan: 'Helper', departemen: 'Gudang' },
-      { nama: 'Eko Purnomo', jabatan: 'Helper-Packing', departemen: 'Gudang' },
-      { nama: 'Rinnawati', jabatan: 'Admin Nota Offlie', departemen: 'gudang' },
-      { nama: 'M. Aditya Rahman', jabatan: 'Helper-Packing', departemen: 'Gudang' },
-      { nama: 'Akhmad Fauzan Akbari', jabatan: 'Helper-Packing', departemen: 'Gudang' },
-      { nama: 'Nicolaus Namang Odung', jabatan: 'Helper-Packing', departemen: 'Gudang' },
-      { nama: 'Olivia Doho', jabatan: 'Staff', departemen: 'General' },
-      { nama: 'Aurelia Fadhilla Naufan', jabatan: 'Accounting', departemen: 'RBB' },
-      { nama: 'Egi Nugraha', jabatan: 'Helper-Jurumudi', departemen: 'Gudang' },
-      { nama: 'Richi Chandra', jabatan: 'Staff', departemen: 'General' },
-      { nama: 'Suryadi', jabatan: 'Driver RBB', departemen: 'Gudang' },
-      { nama: 'M. Riyan Hambali', jabatan: 'Driver Jurumudi', departemen: 'Gudang' },
-      { nama: 'Ahmad Kahfi', jabatan: 'Cleaning Service', departemen: 'Gudang' },
-      { nama: 'Ryzka Syiami Nurharisma', jabatan: 'Admin Nota Rbb', departemen: 'Gudang' },
-      { nama: 'Dio Febriyatna', jabatan: 'Helper', departemen: 'Gudang' },
-      { nama: 'Aldy Priyanto', jabatan: 'Driver JM', departemen: 'Gudang' },
-      { nama: 'Rizky Ramadhan', jabatan: 'Teknisi M2S', departemen: 'Teknisi' },
-      { nama: 'Rahmandani', jabatan: 'Helper-Gudang Puri', departemen: 'Gudang' },
-      { nama: 'M. Rihan saputra', jabatan: 'Helper RBB', departemen: 'Gudang' },
-      { nama: 'Septia Endah Dwi Sulastri', jabatan: 'Admin Service', departemen: 'Teknisi- Admin Service' },
-      { nama: 'Anang Sujhatmiko', jabatan: 'Helper JM', departemen: 'Gudang' },
-      { nama: 'Robi Sugara', jabatan: 'Teknisi Service', departemen: 'Teknisi' },
-      { nama: 'Aryo Giri Anggono', jabatan: 'Teknisi Service', departemen: 'Teknisi' },
-      { nama: 'M. Samsul Bahri', jabatan: 'Admin Gudang JM', departemen: 'Gudang' },
-      { nama: 'Ahmad Akbar Nurullah', jabatan: 'Admin Gudang RBB', departemen: 'Admin Gudang RBB' }
-    ],
-    'ILUMINDO': [
-      { nama: 'Faisal Nu Triansyah', jabatan: 'Sales Offline Ilumindo', departemen: 'Sales Offline' },
-      { nama: 'Joko Yuliantono', jabatan: 'Sales Project', departemen: 'Sales' },
-      { nama: 'Nur Kiswanto', jabatan: 'Videographer & Event', departemen: 'General Affair- HRD' },
-      { nama: 'Reza Fadhillah', jabatan: 'Sales Project', departemen: 'Sales' },
-      { nama: 'Diki Zulkarnain', jabatan: 'Product Support', departemen: 'Teknisi' },
-      { nama: 'Agus Tuaasun', jabatan: 'Product Support', departemen: 'Teknisi' },
-      { nama: 'Muhammad Reynaldi Putra', jabatan: 'Product Support', departemen: 'Teknisi' },
-      { nama: 'Hendra Setiawan', jabatan: 'Sales Project', departemen: 'sales' },
-      { nama: 'Wahid Nurhilaludin', jabatan: 'Sales Project- Government', departemen: 'Sales Offline' },
-      { nama: 'Putri Aulia Mandhasari', jabatan: 'Admin sales', departemen: 'Sales support' },
-      { nama: 'Hoan Junaidi', jabatan: 'Manager', departemen: 'Manager Sales' },
-      { nama: 'Meikel Octavian', jabatan: 'Sales Project', departemen: 'Sales' },
-      { nama: 'Michael Josef Latumahina', jabatan: 'Channel Sales', departemen: 'Sales' }
-    ],
-    'RBM - LABEL': [
-      { nama: 'Arfhond Kasangke', jabatan: 'Kepala Produksi', departemen: 'Label' },
-      { nama: 'Febri Tri Andika', jabatan: 'Operator Sponsing', departemen: 'Label' },
-      { nama: 'Rohmat Hidayat', jabatan: 'Operator Sponsing', departemen: 'Label' },
-      { nama: 'Andre Aggesi Pratama', jabatan: 'Operator Sponsing', departemen: 'Label' },
-      { nama: 'Rio Kusuma', jabatan: 'Operator Sponsing', departemen: 'Label' },
-      { nama: 'Susiana', jabatan: 'Admin & QC', departemen: 'Label' },
-      { nama: 'Fatqur Roji', jabatan: 'Operator Sliting', departemen: 'Label' },
-      { nama: 'Rudiono', jabatan: 'Operator Sponsing', departemen: 'Label' },
-      { nama: 'Rachmat Addin Affandi', jabatan: 'Operator Slitting', departemen: 'Label' },
-      { nama: 'Ibrahim Riyadi Armansyah', jabatan: 'Operator Slitting', departemen: 'Label' },
-      { nama: 'Arvian Bagus Setianto', jabatan: 'Operator Slitting', departemen: 'Label' },
-      { nama: 'Wahyu Teguh Anugrah', jabatan: 'Operator Slitting', departemen: 'Label' },
-      { nama: 'Muhammad Riski Ramadani', jabatan: 'Operator Slitting', departemen: 'Label' },
-      { nama: 'M Faruq Dwi Saputra', jabatan: 'Operator Slitting', departemen: 'Label' },
-      { nama: 'Moch Irfan Dwi', jabatan: 'Operator slitting', departemen: 'Label' },
-      { nama: 'Ari Ariyanto', jabatan: 'Operator slitting', departemen: 'Label' },
-      { nama: 'Firman Ardiansyah', jabatan: 'Operator Packaging', departemen: 'Label' },
-      { nama: 'Aris Firmansyah', jabatan: 'Operator Packaging', departemen: 'Label' },
-      { nama: 'Data Artha Hendra', jabatan: 'Operator Packaging', departemen: 'Label' },
-      { nama: 'Arinta Mustika Rani', jabatan: 'Admin Produksi', departemen: 'Label' }
-    ],
-    'ALGOO': [
-      { nama: 'Irfan Fadhil Rabbaniy', jabatan: 'Desain Grafis', departemen: 'Desain' },
-      { nama: 'Nina Dwi Rusanti', jabatan: 'E commerce spesialist', departemen: 'Marketing Online' },
-      { nama: 'Krisna Yuvi Setyawan', jabatan: 'Helper', departemen: 'Gudang' },
-      { nama: 'Bela Agustina Putri', jabatan: 'Admin Gudang', departemen: 'Gudang' },
-      { nama: 'Mochammad Royhansyah', jabatan: 'Helper', departemen: 'Gudang' },
-      { nama: 'Asep Hidayat', jabatan: 'Helper', departemen: 'Gudang' }
-    ],
-    'RBM - IWARE BALI': [
-      { nama: 'Hendri Novandri', jabatan: 'Admin Gudang', departemen: 'Gudang' },
-      { nama: 'Octavia WigrhaIstia Dewi', jabatan: 'Admin Nota', departemen: 'Gudang' },
-      { nama: 'Samsul Arifin', jabatan: 'Helper/driver gudang', departemen: 'Gudang' },
-      { nama: 'Muhammad Fathur Rosi', jabatan: 'Teknisi Bali', departemen: 'Gudang' }
-    ],
-    'RBM-IWARE JOGJA': [
-      { nama: 'Yudhistira Iyan Purtanto', jabatan: 'Admin Gudang', departemen: 'Gudang' }
-    ]
-};
-
 const PengajuanForm = () => {
   const navigasi = useNavigate();
   const [sedangMemuat, setSedangMemuat] = useState(false);
   const [dataForm, setDataForm] = useState({
     kantor: '',
+    karyawan_id: '',
     nama: '',
     jabatan: '',
     departemen: '',
     no_telp: '',
-    jenis_perizinan: 'cuti',
+    jenis_perizinan: 'tidak_masuk_cuti',
     tanggal_mulai: '',
     tanggal_selesai: '',
     bukti_foto: null
   });
   const [previewImage, setPreviewImage] = useState(null);
-  const [daftarNama, setDaftarNama] = useState([]);
+  const [daftarKaryawan, setDaftarKaryawan] = useState([]);
+  const [quotaInfo, setQuotaInfo] = useState(null);
+  const [loadingQuota, setLoadingQuota] = useState(false);
 
   const jenisPerizinan = [
-    { value: 'cuti', label: 'Cuti' },
-    { value: 'lembur', label: 'Lembur' },
-    { value: 'sakit', label: 'Sakit' },
-    { value: 'dinas_luar', label: 'Dinas Luar' },
-    { value: 'pulang_cepat', label: 'Pulang Lebih Awal' },
-    { value: 'datang_terlambat', label: 'Datang Terlambat' },
-    { value: 'lainnya', label: 'Lainnya' }
+    { 
+      value: 'tidak_masuk_cuti', 
+      label: 'Tidak Masuk / Cuti',
+      keterangan: null
+    },
+    { 
+      value: 'sakit', 
+      label: 'Sakit',
+      keterangan: 'Lengkapi dengan Surat Keterangan Dokter'
+    },
+    { 
+      value: 'dinas_luar', 
+      label: 'Dinas Luar/Kelilingan',
+      keterangan: null
+    },
+    { 
+      value: 'pulang_setengah_hari', 
+      label: 'Ijin Pulang Setengah Hari',
+      keterangan: 'Batas Minimal Pulang jam 13.00'
+    },
+    { 
+      value: 'datang_terlambat', 
+      label: 'Ijin Datang Terlambat',
+      keterangan: 'Batas Maksimal Datang Jam 11.00'
+    },
+    { 
+      value: 'ijin_keluar', 
+      label: 'Ijin Meninggalkan Kantor Di Jam Kerja & WAJIB KEMBALI KE KANTOR',
+      keterangan: 'Ijin keluar untuk keperluan pribadi - maximal 2 jam'
+    },
+    { 
+      value: 'absen_manual', 
+      label: 'Absen Manual',
+      keterangan: 'WAJIB Konfirmasi Dahulu'
+    }
   ];
 
-  // Update daftar nama ketika kantor berubah
+  // Fetch karyawan ketika kantor berubah
   useEffect(() => {
     if (dataForm.kantor) {
-      const karyawanKantor = dataKaryawan[dataForm.kantor] || [];
-      setDaftarNama(karyawanKantor);
-      // Reset field lain saat kantor berubah
+      fetchKaryawan(dataForm.kantor);
+    } else {
+      setDaftarKaryawan([]);
       setDataForm(prev => ({
         ...prev,
+        karyawan_id: '',
         nama: '',
         jabatan: '',
         departemen: '',
         no_telp: ''
       }));
-    } else {
-      setDaftarNama([]);
+      setQuotaInfo(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataForm.kantor]);
 
-  // Auto-fill jabatan, departemen ketika nama dipilih
-  const handleNamaChange = (namaTerpilih) => {
-    const karyawan = daftarNama.find(k => k.nama === namaTerpilih);
+  // Fetch quota ketika karyawan dipilih
+  useEffect(() => {
+    if (dataForm.karyawan_id) {
+      fetchQuota(dataForm.karyawan_id);
+    } else {
+      setQuotaInfo(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataForm.karyawan_id]);
+
+  const fetchKaryawan = async (kantor) => {
+    try {
+      const response = await karyawanAPI.getAll({ kantor, status: 'aktif' });
+      setDaftarKaryawan(response.data);
+    } catch (error) {
+      console.error('Error fetching karyawan:', error);
+      toast.error('Gagal memuat data karyawan');
+    }
+  };
+
+  const fetchQuota = async (karyawanId) => {
+    setLoadingQuota(true);
+    try {
+      const response = await karyawanAPI.getQuota(karyawanId);
+      setQuotaInfo(response.data);
+    } catch (error) {
+      console.error('Error fetching quota:', error);
+    } finally {
+      setLoadingQuota(false);
+    }
+  };
+
+  // Auto-fill data ketika karyawan dipilih (TANPA no_telp)
+  const handleKaryawanChange = (karyawanId) => {
+    const karyawan = daftarKaryawan.find(k => k.id === parseInt(karyawanId));
     if (karyawan) {
       setDataForm(prev => ({
         ...prev,
+        karyawan_id: karyawan.id,
         nama: karyawan.nama,
         jabatan: karyawan.jabatan,
         departemen: karyawan.departemen
+        // no_telp TIDAK auto-fill, user harus input manual
       }));
     }
   };
@@ -295,6 +168,28 @@ const PengajuanForm = () => {
       return;
     }
 
+    // Validasi sakit harus ada foto (surat dokter)
+    if (dataForm.jenis_perizinan === 'sakit' && !dataForm.bukti_foto) {
+      toast.error('Sakit wajib melampirkan Surat Keterangan Dokter');
+      return;
+    }
+
+    // Validasi quota
+    if (quotaInfo) {
+      if (dataForm.jenis_perizinan === 'pulang_setengah_hari' && quotaInfo.pulang_cepat >= 3) {
+        toast.error('Quota pulang setengah hari bulan ini sudah habis (maksimal 3x)');
+        return;
+      }
+      if (dataForm.jenis_perizinan === 'datang_terlambat' && quotaInfo.datang_terlambat >= 3) {
+        toast.error('Quota datang terlambat bulan ini sudah habis (maksimal 3x)');
+        return;
+      }
+      if (dataForm.jenis_perizinan === 'tidak_masuk_cuti' && quotaInfo.sisa_cuti <= 0) {
+        toast.error('Sisa cuti Anda sudah habis');
+        return;
+      }
+    }
+
     setSedangMemuat(true);
 
     const data = new FormData();
@@ -316,23 +211,373 @@ const PengajuanForm = () => {
   };
 
   // Cek apakah jenis perizinan memerlukan foto wajib
-  const isFotoWajib = dataForm.jenis_perizinan === 'dinas_luar';
+  const isFotoWajib = dataForm.jenis_perizinan === 'dinas_luar' || dataForm.jenis_perizinan === 'sakit';
+
+  // Hitung sisa quota
+  const sisaPulangCepat = quotaInfo ? 3 - quotaInfo.pulang_cepat : 3;
+  const sisaDatangTerlambat = quotaInfo ? 3 - quotaInfo.datang_terlambat : 3;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 sm:py-12 px-4">
-      <div className="max-w-3xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-2xl p-6 sm:p-8"
-        >
-          <div className="text-center mb-6 sm:mb-8">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">Form Pengajuan</h2>
-            <p className="text-gray-600 mt-2 text-sm sm:text-base">Isi formulir di bawah ini dengan lengkap</p>
-          </div>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Background - sama dengan homepage */}
+      <div 
+        className="fixed inset-0 z-0 bg-cover bg-center"
+        style={{ 
+          backgroundImage: 'url(/img/bg.jpeg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
+        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-gray-900/40 to-slate-900/50" />
+        <div className="absolute inset-0 opacity-[0.02]" style={{
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+          backgroundSize: '50px 50px'
+        }} />
+      </div>
 
-          <form onSubmit={tanganiSubmit} className="space-y-4 sm:space-y-6">
-            {/* 1. KANTOR - Paling Atas */}
+      {/* Content */}
+      <div className="relative z-10 py-20 sm:py-24 px-4">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-8"
+          >
+            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">
+              Form Pengajuan Perizinan
+            </h1>
+            <p className="text-base sm:text-lg text-slate-400">
+              Lengkapi formulir di bawah ini dengan data yang benar
+            </p>
+          </motion.div>
+
+          {/* Form Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 sm:p-8"
+          >
+            <form onSubmit={tanganiSubmit} className="space-y-6">
+              {/* 1. KANTOR */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  <FiMapPin className="inline mr-2" />
+                  Kantor <span className="text-red-500">*</span>
+                </label>
+                <select
+                  required
+                  value={dataForm.kantor}
+                  onChange={(e) => setDataForm({ ...dataForm, kantor: e.target.value })}
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition placeholder-slate-400"
+                >
+                  <option value="" className="bg-slate-900 text-white">-- Pilih Kantor --</option>
+                  {daftarKantor.map(kantor => (
+                    <option key={kantor} value={kantor} className="bg-slate-900 text-white">
+                      {kantor}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 2. NAMA KARYAWAN */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  <FiUser className="inline mr-2" />
+                  Nama Karyawan <span className="text-red-500">*</span>
+                </label>
+                <select
+                  required
+                  value={dataForm.karyawan_id}
+                  onChange={(e) => handleKaryawanChange(e.target.value)}
+                  disabled={!dataForm.kantor}
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition placeholder-slate-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <option value="" className="bg-slate-900 text-white">
+                    {dataForm.kantor ? '-- Pilih Nama Karyawan --' : '-- Pilih Kantor Terlebih Dahulu --'}
+                  </option>
+                  {daftarKaryawan.map((karyawan) => (
+                    <option key={karyawan.id} value={karyawan.id} className="bg-slate-900 text-white">
+                      {karyawan.nama} - {karyawan.jabatan}
+                    </option>
+                  ))}
+                </select>
+                {!dataForm.kantor && (
+                  <p className="text-xs text-slate-400 mt-1">Pilih kantor terlebih dahulu</p>
+                )}
+              </div>
+
+              {/* 3. JABATAN - Auto-fill */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  <FiBriefcase className="inline mr-2" />
+                  Jabatan
+                </label>
+                <input
+                  type="text"
+                  value={dataForm.jabatan}
+                  readOnly
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-slate-400 cursor-not-allowed"
+                  placeholder="Otomatis terisi setelah pilih nama"
+                />
+              </div>
+
+              {/* 4. DEPARTEMEN - Auto-fill */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  <FiBriefcase className="inline mr-2" />
+                  Departemen
+                </label>
+                <input
+                  type="text"
+                  value={dataForm.departemen}
+                  readOnly
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-slate-400 cursor-not-allowed"
+                  placeholder="Otomatis terisi setelah pilih nama"
+                />
+              </div>
+
+              {/* 5. NO TELP */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  <FiPhone className="inline mr-2" />
+                  No. Telp/WhatsApp <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  required
+                  value={dataForm.no_telp}
+                  onChange={(e) => setDataForm({ ...dataForm, no_telp: e.target.value })}
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition placeholder-slate-400"
+                  placeholder="08xxxxxxxxxx"
+                />
+              </div>
+
+              {/* 6. JENIS PERIZINAN */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  Jenis Perizinan <span className="text-red-500">*</span>
+                </label>
+                <select
+                  required
+                  value={dataForm.jenis_perizinan}
+                  onChange={(e) => setDataForm({ ...dataForm, jenis_perizinan: e.target.value })}
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                >
+                  {jenisPerizinan.map(jenis => (
+                    <option key={jenis.value} value={jenis.value} className="bg-slate-900 text-white">
+                      {jenis.label}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Keterangan Jenis Perizinan */}
+                {jenisPerizinan.find(j => j.value === dataForm.jenis_perizinan)?.keterangan && (
+                  <div className="mt-3 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                    <div className="flex items-start">
+                      <FiAlertCircle className="text-blue-400 mt-0.5 mr-2 flex-shrink-0" size={18} />
+                      <div>
+                        <p className="text-sm font-semibold text-blue-300 mb-1">
+                          Perhatian
+                        </p>
+                        <p className="text-sm text-blue-200">
+                          {jenisPerizinan.find(j => j.value === dataForm.jenis_perizinan)?.keterangan}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Info Quota */}
+                {quotaInfo && !loadingQuota && (
+                  <div className="mt-3 space-y-2">
+                    {dataForm.jenis_perizinan === 'tidak_masuk_cuti' && (
+                      <div className={`p-3 rounded-lg border ${quotaInfo.sisa_cuti > 0 ? 'bg-green-500/10 border-green-500/20' : 'bg-red-500/10 border-red-500/20'}`}>
+                        <p className="text-sm font-semibold text-white">
+                          Sisa Cuti: <span className={quotaInfo.sisa_cuti > 0 ? 'text-green-400' : 'text-red-400'}>{quotaInfo.sisa_cuti} hari</span> (Tahun {quotaInfo.tahun_cuti})
+                        </p>
+                      </div>
+                    )}
+                    {dataForm.jenis_perizinan === 'pulang_setengah_hari' && (
+                      <div className={`p-3 rounded-lg border ${sisaPulangCepat > 0 ? 'bg-blue-500/10 border-blue-500/20' : 'bg-red-500/10 border-red-500/20'}`}>
+                        <p className="text-sm font-semibold text-white">
+                          Sisa Pulang Setengah Hari Bulan Ini: <span className={sisaPulangCepat > 0 ? 'text-blue-400' : 'text-red-400'}>{sisaPulangCepat}x</span> dari 3x
+                        </p>
+                      </div>
+                    )}
+                    {dataForm.jenis_perizinan === 'datang_terlambat' && (
+                      <div className={`p-3 rounded-lg border ${sisaDatangTerlambat > 0 ? 'bg-yellow-500/10 border-yellow-500/20' : 'bg-red-500/10 border-red-500/20'}`}>
+                        <p className="text-sm font-semibold text-white">
+                          Sisa Datang Terlambat Bulan Ini: <span className={sisaDatangTerlambat > 0 ? 'text-yellow-400' : 'text-red-400'}>{sisaDatangTerlambat}x</span> dari 3x
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* 7. TANGGAL */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
+                    <FiCalendar className="inline mr-2" />
+                    Tanggal & Jam Mulai <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="datetime-local"
+                    required
+                    value={dataForm.tanggal_mulai}
+                    onChange={(e) => setDataForm({ ...dataForm, tanggal_mulai: e.target.value })}
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
+                    <FiCalendar className="inline mr-2" />
+                    Tanggal & Jam Selesai <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="datetime-local"
+                    required
+                    value={dataForm.tanggal_selesai}
+                    onChange={(e) => setDataForm({ ...dataForm, tanggal_selesai: e.target.value })}
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                  />
+                </div>
+              </div>
+
+              {/* 8. BUKTI FOTO */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  <FiUpload className="inline mr-2" />
+                  Bukti Foto {isFotoWajib && <span className="text-red-500">*</span>}
+                  {isFotoWajib && <span className="text-red-400 text-xs ml-2">(Wajib)</span>}
+                </label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*,.pdf"
+                    required={isFotoWajib}
+                    onChange={tanganiPerubahanFile}
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-red-600 file:text-white hover:file:bg-red-700"
+                  />
+                </div>
+                <p className="text-xs text-slate-400 mt-1">Format: JPG, PNG, PDF (Maks 5MB)</p>
+                
+                {/* Alert untuk Foto Wajib */}
+                {dataForm.jenis_perizinan === 'dinas_luar' && (
+                  <div className="mt-3 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+                    <div className="flex items-start">
+                      <FiAlertCircle className="text-red-400 mt-0.5 mr-2 flex-shrink-0" size={18} />
+                      <div>
+                        <p className="text-sm font-semibold text-red-300 mb-1">
+                          Perhatian!
+                        </p>
+                        <p className="text-sm text-red-200">
+                          Untuk izin Dinas Luar/Kelilingan, Anda WAJIB melampirkan bukti foto.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {dataForm.jenis_perizinan === 'sakit' && (
+                  <div className="mt-3 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+                    <div className="flex items-start">
+                      <FiAlertCircle className="text-red-400 mt-0.5 mr-2 flex-shrink-0" size={18} />
+                      <div>
+                        <p className="text-sm font-semibold text-red-300 mb-1">
+                          Perhatian!
+                        </p>
+                        <p className="text-sm text-red-200">
+                          Untuk izin Sakit, Anda WAJIB melampirkan Surat Keterangan Dokter.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* WhatsApp Notification */}
+                <div className="mt-3 p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+                  <div className="flex items-start">
+                    <FiPhone className="text-green-400 mt-0.5 mr-2 flex-shrink-0" size={18} />
+                    <div>
+                      <p className="text-sm font-semibold text-green-300 mb-1">
+                        Penting!
+                      </p>
+                      <p className="text-sm text-green-200 mb-2">
+                        Setelah Mengisi Form, Mohon Kirim Bukti Berupa Screenshot Ke Nomor WhatsApp HRD:
+                      </p>
+                      <a 
+                        href="https://wa.me/6281249749282" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center text-sm font-bold text-green-400 hover:text-green-300 transition-colors"
+                      >
+                        <FiPhone className="mr-1" size={14} />
+                        +62 812-4974-9282
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Image Preview */}
+                {previewImage && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="mt-3 relative"
+                  >
+                    <img 
+                      src={previewImage} 
+                      alt="Preview" 
+                      className="w-full h-48 object-cover rounded-lg border-2 border-white/20"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPreviewImage(null);
+                        setDataForm({ ...dataForm, bukti_foto: null });
+                      }}
+                      className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-colors"
+                    >
+                      <FiX size={16} />
+                    </button>
+                  </motion.div>
+                )}
+              </div>
+
+              {/* SUBMIT BUTTONS */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                <button
+                  type="submit"
+                  disabled={sedangMemuat}
+                  className="flex-1 flex items-center justify-center space-x-2 py-3.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <FiSend />
+                  <span>{sedangMemuat ? 'Mengirim...' : 'Kirim Pengajuan'}</span>
+                </button>
+
+                <Link to="/" className="flex-1">
+                  <button
+                    type="button"
+                    className="w-full py-3.5 bg-white/10 border border-white/20 text-white rounded-lg font-medium hover:bg-white/20 transition"
+                  >
+                    Batal
+                  </button>
+                </Link>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      </div>
+    </div>
+  );
+};
+            {/* 1. KANTOR */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <FiMapPin className="inline mr-2" />
@@ -342,7 +587,7 @@ const PengajuanForm = () => {
                 required
                 value={dataForm.kantor}
                 onChange={(e) => setDataForm({ ...dataForm, kantor: e.target.value })}
-                className="w-full px-4 py-3 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base"
               >
                 <option value="">-- Pilih Kantor --</option>
                 {daftarKantor.map(kantor => (
@@ -353,25 +598,25 @@ const PengajuanForm = () => {
               </select>
             </div>
 
-            {/* 2. NAMA - Muncul setelah kantor dipilih */}
+            {/* 2. NAMA KARYAWAN */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <FiUser className="inline mr-2" />
-                Nama Lengkap <span className="text-red-500">*</span>
+                Nama Karyawan <span className="text-red-500">*</span>
               </label>
               <select
                 required
-                value={dataForm.nama}
-                onChange={(e) => handleNamaChange(e.target.value)}
+                value={dataForm.karyawan_id}
+                onChange={(e) => handleKaryawanChange(e.target.value)}
                 disabled={!dataForm.kantor}
-                className="w-full px-4 py-3 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base disabled:bg-gray-100 disabled:cursor-not-allowed"
               >
                 <option value="">
-                  {dataForm.kantor ? '-- Pilih Nama --' : '-- Pilih Kantor Terlebih Dahulu --'}
+                  {dataForm.kantor ? '-- Pilih Nama Karyawan --' : '-- Pilih Kantor Terlebih Dahulu --'}
                 </option>
-                {daftarNama.map((karyawan, index) => (
-                  <option key={index} value={karyawan.nama}>
-                    {karyawan.nama}
+                {daftarKaryawan.map((karyawan) => (
+                  <option key={karyawan.id} value={karyawan.id}>
+                    {karyawan.nama} - {karyawan.jabatan}
                   </option>
                 ))}
               </select>
@@ -380,7 +625,7 @@ const PengajuanForm = () => {
               )}
             </div>
 
-            {/* 3. JABATAN - Auto-fill (Read-only) */}
+            {/* 3. JABATAN - Auto-fill */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <FiBriefcase className="inline mr-2" />
@@ -390,12 +635,12 @@ const PengajuanForm = () => {
                 type="text"
                 value={dataForm.jabatan}
                 readOnly
-                className="w-full px-4 py-3 sm:py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed text-base"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed text-base"
                 placeholder="Otomatis terisi setelah pilih nama"
               />
             </div>
 
-            {/* 4. DEPARTEMEN - Auto-fill (Read-only) */}
+            {/* 4. DEPARTEMEN - Auto-fill */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <FiBriefcase className="inline mr-2" />
@@ -405,12 +650,12 @@ const PengajuanForm = () => {
                 type="text"
                 value={dataForm.departemen}
                 readOnly
-                className="w-full px-4 py-3 sm:py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed text-base"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed text-base"
                 placeholder="Otomatis terisi setelah pilih nama"
               />
             </div>
 
-            {/* 5. NO TELP - Manual Input */}
+            {/* 5. NO TELP */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <FiPhone className="inline mr-2" />
@@ -421,19 +666,21 @@ const PengajuanForm = () => {
                 required
                 value={dataForm.no_telp}
                 onChange={(e) => setDataForm({ ...dataForm, no_telp: e.target.value })}
-                className="w-full px-4 py-3 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base"
                 placeholder="08xxxxxxxxxx"
               />
             </div>
 
+            {/* 6. JENIS PERIZINAN */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Jenis Perizinan
+                Jenis Perizinan <span className="text-red-500">*</span>
               </label>
               <select
+                required
                 value={dataForm.jenis_perizinan}
                 onChange={(e) => setDataForm({ ...dataForm, jenis_perizinan: e.target.value })}
-                className="w-full px-4 py-3 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base"
               >
                 {jenisPerizinan.map(jenis => (
                   <option key={jenis.value} value={jenis.value}>
@@ -441,38 +688,84 @@ const PengajuanForm = () => {
                   </option>
                 ))}
               </select>
+
+              {/* Keterangan Jenis Perizinan */}
+              {jenisPerizinan.find(j => j.value === dataForm.jenis_perizinan)?.keterangan && (
+                <div className="mt-3 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
+                  <div className="flex items-start">
+                    <FiAlertCircle className="text-blue-600 mt-0.5 mr-2 flex-shrink-0" size={18} />
+                    <div>
+                      <p className="text-sm font-semibold text-blue-800 mb-1">
+                        ℹ️ Perhatian
+                      </p>
+                      <p className="text-sm text-blue-700">
+                        {jenisPerizinan.find(j => j.value === dataForm.jenis_perizinan)?.keterangan}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Info Quota */}
+              {quotaInfo && !loadingQuota && (
+                <div className="mt-3 space-y-2">
+                  {dataForm.jenis_perizinan === 'tidak_masuk_cuti' && (
+                    <div className={`p-3 rounded-lg border ${quotaInfo.sisa_cuti > 0 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                      <p className="text-sm font-semibold text-gray-700">
+                        📅 Sisa Cuti: <span className={quotaInfo.sisa_cuti > 0 ? 'text-green-600' : 'text-red-600'}>{quotaInfo.sisa_cuti} hari</span> (Tahun {quotaInfo.tahun_cuti})
+                      </p>
+                    </div>
+                  )}
+                  {dataForm.jenis_perizinan === 'pulang_setengah_hari' && (
+                    <div className={`p-3 rounded-lg border ${sisaPulangCepat > 0 ? 'bg-blue-50 border-blue-200' : 'bg-red-50 border-red-200'}`}>
+                      <p className="text-sm font-semibold text-gray-700">
+                        🏃 Sisa Pulang Setengah Hari Bulan Ini: <span className={sisaPulangCepat > 0 ? 'text-blue-600' : 'text-red-600'}>{sisaPulangCepat}x</span> dari 3x
+                      </p>
+                    </div>
+                  )}
+                  {dataForm.jenis_perizinan === 'datang_terlambat' && (
+                    <div className={`p-3 rounded-lg border ${sisaDatangTerlambat > 0 ? 'bg-yellow-50 border-yellow-200' : 'bg-red-50 border-red-200'}`}>
+                      <p className="text-sm font-semibold text-gray-700">
+                        ⏰ Sisa Datang Terlambat Bulan Ini: <span className={sisaDatangTerlambat > 0 ? 'text-yellow-600' : 'text-red-600'}>{sisaDatangTerlambat}x</span> dari 3x
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
+            {/* 7. TANGGAL */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <FiCalendar className="inline mr-2" />
-                  Tanggal & Jam Mulai
+                  Tanggal & Jam Mulai <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="datetime-local"
                   required
                   value={dataForm.tanggal_mulai}
                   onChange={(e) => setDataForm({ ...dataForm, tanggal_mulai: e.target.value })}
-                  className="w-full px-4 py-3 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <FiCalendar className="inline mr-2" />
-                  Tanggal & Jam Selesai
+                  Tanggal & Jam Selesai <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="datetime-local"
                   required
                   value={dataForm.tanggal_selesai}
                   onChange={(e) => setDataForm({ ...dataForm, tanggal_selesai: e.target.value })}
-                  className="w-full px-4 py-3 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base"
                 />
               </div>
             </div>
 
+            {/* 8. BUKTI FOTO */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <FiUpload className="inline mr-2" />
@@ -485,12 +778,12 @@ const PengajuanForm = () => {
                   accept="image/*,.pdf"
                   required={isFotoWajib}
                   onChange={tanganiPerubahanFile}
-                  className="w-full px-4 py-3 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                 />
               </div>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">Format: JPG, PNG, PDF (Maks 5MB)</p>
               
-              {/* Alert untuk Dinas Luar */}
+              {/* Alert untuk Foto Wajib */}
               {dataForm.jenis_perizinan === 'dinas_luar' && (
                 <div className="mt-3 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
                   <div className="flex items-start">
@@ -500,27 +793,26 @@ const PengajuanForm = () => {
                         ⚠️ Perhatian!
                       </p>
                       <p className="text-sm text-red-700">
-                        Untuk izin Dinas Luar, Anda WAJIB melampirkan bukti foto.
+                        Untuk izin Dinas Luar/Kelilingan, Anda WAJIB melampirkan bukti foto.
                       </p>
                     </div>
                   </div>
                 </div>
               )}
               
-              {/* Info Sisa Cuti & Quota */}
-              {dataForm.jenis_perizinan === 'cuti' && (
-                <div className="mt-3 p-3 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
-                  <p className="text-sm text-blue-700">
-                    💡 <strong>Info:</strong> Setiap karyawan memiliki jatah cuti 12 hari per tahun. Pastikan sisa cuti Anda mencukupi.
-                  </p>
-                </div>
-              )}
-              
-              {(dataForm.jenis_perizinan === 'pulang_cepat' || dataForm.jenis_perizinan === 'datang_terlambat') && (
-                <div className="mt-3 p-3 bg-yellow-50 border-l-4 border-yellow-500 rounded-lg">
-                  <p className="text-sm text-yellow-700">
-                    💡 <strong>Info:</strong> Maksimal 3x per bulan untuk {dataForm.jenis_perizinan === 'pulang_cepat' ? 'Pulang Lebih Awal' : 'Datang Terlambat'}.
-                  </p>
+              {dataForm.jenis_perizinan === 'sakit' && (
+                <div className="mt-3 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
+                  <div className="flex items-start">
+                    <FiAlertCircle className="text-red-600 mt-0.5 mr-2 flex-shrink-0" size={18} />
+                    <div>
+                      <p className="text-sm font-semibold text-red-800 mb-1">
+                        ⚠️ Perhatian!
+                      </p>
+                      <p className="text-sm text-red-700">
+                        Untuk izin Sakit, Anda WAJIB melampirkan Surat Keterangan Dokter.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
               
@@ -574,22 +866,21 @@ const PengajuanForm = () => {
               )}
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+            {/* SUBMIT BUTTONS */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <button
                 type="submit"
                 disabled={sedangMemuat}
-                className="flex-1 flex items-center justify-center space-x-2 py-3 sm:py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition disabled:opacity-50 min-h-[48px]"
+                className="flex-1 flex items-center justify-center space-x-2 py-3.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <FiSend />
                 <span>{sedangMemuat ? 'Mengirim...' : 'Kirim Pengajuan'}</span>
-              </motion.button>
+              </button>
 
               <Link to="/" className="flex-1">
                 <button
                   type="button"
-                  className="w-full py-3 sm:py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition min-h-[48px]"
+                  className="w-full py-3.5 bg-white/10 border border-white/20 text-white rounded-lg font-medium hover:bg-white/20 transition"
                 >
                   Batal
                 </button>

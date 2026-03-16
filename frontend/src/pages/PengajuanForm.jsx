@@ -218,332 +218,361 @@ const PengajuanForm = () => {
   const sisaDatangTerlambat = quotaInfo ? 3 - quotaInfo.datang_terlambat : 3;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 sm:py-12 px-4">
-      <div className="max-w-3xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-2xl p-6 sm:p-8"
-        >
-          <div className="text-center mb-6 sm:mb-8">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">Form Pengajuan</h2>
-            <p className="text-gray-600 mt-2 text-sm sm:text-base">Isi formulir di bawah ini dengan lengkap</p>
-          </div>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Background - sama dengan homepage */}
+      <div 
+        className="fixed inset-0 z-0 bg-cover bg-center"
+        style={{ 
+          backgroundImage: 'url(/img/bg.jpeg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
+        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-gray-900/40 to-slate-900/50" />
+        <div className="absolute inset-0 opacity-[0.02]" style={{
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+          backgroundSize: '50px 50px'
+        }} />
+      </div>
 
-          <form onSubmit={tanganiSubmit} className="space-y-4 sm:space-y-6">
-            {/* 1. KANTOR */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <FiMapPin className="inline mr-2" />
-                Kantor <span className="text-red-500">*</span>
-              </label>
-              <select
-                required
-                value={dataForm.kantor}
-                onChange={(e) => setDataForm({ ...dataForm, kantor: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base"
-              >
-                <option value="">-- Pilih Kantor --</option>
-                {daftarKantor.map(kantor => (
-                  <option key={kantor} value={kantor}>
-                    {kantor}
-                  </option>
-                ))}
-              </select>
-            </div>
+      {/* Content */}
+      <div className="relative z-10 py-20 sm:py-24 px-4">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-8"
+          >
+            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">
+              Form Pengajuan Perizinan
+            </h1>
+            <p className="text-base sm:text-lg text-slate-400">
+              Lengkapi formulir di bawah ini dengan data yang benar
+            </p>
+          </motion.div>
 
-            {/* 2. NAMA KARYAWAN */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <FiUser className="inline mr-2" />
-                Nama Karyawan <span className="text-red-500">*</span>
-              </label>
-              <select
-                required
-                value={dataForm.karyawan_id}
-                onChange={(e) => handleKaryawanChange(e.target.value)}
-                disabled={!dataForm.kantor}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base disabled:bg-gray-100 disabled:cursor-not-allowed"
-              >
-                <option value="">
-                  {dataForm.kantor ? '-- Pilih Nama Karyawan --' : '-- Pilih Kantor Terlebih Dahulu --'}
-                </option>
-                {daftarKaryawan.map((karyawan) => (
-                  <option key={karyawan.id} value={karyawan.id}>
-                    {karyawan.nama} - {karyawan.jabatan}
-                  </option>
-                ))}
-              </select>
-              {!dataForm.kantor && (
-                <p className="text-xs text-gray-500 mt-1">Pilih kantor terlebih dahulu</p>
-              )}
-            </div>
-
-            {/* 3. JABATAN - Auto-fill */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <FiBriefcase className="inline mr-2" />
-                Jabatan
-              </label>
-              <input
-                type="text"
-                value={dataForm.jabatan}
-                readOnly
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed text-base"
-                placeholder="Otomatis terisi setelah pilih nama"
-              />
-            </div>
-
-            {/* 4. DEPARTEMEN - Auto-fill */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <FiBriefcase className="inline mr-2" />
-                Departemen
-              </label>
-              <input
-                type="text"
-                value={dataForm.departemen}
-                readOnly
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed text-base"
-                placeholder="Otomatis terisi setelah pilih nama"
-              />
-            </div>
-
-            {/* 5. NO TELP */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <FiPhone className="inline mr-2" />
-                No. Telp/WhatsApp <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="tel"
-                required
-                value={dataForm.no_telp}
-                onChange={(e) => setDataForm({ ...dataForm, no_telp: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base"
-                placeholder="08xxxxxxxxxx"
-              />
-            </div>
-
-            {/* 6. JENIS PERIZINAN */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Jenis Perizinan <span className="text-red-500">*</span>
-              </label>
-              <select
-                required
-                value={dataForm.jenis_perizinan}
-                onChange={(e) => setDataForm({ ...dataForm, jenis_perizinan: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base"
-              >
-                {jenisPerizinan.map(jenis => (
-                  <option key={jenis.value} value={jenis.value}>
-                    {jenis.label}
-                  </option>
-                ))}
-              </select>
-
-              {/* Keterangan Jenis Perizinan */}
-              {jenisPerizinan.find(j => j.value === dataForm.jenis_perizinan)?.keterangan && (
-                <div className="mt-3 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
-                  <div className="flex items-start">
-                    <FiAlertCircle className="text-blue-600 mt-0.5 mr-2 flex-shrink-0" size={18} />
-                    <div>
-                      <p className="text-sm font-semibold text-blue-800 mb-1">
-                        ℹ️ Perhatian
-                      </p>
-                      <p className="text-sm text-blue-700">
-                        {jenisPerizinan.find(j => j.value === dataForm.jenis_perizinan)?.keterangan}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Info Quota */}
-              {quotaInfo && !loadingQuota && (
-                <div className="mt-3 space-y-2">
-                  {dataForm.jenis_perizinan === 'tidak_masuk_cuti' && (
-                    <div className={`p-3 rounded-lg border ${quotaInfo.sisa_cuti > 0 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
-                      <p className="text-sm font-semibold text-gray-700">
-                        📅 Sisa Cuti: <span className={quotaInfo.sisa_cuti > 0 ? 'text-green-600' : 'text-red-600'}>{quotaInfo.sisa_cuti} hari</span> (Tahun {quotaInfo.tahun_cuti})
-                      </p>
-                    </div>
-                  )}
-                  {dataForm.jenis_perizinan === 'pulang_setengah_hari' && (
-                    <div className={`p-3 rounded-lg border ${sisaPulangCepat > 0 ? 'bg-blue-50 border-blue-200' : 'bg-red-50 border-red-200'}`}>
-                      <p className="text-sm font-semibold text-gray-700">
-                        🏃 Sisa Pulang Setengah Hari Bulan Ini: <span className={sisaPulangCepat > 0 ? 'text-blue-600' : 'text-red-600'}>{sisaPulangCepat}x</span> dari 3x
-                      </p>
-                    </div>
-                  )}
-                  {dataForm.jenis_perizinan === 'datang_terlambat' && (
-                    <div className={`p-3 rounded-lg border ${sisaDatangTerlambat > 0 ? 'bg-yellow-50 border-yellow-200' : 'bg-red-50 border-red-200'}`}>
-                      <p className="text-sm font-semibold text-gray-700">
-                        ⏰ Sisa Datang Terlambat Bulan Ini: <span className={sisaDatangTerlambat > 0 ? 'text-yellow-600' : 'text-red-600'}>{sisaDatangTerlambat}x</span> dari 3x
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* 7. TANGGAL */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Form Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 sm:p-8"
+          >
+            <form onSubmit={tanganiSubmit} className="space-y-6">
+              {/* 1. KANTOR */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <FiCalendar className="inline mr-2" />
-                  Tanggal & Jam Mulai <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium text-white mb-2">
+                  <FiMapPin className="inline mr-2" />
+                  Kantor <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="datetime-local"
+                <select
                   required
-                  value={dataForm.tanggal_mulai}
-                  onChange={(e) => setDataForm({ ...dataForm, tanggal_mulai: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <FiCalendar className="inline mr-2" />
-                  Tanggal & Jam Selesai <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="datetime-local"
-                  required
-                  value={dataForm.tanggal_selesai}
-                  onChange={(e) => setDataForm({ ...dataForm, tanggal_selesai: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base"
-                />
-              </div>
-            </div>
-
-            {/* 8. BUKTI FOTO */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <FiUpload className="inline mr-2" />
-                Bukti Foto {isFotoWajib && <span className="text-red-500">*</span>}
-                {isFotoWajib && <span className="text-red-500 text-xs ml-2">(Wajib untuk Dinas Luar)</span>}
-              </label>
-              <div className="relative">
-                <input
-                  type="file"
-                  accept="image/*,.pdf"
-                  required={isFotoWajib}
-                  onChange={tanganiPerubahanFile}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                />
-              </div>
-              <p className="text-xs sm:text-sm text-gray-500 mt-1">Format: JPG, PNG, PDF (Maks 5MB)</p>
-              
-              {/* Alert untuk Foto Wajib */}
-              {dataForm.jenis_perizinan === 'dinas_luar' && (
-                <div className="mt-3 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
-                  <div className="flex items-start">
-                    <FiAlertCircle className="text-red-600 mt-0.5 mr-2 flex-shrink-0" size={18} />
-                    <div>
-                      <p className="text-sm font-semibold text-red-800 mb-1">
-                        ⚠️ Perhatian!
-                      </p>
-                      <p className="text-sm text-red-700">
-                        Untuk izin Dinas Luar/Kelilingan, Anda WAJIB melampirkan bukti foto.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-              
-              {dataForm.jenis_perizinan === 'sakit' && (
-                <div className="mt-3 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
-                  <div className="flex items-start">
-                    <FiAlertCircle className="text-red-600 mt-0.5 mr-2 flex-shrink-0" size={18} />
-                    <div>
-                      <p className="text-sm font-semibold text-red-800 mb-1">
-                        ⚠️ Perhatian!
-                      </p>
-                      <p className="text-sm text-red-700">
-                        Untuk izin Sakit, Anda WAJIB melampirkan Surat Keterangan Dokter.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-              
-              {/* WhatsApp Notification */}
-              <div className="mt-3 p-4 bg-green-50 border-l-4 border-green-500 rounded-lg">
-                <div className="flex items-start">
-                  <FiPhone className="text-green-600 mt-0.5 mr-2 flex-shrink-0" size={18} />
-                  <div>
-                    <p className="text-sm font-semibold text-green-800 mb-1">
-                      📱 Penting!
-                    </p>
-                    <p className="text-sm text-green-700">
-                      Setelah Mengisi Form, Mohon Kirim Bukti Berupa Screenshot Ke Nomor WhatsApp HRD:
-                    </p>
-                    <a 
-                      href="https://wa.me/6281249749282" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center mt-2 text-sm font-bold text-green-600 hover:text-green-800 hover:underline transition-colors"
-                    >
-                      <FiPhone className="mr-1" size={14} />
-                      +62 812-4974-9282
-                    </a>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Image Preview */}
-              {previewImage && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="mt-3 relative"
+                  value={dataForm.kantor}
+                  onChange={(e) => setDataForm({ ...dataForm, kantor: e.target.value })}
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition placeholder-slate-400"
                 >
-                  <img 
-                    src={previewImage} 
-                    alt="Preview" 
-                    className="w-full h-48 object-cover rounded-lg border-2 border-gray-200"
+                  <option value="" className="bg-slate-900 text-white">-- Pilih Kantor --</option>
+                  {daftarKantor.map(kantor => (
+                    <option key={kantor} value={kantor} className="bg-slate-900 text-white">
+                      {kantor}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 2. NAMA KARYAWAN */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  <FiUser className="inline mr-2" />
+                  Nama Karyawan <span className="text-red-500">*</span>
+                </label>
+                <select
+                  required
+                  value={dataForm.karyawan_id}
+                  onChange={(e) => handleKaryawanChange(e.target.value)}
+                  disabled={!dataForm.kantor}
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition placeholder-slate-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <option value="" className="bg-slate-900 text-white">
+                    {dataForm.kantor ? '-- Pilih Nama Karyawan --' : '-- Pilih Kantor Terlebih Dahulu --'}
+                  </option>
+                  {daftarKaryawan.map((karyawan) => (
+                    <option key={karyawan.id} value={karyawan.id} className="bg-slate-900 text-white">
+                      {karyawan.nama} - {karyawan.jabatan}
+                    </option>
+                  ))}
+                </select>
+                {!dataForm.kantor && (
+                  <p className="text-xs text-slate-400 mt-1">Pilih kantor terlebih dahulu</p>
+                )}
+              </div>
+
+              {/* 3. JABATAN - Auto-fill */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  <FiBriefcase className="inline mr-2" />
+                  Jabatan
+                </label>
+                <input
+                  type="text"
+                  value={dataForm.jabatan}
+                  readOnly
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-slate-400 cursor-not-allowed"
+                  placeholder="Otomatis terisi setelah pilih nama"
+                />
+              </div>
+
+              {/* 4. DEPARTEMEN - Auto-fill */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  <FiBriefcase className="inline mr-2" />
+                  Departemen
+                </label>
+                <input
+                  type="text"
+                  value={dataForm.departemen}
+                  readOnly
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-slate-400 cursor-not-allowed"
+                  placeholder="Otomatis terisi setelah pilih nama"
+                />
+              </div>
+
+              {/* 5. NO TELP */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  <FiPhone className="inline mr-2" />
+                  No. Telp/WhatsApp <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  required
+                  value={dataForm.no_telp}
+                  onChange={(e) => setDataForm({ ...dataForm, no_telp: e.target.value })}
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition placeholder-slate-400"
+                  placeholder="08xxxxxxxxxx"
+                />
+              </div>
+
+              {/* 6. JENIS PERIZINAN */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  Jenis Perizinan <span className="text-red-500">*</span>
+                </label>
+                <select
+                  required
+                  value={dataForm.jenis_perizinan}
+                  onChange={(e) => setDataForm({ ...dataForm, jenis_perizinan: e.target.value })}
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                >
+                  {jenisPerizinan.map(jenis => (
+                    <option key={jenis.value} value={jenis.value} className="bg-slate-900 text-white">
+                      {jenis.label}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Keterangan Jenis Perizinan */}
+                {jenisPerizinan.find(j => j.value === dataForm.jenis_perizinan)?.keterangan && (
+                  <div className="mt-3 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                    <div className="flex items-start">
+                      <FiAlertCircle className="text-blue-400 mt-0.5 mr-2 flex-shrink-0" size={18} />
+                      <div>
+                        <p className="text-sm font-semibold text-blue-300 mb-1">
+                          Perhatian
+                        </p>
+                        <p className="text-sm text-blue-200">
+                          {jenisPerizinan.find(j => j.value === dataForm.jenis_perizinan)?.keterangan}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Info Quota */}
+                {quotaInfo && !loadingQuota && (
+                  <div className="mt-3 space-y-2">
+                    {dataForm.jenis_perizinan === 'tidak_masuk_cuti' && (
+                      <div className={`p-3 rounded-lg border ${quotaInfo.sisa_cuti > 0 ? 'bg-green-500/10 border-green-500/20' : 'bg-red-500/10 border-red-500/20'}`}>
+                        <p className="text-sm font-semibold text-white">
+                          Sisa Cuti: <span className={quotaInfo.sisa_cuti > 0 ? 'text-green-400' : 'text-red-400'}>{quotaInfo.sisa_cuti} hari</span> (Tahun {quotaInfo.tahun_cuti})
+                        </p>
+                      </div>
+                    )}
+                    {dataForm.jenis_perizinan === 'pulang_setengah_hari' && (
+                      <div className={`p-3 rounded-lg border ${sisaPulangCepat > 0 ? 'bg-blue-500/10 border-blue-500/20' : 'bg-red-500/10 border-red-500/20'}`}>
+                        <p className="text-sm font-semibold text-white">
+                          Sisa Pulang Setengah Hari Bulan Ini: <span className={sisaPulangCepat > 0 ? 'text-blue-400' : 'text-red-400'}>{sisaPulangCepat}x</span> dari 3x
+                        </p>
+                      </div>
+                    )}
+                    {dataForm.jenis_perizinan === 'datang_terlambat' && (
+                      <div className={`p-3 rounded-lg border ${sisaDatangTerlambat > 0 ? 'bg-yellow-500/10 border-yellow-500/20' : 'bg-red-500/10 border-red-500/20'}`}>
+                        <p className="text-sm font-semibold text-white">
+                          Sisa Datang Terlambat Bulan Ini: <span className={sisaDatangTerlambat > 0 ? 'text-yellow-400' : 'text-red-400'}>{sisaDatangTerlambat}x</span> dari 3x
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* 7. TANGGAL */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
+                    <FiCalendar className="inline mr-2" />
+                    Tanggal & Jam Mulai <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="datetime-local"
+                    required
+                    value={dataForm.tanggal_mulai}
+                    onChange={(e) => setDataForm({ ...dataForm, tanggal_mulai: e.target.value })}
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
+                    <FiCalendar className="inline mr-2" />
+                    Tanggal & Jam Selesai <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="datetime-local"
+                    required
+                    value={dataForm.tanggal_selesai}
+                    onChange={(e) => setDataForm({ ...dataForm, tanggal_selesai: e.target.value })}
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                  />
+                </div>
+              </div>
+
+              {/* 8. BUKTI FOTO */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-2">
+                  <FiUpload className="inline mr-2" />
+                  Bukti Foto {isFotoWajib && <span className="text-red-500">*</span>}
+                  {isFotoWajib && <span className="text-red-400 text-xs ml-2">(Wajib)</span>}
+                </label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*,.pdf"
+                    required={isFotoWajib}
+                    onChange={tanganiPerubahanFile}
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-red-600 file:text-white hover:file:bg-red-700"
+                  />
+                </div>
+                <p className="text-xs text-slate-400 mt-1">Format: JPG, PNG, PDF (Maks 5MB)</p>
+                
+                {/* Alert untuk Foto Wajib */}
+                {dataForm.jenis_perizinan === 'dinas_luar' && (
+                  <div className="mt-3 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+                    <div className="flex items-start">
+                      <FiAlertCircle className="text-red-400 mt-0.5 mr-2 flex-shrink-0" size={18} />
+                      <div>
+                        <p className="text-sm font-semibold text-red-300 mb-1">
+                          Perhatian!
+                        </p>
+                        <p className="text-sm text-red-200">
+                          Untuk izin Dinas Luar/Kelilingan, Anda WAJIB melampirkan bukti foto.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {dataForm.jenis_perizinan === 'sakit' && (
+                  <div className="mt-3 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+                    <div className="flex items-start">
+                      <FiAlertCircle className="text-red-400 mt-0.5 mr-2 flex-shrink-0" size={18} />
+                      <div>
+                        <p className="text-sm font-semibold text-red-300 mb-1">
+                          Perhatian!
+                        </p>
+                        <p className="text-sm text-red-200">
+                          Untuk izin Sakit, Anda WAJIB melampirkan Surat Keterangan Dokter.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* WhatsApp Notification */}
+                <div className="mt-3 p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+                  <div className="flex items-start">
+                    <FiPhone className="text-green-400 mt-0.5 mr-2 flex-shrink-0" size={18} />
+                    <div>
+                      <p className="text-sm font-semibold text-green-300 mb-1">
+                        Penting!
+                      </p>
+                      <p className="text-sm text-green-200 mb-2">
+                        Setelah Mengisi Form, Mohon Kirim Bukti Berupa Screenshot Ke Nomor WhatsApp HRD:
+                      </p>
+                      <a 
+                        href="https://wa.me/6281249749282" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center text-sm font-bold text-green-400 hover:text-green-300 transition-colors"
+                      >
+                        <FiPhone className="mr-1" size={14} />
+                        +62 812-4974-9282
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Image Preview */}
+                {previewImage && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="mt-3 relative"
+                  >
+                    <img 
+                      src={previewImage} 
+                      alt="Preview" 
+                      className="w-full h-48 object-cover rounded-lg border-2 border-white/20"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPreviewImage(null);
+                        setDataForm({ ...dataForm, bukti_foto: null });
+                      }}
+                      className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-colors"
+                    >
+                      <FiX size={16} />
+                    </button>
+                  </motion.div>
+                )}
+              </div>
+
+              {/* SUBMIT BUTTONS */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                <button
+                  type="submit"
+                  disabled={sedangMemuat}
+                  className="flex-1 flex items-center justify-center space-x-2 py-3.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <FiSend />
+                  <span>{sedangMemuat ? 'Mengirim...' : 'Kirim Pengajuan'}</span>
+                </button>
+
+                <Link to="/" className="flex-1">
                   <button
                     type="button"
-                    onClick={() => {
-                      setPreviewImage(null);
-                      setDataForm({ ...dataForm, bukti_foto: null });
-                    }}
-                    className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
+                    className="w-full py-3.5 bg-white/10 border border-white/20 text-white rounded-lg font-medium hover:bg-white/20 transition"
                   >
-                    <FiX size={16} />
+                    Batal
                   </button>
-                </motion.div>
-              )}
-            </div>
-
-            {/* SUBMIT BUTTONS */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                type="submit"
-                disabled={sedangMemuat}
-                className="flex-1 flex items-center justify-center space-x-2 py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition disabled:opacity-50 min-h-[48px]"
-              >
-                <FiSend />
-                <span>{sedangMemuat ? 'Mengirim...' : 'Kirim Pengajuan'}</span>
-              </motion.button>
-
-              <Link to="/" className="flex-1">
-                <button
-                  type="button"
-                  className="w-full py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition min-h-[48px]"
-                >
-                  Batal
-                </button>
-              </Link>
-            </div>
-          </form>
-        </motion.div>
+                </Link>
+              </div>
+            </form>
+          </motion.div>
+        </div>
       </div>
     </div>
   );
