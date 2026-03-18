@@ -9,3 +9,9 @@ root.render(
     <App />
   </React.StrictMode>
 );
+
+// Signal to public/index.html that React has mounted successfully.
+// This hides the loading screen only after React renders at least once.
+requestAnimationFrame(() => {
+  window.dispatchEvent(new Event('react-app-mounted'));
+});

@@ -34,7 +34,7 @@ const Navbar = ({ isLoggedIn, onLogout }) => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-3">
-              <img src="/img/lg.png" alt="IWARE Logo" className="h-9 w-auto" onError={(e) => {
+              <img src="/img/logo.png" alt="IWARE Logo" className="h-9 w-auto" onError={(e) => {
                 e.target.style.display = 'none';
               }} />
               <span className="text-xl font-semibold text-white">IWARE</span>

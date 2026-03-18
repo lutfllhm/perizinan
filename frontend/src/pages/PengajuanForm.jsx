@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { pengajuanAPI, karyawanAPI } from '../utils/api';
 import { FiUser, FiPhone, FiCalendar, FiUpload, FiSend, FiX, FiMapPin, FiBriefcase, FiAlertCircle } from 'react-icons/fi';
+import Card from '../components/ui/Card';
 
 // Data Master Kantor
 const daftarKantor = [
@@ -107,7 +108,16 @@ const PengajuanForm = () => {
   const fetchKaryawan = async (kantor) => {
     try {
       const response = await karyawanAPI.getAll({ kantor, status: 'aktif' });
-      setDaftarKaryawan(response.data);
+      // Be tolerant to different API response shapes:
+      // - array directly: []
+      // - wrapped: { data: [] } or { karyawan: [] }
+      const payload = response?.data;
+      const list =
+        Array.isArray(payload) ? payload :
+        Array.isArray(payload?.data) ? payload.data :
+        Array.isArray(payload?.karyawan) ? payload.karyawan :
+        [];
+      setDaftarKaryawan(list);
     } catch (error) {
       console.error('Error fetching karyawan:', error);
       toast.error('Gagal memuat data karyawan');
@@ -128,15 +138,24 @@ const PengajuanForm = () => {
 
   // Auto-fill data ketika karyawan dipilih (TANPA no_telp)
   const handleKaryawanChange = (karyawanId) => {
-    const karyawan = daftarKaryawan.find(k => k.id === parseInt(karyawanId));
+    const karyawan = daftarKaryawan.find(k => String(k.id) === String(karyawanId));
     if (karyawan) {
       setDataForm(prev => ({
         ...prev,
-        karyawan_id: karyawan.id,
+        karyawan_id: karyawanId,
         nama: karyawan.nama,
         jabatan: karyawan.jabatan,
         departemen: karyawan.departemen
         // no_telp TIDAK auto-fill, user harus input manual
+      }));
+    } else {
+      // Keep selected id even if lookup fails; avoids stale UI state
+      setDataForm(prev => ({
+        ...prev,
+        karyawan_id: karyawanId,
+        nama: '',
+        jabatan: '',
+        departemen: ''
       }));
     }
   };
@@ -219,37 +238,42 @@ const PengajuanForm = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Background - sama dengan homepage */}
-      <div 
+      {/* Background - konsisten dengan homepage */}
+      <div
         className="fixed inset-0 z-0 bg-cover bg-center"
-        style={{ 
+        style={{
           backgroundImage: 'url(/img/bg.jpeg)',
           backgroundSize: 'cover',
-          backgroundPosition: 'center'
+          backgroundPosition: 'center',
         }}
       >
-        <div className="absolute inset-0 bg-black/30" />
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-gray-900/40 to-slate-900/50" />
-        <div className="absolute inset-0 opacity-[0.02]" style={{
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-          backgroundSize: '50px 50px'
-        }} />
+        <div className="absolute inset-0 bg-black/45" />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950/70 via-gray-900/45 to-slate-950/70" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent" />
+        <div
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage:
+              'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+            backgroundSize: '50px 50px',
+          }}
+        />
       </div>
 
       {/* Content */}
-      <div className="relative z-10 py-20 sm:py-24 px-4">
+      <div className="relative z-10 py-16 sm:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8"
+            className="text-center mb-8 sm:mb-10"
           >
             <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">
               Form Pengajuan Perizinan
             </h1>
-            <p className="text-base sm:text-lg text-slate-400">
-              Lengkapi formulir di bawah ini dengan data yang benar
+            <p className="text-sm sm:text-base md:text-lg text-slate-300 max-w-2xl mx-auto">
+              Lengkapi formulir di bawah ini dengan data yang benar untuk memudahkan proses persetujuan HRD.
             </p>
           </motion.div>
 
@@ -258,8 +282,8 @@ const PengajuanForm = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 sm:p-8"
           >
+            <Card className="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8">
             <form onSubmit={tanganiSubmit} className="space-y-6">
               {/* 1. KANTOR */}
               <div>
@@ -571,6 +595,7 @@ const PengajuanForm = () => {
                 </Link>
               </div>
             </form>
+            </Card>
           </motion.div>
         </div>
       </div>

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
+import { Routes, Route, Link, useNavigate, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { authAPI, pengajuanAPI } from '../utils/api';
@@ -12,246 +12,116 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
 } from 'recharts';
 import { useIsMobile } from '../hooks/useMediaQuery';
-import BottomNavigation from '../components/BottomNavigation';
 import MobileCard, { MobileCardRow, MobileCardBadge, MobileCardActions } from '../components/MobileCard';
 import TouchButton from '../components/TouchButton';
+import PhotoBackground from '../components/layout/PhotoBackground';
+import DashboardShell from '../components/layout/DashboardShell';
+import Card from '../components/ui/Card';
+import Input from '../components/ui/Input';
 
 const AdminDashboard = () => {
-  const isMobile = useIsMobile();
-  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
   const navigate = useNavigate();
-  const nama = localStorage.getItem('nama');
-
-  // Auto-hide sidebar on mobile
-  useEffect(() => {
-    setSidebarOpen(!isMobile);
-  }, [isMobile]);
+  const nama = localStorage.getItem('nama') || sessionStorage.getItem('nama');
+  const username = localStorage.getItem('username') || sessionStorage.getItem('username');
+  const role = (localStorage.getItem('role') || sessionStorage.getItem('role') || '').trim().toLowerCase();
+  const isSuperadmin = role === 'superadmin';
+  const [pendingCount, setPendingCount] = useState(0);
+  const prevPendingRef = useRef(null);
+  const pollRef = useRef(null);
 
   const handleLogout = () => {
     localStorage.clear();
+    sessionStorage.clear();
     toast.success('Logout berhasil');
     navigate('/');
   };
 
-  const bottomNavItems = [
-    { path: '/admin', icon: FiHome, label: 'Home', exact: true },
-    { path: '/admin/users', icon: FiUsers, label: 'Users' },
-    { path: '/admin/register-hrd', icon: FiUserPlus, label: 'Tambah' },
-    { path: '/admin/profile', icon: FiSettings, label: 'Profil' },
-  ];
+  useEffect(() => {
+    let mounted = true;
 
-  const Sidebar = () => {
-    const location = window.location.pathname;
-    
-    const menuItems = [
-      { path: '/admin', icon: FiHome, label: 'Dashboard', exact: true },
-      { path: '/admin/users', icon: FiUsers, label: 'Kelola User' },
-      { path: '/admin/register-hrd', icon: FiUserPlus, label: 'Tambah HRD' },
-      { path: '/admin/profile', icon: FiSettings, label: 'Manajemen Akun' },
-    ];
+    const tick = async (silent = false) => {
+      try {
+        const res = await pengajuanAPI.getStats();
+        const pending = Number(res?.data?.pending || 0);
+        if (!mounted) return;
 
-    const isActive = (path, exact = false) => {
-      if (exact) return location === path;
-      return location.startsWith(path);
+        setPendingCount(pending);
+
+        const prev = prevPendingRef.current;
+        if (prev === null) {
+          prevPendingRef.current = pending;
+          return;
+        }
+
+        if (!silent && pending > prev) {
+          const diff = pending - prev;
+          toast.info(`${diff} pengajuan baru masuk.`, { autoClose: 2500 });
+        }
+
+        prevPendingRef.current = pending;
+      } catch (e) {
+        // ignore polling errors
+      }
     };
 
-    // Don't render sidebar on mobile, use drawer instead
-    if (isMobile && !sidebarOpen) return null;
+    tick(true);
+    pollRef.current = window.setInterval(() => {
+      if (document.hidden) return;
+      tick(false);
+    }, 25000);
 
-    return (
-      <>
-        {/* Backdrop for mobile */}
-        {isMobile && sidebarOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSidebarOpen(false)}
-            className="fixed inset-0 bg-black/50 z-30"
-          />
-        )}
-
-        {/* Sidebar */}
-        <motion.div
-          initial={{ x: isMobile ? -300 : 0 }}
-          animate={{ x: 0 }}
-          exit={{ x: -300 }}
-          className={`${
-            isMobile ? 'w-72' : sidebarOpen ? 'w-72' : 'w-20'
-          } bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white min-h-screen fixed left-0 top-0 transition-all duration-300 z-40 shadow-2xl overflow-y-auto dark-scrollbar`}
-        >
-        <div className="p-3 pb-20">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6 pb-3 border-b border-gray-700">
-            {sidebarOpen && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex items-center space-x-2"
-              >
-                <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-2 rounded-lg">
-                  <FiUsers className="text-xl" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-bold">Admin Panel</h2>
-                  <p className="text-xs text-gray-400">Sistem Perizinan</p>
-                </div>
-              </motion.div>
-            )}
-            {!isMobile && (
-              <button
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
-              >
-                {sidebarOpen ? <FiX size={20} /> : <FiMenu size={20} />}
-              </button>
-            )}
-            {isMobile && (
-              <button
-                onClick={() => setSidebarOpen(false)}
-                className="p-2 hover:bg-gray-700 rounded-lg transition-colors ml-auto"
-              >
-                <FiX size={20} />
-              </button>
-            )}
-          </div>
-
-          {/* User Info */}
-          {sidebarOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-4 p-3 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 rounded-lg border border-purple-500/30"
-            >
-              <div className="flex items-center space-x-2">
-                <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-2 rounded-full">
-                  <FiUser className="text-lg" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold truncate">{nama}</p>
-                  <p className="text-xs text-gray-400">Administrator</p>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Navigation Menu */}
-          <nav className="space-y-1">
-            {menuItems.map((item, index) => {
-              const Icon = item.icon;
-              const active = isActive(item.path, item.exact);
-              
-              return (
-                <Link key={item.path} to={item.path} onClick={() => isMobile && setSidebarOpen(false)}>
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className={`flex items-center space-x-2 p-2.5 rounded-lg transition-all duration-200 ${
-                      active
-                        ? 'bg-gradient-to-r from-purple-600 to-indigo-600 shadow-lg shadow-purple-500/50'
-                        : 'hover:bg-gray-800 hover:translate-x-1'
-                    }`}
-                  >
-                    <Icon size={18} className={active ? 'text-white' : 'text-gray-400'} />
-                    {sidebarOpen && (
-                      <span className={`text-sm font-medium ${active ? 'text-white' : 'text-gray-300'}`}>
-                        {item.label}
-                      </span>
-                    )}
-                    {active && sidebarOpen && (
-                      <motion.div
-                        layoutId="activeIndicator"
-                        className="ml-auto w-1.5 h-1.5 bg-white rounded-full"
-                      />
-                    )}
-                  </motion.div>
-                </Link>
-              );
-            })}
-
-            {/* Divider */}
-            <div className="py-2">
-              <div className="border-t border-gray-700"></div>
-            </div>
-
-            {/* Logout Button */}
-            <motion.button
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
-              onClick={handleLogout}
-              className="w-full flex items-center space-x-2 p-2.5 rounded-lg hover:bg-red-600 hover:translate-x-1 transition-all duration-200 group"
-            >
-              <FiLogOut size={18} className="text-gray-400 group-hover:text-white" />
-              {sidebarOpen && <span className="text-sm font-medium text-gray-300 group-hover:text-white">Logout</span>}
-            </motion.button>
-          </nav>
-
-          {/* Footer */}
-          {sidebarOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="absolute bottom-4 left-4 right-4"
-            >
-              <div className="p-2 bg-gray-800/50 rounded-lg border border-gray-700">
-                <p className="text-xs text-gray-400 text-center">
-                  © 2024 IWARE
-                </p>
-                <p className="text-xs text-gray-500 text-center mt-0.5">
-                  v1.0.0
-                </p>
-              </div>
-            </motion.div>
-          )}
-        </div>
-      </motion.div>
-      </>
-    );
-  };
+    return () => {
+      mounted = false;
+      if (pollRef.current) window.clearInterval(pollRef.current);
+    };
+  }, []);
 
   return (
-    <div className="flex bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
-      <Sidebar />
-      <div className={`flex-1 ${!isMobile && sidebarOpen ? 'ml-72' : !isMobile ? 'ml-20' : 'ml-0'} transition-all duration-300 ${isMobile ? 'pb-20' : ''}`}>
-        <div className="p-4 md:p-8">
-          {/* Mobile Header */}
-          {isMobile && (
-            <div className="flex items-center justify-between mb-4 bg-white rounded-xl p-4 shadow-md">
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <FiMenu size={24} />
-              </button>
-              <h1 className="text-lg font-bold text-gray-800">Admin Panel</h1>
-              <button
-                onClick={handleLogout}
-                className="p-2 hover:bg-red-50 text-red-600 rounded-lg transition-colors"
-              >
-                <FiLogOut size={24} />
-              </button>
-            </div>
-          )}
-
+    <PhotoBackground>
+      <DashboardShell
+        logoSrc="/img/logo.png"
+        brandTitle="IWARE"
+        brandSubtitle={isSuperadmin ? 'Superadmin Console' : 'Admin Panel'}
+        accent={isSuperadmin ? 'fuchsia' : 'violet'}
+        roleLabel={isSuperadmin ? 'Superadmin' : 'Admin/Pengelola'}
+        user={{ name: nama, username }}
+        onLogout={handleLogout}
+        searchPlaceholder="Cari di dashboard…"
+        onSearchChange={() => {}}
+        notificationCount={pendingCount}
+        onNotificationsClick={() => toast.info('Buka HRD Panel untuk melihat daftar pengajuan.', { autoClose: 2500 })}
+        navItems={[
+          { path: '/admin', icon: FiHome, label: 'Dashboard', exact: true },
+          ...(isSuperadmin ? [{ path: '/admin/users', icon: FiUsers, label: 'Kelola User' }] : []),
+          ...(isSuperadmin ? [{ path: '/admin/register-hrd', icon: FiUserPlus, label: 'Tambah HRD' }] : []),
+          { path: '/admin/profile', icon: FiSettings, label: 'Manajemen Akun' },
+        ]}
+        bottomNavItems={[
+          { path: '/admin', icon: FiHome, label: 'Home', exact: true },
+          ...(isSuperadmin ? [{ path: '/admin/users', icon: FiUsers, label: 'Users' }] : []),
+          ...(isSuperadmin ? [{ path: '/admin/register-hrd', icon: FiUserPlus, label: 'Tambah' }] : []),
+          { path: '/admin/profile', icon: FiSettings, label: 'Profil' },
+        ]}
+      >
           <Routes>
             <Route path="/" element={<AdminHome />} />
-            <Route path="/users" element={<UserManagement />} />
-            <Route path="/register-hrd" element={<RegisterHRD />} />
+            <Route
+              path="/users"
+              element={isSuperadmin ? <UserManagement /> : <Navigate to="/admin" replace />}
+            />
+            <Route
+              path="/register-hrd"
+              element={isSuperadmin ? <RegisterHRD /> : <Navigate to="/admin" replace />}
+            />
             <Route path="/profile" element={<ManajemenAkun />} />
           </Routes>
-        </div>
-      </div>
-
-      {/* Bottom Navigation for Mobile */}
-      {isMobile && <BottomNavigation items={bottomNavItems} />}
-    </div>
+      </DashboardShell>
+    </PhotoBackground>
   );
 };
 
 const AdminHome = () => {
+  const isMobile = useIsMobile();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -280,31 +150,38 @@ const AdminHome = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    );
-  }
+  const statCards = useMemo(
+    () => [
+      { label: 'Total Pengajuan', value: stats?.total || 0, icon: FiFileText, tint: 'from-indigo-500/25 to-violet-500/10' },
+      { label: 'Pending', value: stats?.pending || 0, icon: FiClock, tint: 'from-amber-500/25 to-orange-500/10' },
+      { label: 'Approved', value: stats?.approved || 0, icon: FiCheckCircle, tint: 'from-emerald-500/25 to-teal-500/10' },
+      { label: 'Rejected', value: stats?.rejected || 0, icon: FiXCircle, tint: 'from-rose-500/25 to-red-500/10' },
+    ],
+    [stats]
+  );
 
   return (
     <div className="space-y-8">
-      {/* Header dengan Gradient */}
+      {loading && (
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-400"></div>
+        </div>
+      )}
+      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 rounded-2xl p-8 text-white shadow-2xl"
+        className="rounded-3xl border border-white/10 bg-white/[0.06] backdrop-blur-2xl p-6 md:p-8 shadow-[0_30px_80px_rgba(0,0,0,0.45)]"
       >
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold mb-2">Dashboard Admin</h2>
-            <p className="text-blue-100">Kelola dan monitor seluruh aktivitas sistem</p>
+            <h2 className="text-2xl md:text-3xl font-semibold mb-2 text-white">Dashboard Admin</h2>
+            <p className="text-slate-300">Kelola dan monitor seluruh aktivitas sistem</p>
           </div>
           <div className="hidden md:block">
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4">
-              <p className="text-sm text-blue-100">Tanggal Hari Ini</p>
-              <p className="text-xl font-bold">{new Date().toLocaleDateString('id-ID', { 
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+              <p className="text-xs text-slate-400">Tanggal</p>
+              <p className="text-sm font-semibold text-white">{new Date().toLocaleDateString('id-ID', { 
                 weekday: 'long', 
                 year: 'numeric', 
                 month: 'long', 
@@ -315,270 +192,110 @@ const AdminHome = () => {
         </div>
       </motion.div>
 
-      {/* Stats Cards dengan Icon */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.1 }}
-          whileHover={{ scale: 1.05, y: -5 }}
-          whileTap={{ scale: 0.98 }}
-          className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
-        >
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="bg-blue-100 p-3 rounded-xl">
-                <FiFileText className="text-3xl text-blue-600" />
-              </div>
-              <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
-                TOTAL
-              </span>
-            </div>
-            <h3 className="text-gray-600 text-sm font-medium mb-1">Total Pengajuan</h3>
-            <p className="text-4xl font-bold text-gray-800">{stats?.total || 0}</p>
-            <div className="mt-4 flex items-center text-sm text-gray-500">
-              <span className="text-green-500 font-semibold mr-1">↑ 100%</span>
-              dari semua data
-            </div>
-          </div>
-          <div className="h-2 bg-gradient-to-r from-blue-400 to-blue-600"></div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-          whileHover={{ scale: 1.05, y: -5 }}
-          className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
-        >
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="bg-yellow-100 p-3 rounded-xl">
-                <FiClock className="text-3xl text-yellow-600" />
-              </div>
-              <span className="text-xs font-semibold text-yellow-600 bg-yellow-50 px-3 py-1 rounded-full">
-                PENDING
-              </span>
-            </div>
-            <h3 className="text-gray-600 text-sm font-medium mb-1">Menunggu Persetujuan</h3>
-            <p className="text-4xl font-bold text-gray-800">{stats?.pending || 0}</p>
-            <div className="mt-4 flex items-center text-sm text-gray-500">
-              <span className="text-yellow-500 font-semibold mr-1">⏳</span>
-              perlu ditinjau
-            </div>
-          </div>
-          <div className="h-2 bg-gradient-to-r from-yellow-400 to-yellow-600"></div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3 }}
-          whileHover={{ scale: 1.05, y: -5 }}
-          className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
-        >
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="bg-green-100 p-3 rounded-xl">
-                <FiCheckCircle className="text-3xl text-green-600" />
-              </div>
-              <span className="text-xs font-semibold text-green-600 bg-green-50 px-3 py-1 rounded-full">
-                APPROVED
-              </span>
-            </div>
-            <h3 className="text-gray-600 text-sm font-medium mb-1">Disetujui</h3>
-            <p className="text-4xl font-bold text-gray-800">{stats?.approved || 0}</p>
-            <div className="mt-4 flex items-center text-sm text-gray-500">
-              <span className="text-green-500 font-semibold mr-1">✓</span>
-              telah disetujui
-            </div>
-          </div>
-          <div className="h-2 bg-gradient-to-r from-green-400 to-green-600"></div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.4 }}
-          whileHover={{ scale: 1.05, y: -5 }}
-          className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
-        >
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="bg-red-100 p-3 rounded-xl">
-                <FiXCircle className="text-3xl text-red-600" />
-              </div>
-              <span className="text-xs font-semibold text-red-600 bg-red-50 px-3 py-1 rounded-full">
-                REJECTED
-              </span>
-            </div>
-            <h3 className="text-gray-600 text-sm font-medium mb-1">Ditolak</h3>
-            <p className="text-4xl font-bold text-gray-800">{stats?.rejected || 0}</p>
-            <div className="mt-4 flex items-center text-sm text-gray-500">
-              <span className="text-red-500 font-semibold mr-1">✗</span>
-              tidak disetujui
-            </div>
-          </div>
-          <div className="h-2 bg-gradient-to-r from-red-400 to-red-600"></div>
-        </motion.div>
+        {statCards.map((c, i) => {
+          const Icon = c.icon;
+          return (
+            <motion.div
+              key={c.label}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.06 + i * 0.04, duration: 0.35 }}
+              whileHover={isMobile ? {} : { y: -4 }}
+            >
+              <Card className="p-5">
+                <div className={`rounded-2xl border border-white/10 bg-gradient-to-br ${c.tint} p-3 flex items-center justify-between`}>
+                  <div className="h-10 w-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                    <Icon className="text-white" />
+                  </div>
+                  <div className="text-xs text-slate-300">Overview</div>
+                </div>
+                <div className="mt-4 text-xs text-slate-400">{c.label}</div>
+                <div className="mt-2 text-3xl font-semibold text-white">{c.value}</div>
+              </Card>
+            </motion.div>
+          );
+        })}
       </div>
 
       {/* Quick Actions */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="bg-white rounded-2xl shadow-lg p-6"
-      >
-        <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-          <span className="bg-primary-100 p-2 rounded-lg mr-3">
-            <FiUsers className="text-primary-600" />
-          </span>
-          Aksi Cepat
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Link to="/admin/users">
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="p-4 border-2 border-gray-200 rounded-xl hover:border-primary-500 hover:bg-primary-50 transition-all cursor-pointer"
-            >
-              <FiUsers className="text-2xl text-primary-600 mb-2" />
-              <h4 className="font-semibold text-gray-800">Kelola User</h4>
-              <p className="text-sm text-gray-600">Lihat dan kelola semua user</p>
-            </motion.div>
-          </Link>
-          <Link to="/admin/register-hrd">
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="p-4 border-2 border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all cursor-pointer"
-            >
-              <FiUserPlus className="text-2xl text-green-600 mb-2" />
-              <h4 className="font-semibold text-gray-800">Tambah HRD</h4>
-              <p className="text-sm text-gray-600">Daftarkan HRD baru</p>
-            </motion.div>
-          </Link>
-          <Link to="/admin/profile">
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="p-4 border-2 border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all cursor-pointer"
-            >
-              <FiSettings className="text-2xl text-purple-600 mb-2" />
-              <h4 className="font-semibold text-gray-800">Pengaturan</h4>
-              <p className="text-sm text-gray-600">Kelola akun Anda</p>
-            </motion.div>
-          </Link>
-        </div>
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}>
+        <Card className="p-6">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl border border-white/10 bg-white/5 flex items-center justify-center">
+              <FiUsers className="text-white" />
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-white">Quick actions</div>
+              <div className="text-xs text-slate-400">Navigate faster</div>
+            </div>
+          </div>
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+            {[
+              { to: '/admin/users', icon: FiUsers, title: 'Kelola User', desc: 'Lihat dan kelola semua user' },
+              { to: '/admin/register-hrd', icon: FiUserPlus, title: 'Tambah HRD', desc: 'Daftarkan HRD baru' },
+              { to: '/admin/profile', icon: FiSettings, title: 'Pengaturan', desc: 'Kelola akun Anda' },
+            ].map((a) => {
+              const Icon = a.icon;
+              return (
+                <Link key={a.to} to={a.to}>
+                  <div className="rounded-2xl border border-white/10 bg-white/5 hover:bg-white/[0.08] transition p-4">
+                    <Icon className="text-white/90" />
+                    <div className="mt-3 text-sm font-semibold text-white">{a.title}</div>
+                    <div className="mt-1 text-xs text-slate-400">{a.desc}</div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </Card>
       </motion.div>
-
-      {/* Info Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.6 }}
-          className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl shadow-lg p-6 border border-blue-100"
-        >
-          <div className="flex items-start">
-            <div className="bg-blue-500 p-3 rounded-xl mr-4">
-              <FiAlertCircle className="text-2xl text-white" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-gray-800 mb-2">Informasi Sistem</h3>
-              <ul className="space-y-2 text-gray-700">
-                <li className="flex items-center">
-                  <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-                  Sistem Perizinan Cuti/Lembur IWARE
-                </li>
-                <li className="flex items-center">
-                  <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-                  Kelola user HRD dan monitor aktivitas
-                </li>
-                <li className="flex items-center">
-                  <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-                  Akses penuh ke semua fitur administrasi
-                </li>
-              </ul>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.7 }}
-          className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl shadow-lg p-6 border border-purple-100"
-        >
-          <div className="flex items-start">
-            <div className="bg-purple-500 p-3 rounded-xl mr-4">
-              <FiCheckCircle className="text-2xl text-white" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-gray-800 mb-2">Status Sistem</h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-700">Server Status</span>
-                  <span className="flex items-center text-green-600 font-semibold">
-                    <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-                    Online
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-700">Database</span>
-                  <span className="flex items-center text-green-600 font-semibold">
-                    <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-                    Connected
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-700">Last Update</span>
-                  <span className="text-gray-600 font-semibold">
-                    {new Date().toLocaleTimeString('id-ID')}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-          className="bg-white p-6 rounded-xl shadow-lg"
+          transition={{ delay: 0.22 }}
         >
-          <h3 className="text-xl font-bold text-gray-800 mb-4">Pengajuan per Bulan</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={stats?.byMonth || []}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="bulan" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="jumlah" fill="#3b82f6" name="Jumlah Pengajuan" />
-            </BarChart>
-          </ResponsiveContainer>
+          <Card className="p-6">
+            <div className="text-sm font-semibold text-white mb-4">Pengajuan per Bulan</div>
+            <div className="h-[280px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={stats?.byMonth || []}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+                  <XAxis dataKey="bulan" stroke="rgba(148,163,184,0.7)" tick={{ fontSize: 12 }} />
+                  <YAxis stroke="rgba(148,163,184,0.7)" tick={{ fontSize: 12 }} />
+                  <Tooltip contentStyle={{ background: 'rgba(2,6,23,0.9)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                  <Legend />
+                  <Bar dataKey="jumlah" fill="#8b5cf6" name="Jumlah" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.9 }}
-          className="bg-white p-6 rounded-xl shadow-lg"
+          transition={{ delay: 0.26 }}
         >
-          <h3 className="text-xl font-bold text-gray-800 mb-4">Jenis Perizinan</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={stats?.byType || []}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="jenis_perizinan" angle={-45} textAnchor="end" height={100} />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="jumlah" fill="#10b981" name="Jumlah" />
-            </BarChart>
-          </ResponsiveContainer>
+          <Card className="p-6">
+            <div className="text-sm font-semibold text-white mb-4">Jenis Perizinan</div>
+            <div className="h-[280px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={stats?.byType || []}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+                  <XAxis dataKey="jenis_perizinan" stroke="rgba(148,163,184,0.7)" tick={{ fontSize: 10 }} angle={-30} textAnchor="end" height={70} />
+                  <YAxis stroke="rgba(148,163,184,0.7)" tick={{ fontSize: 12 }} />
+                  <Tooltip contentStyle={{ background: 'rgba(2,6,23,0.9)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                  <Legend />
+                  <Bar dataKey="jumlah" fill="#22c55e" name="Jumlah" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
         </motion.div>
       </div>
     </div>
@@ -621,56 +338,60 @@ const UserManagement = () => {
   if (loading) return (
     <div className="text-center py-12">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-      <p className="mt-4 text-gray-600">Memuat data...</p>
+      <p className="mt-4 text-slate-300">Memuat data...</p>
     </div>
   );
 
   return (
     <div className="space-y-4 md:space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl md:text-2xl font-bold text-gray-800">Kelola User</h2>
-        <span className="text-sm text-gray-600 bg-blue-50 px-3 py-1 rounded-full">
+        <h2 className="text-xl md:text-2xl font-bold text-white">Kelola User</h2>
+        <span className="text-sm text-slate-200 bg-white/10 px-3 py-1 rounded-full border border-white/15">
           {users.length} user
         </span>
       </div>
 
       {/* Desktop Table View */}
       {!isMobile && (
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <Card className="overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-slate-950/40 border-b border-white/10">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Username</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dibuat</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Username</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Nama</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Role</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Dibuat</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-white/10">
                 {users && users.length > 0 ? (
                   users.map((user) => (
-                    <tr key={user.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">{user.id}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{user.username}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{user.nama}</td>
+                    <tr key={user.id} className="hover:bg-white/[0.04] transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap text-slate-200">{user.id}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-slate-200">{user.username}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-slate-200">{user.nama}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 rounded-full text-sm ${
-                          user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${
+                          user.role === 'admin'
+                            ? 'bg-violet-500/15 text-violet-200 border-violet-400/20'
+                            : user.role === 'superadmin'
+                            ? 'bg-fuchsia-500/15 text-fuchsia-200 border-fuchsia-400/20'
+                            : 'bg-sky-500/15 text-sky-200 border-sky-400/20'
                         }`}>
                           {user.role}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
                         {new Date(user.created_at).toLocaleDateString('id-ID')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {user.role !== 'admin' && (
                           <button
                             onClick={() => handleDelete(user.id)}
-                            className="flex items-center space-x-1 px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+                            className="flex items-center space-x-1 px-3 py-1.5 bg-rose-500/15 text-rose-200 border border-rose-400/20 rounded-lg hover:bg-rose-500/20 text-sm transition-colors"
                           >
                             <FiTrash2 />
                             <span>Hapus</span>
@@ -681,7 +402,7 @@ const UserManagement = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan="6" className="px-6 py-8 text-center text-slate-400">
                       Tidak ada data user
                     </td>
                   </tr>
@@ -689,7 +410,7 @@ const UserManagement = () => {
               </tbody>
             </table>
           </div>
-        </div>
+        </Card>
       )}
 
       {/* Mobile Card View */}
@@ -700,8 +421,8 @@ const UserManagement = () => {
               <MobileCard key={user.id}>
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
-                    <h3 className="font-bold text-gray-900 text-lg">{user.nama}</h3>
-                    <p className="text-sm text-gray-600">@{user.username}</p>
+                    <h3 className="font-bold text-white text-lg">{user.nama}</h3>
+                    <p className="text-sm text-slate-300">@{user.username}</p>
                   </div>
                   <MobileCardBadge variant={user.role === 'admin' ? 'info' : 'default'}>
                     {user.role}
@@ -733,7 +454,7 @@ const UserManagement = () => {
               </MobileCard>
             ))
           ) : (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-slate-400">
               <p>Tidak ada data user</p>
             </div>
           )}
@@ -769,53 +490,57 @@ const RegisterHRD = () => {
 
   return (
     <div className="space-y-4 md:space-y-6">
-      <h2 className="text-xl md:text-2xl font-bold text-gray-800">Tambah HRD Baru</h2>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-xl md:text-2xl font-bold text-white">Tambah HRD Baru</h2>
+          <p className="text-sm text-slate-300 mt-1">Buat akun HRD untuk memproses pengajuan dan mengelola data karyawan.</p>
+        </div>
+      </div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white p-6 md:p-8 rounded-xl shadow-lg max-w-2xl"
+        className="max-w-2xl"
       >
-        <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+        <Card className="p-6 md:p-8">
+          <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-slate-200 mb-2">
               Username
             </label>
-            <input
-              type="text"
-              required
+            <Input
               value={formData.username}
               onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-              className="w-full px-4 py-3 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base"
               placeholder="Masukkan username"
+              className="w-full"
+              required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-slate-200 mb-2">
               Password
             </label>
-            <input
+            <Input
               type="password"
-              required
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-4 py-3 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base"
               placeholder="Masukkan password"
+              className="w-full"
+              required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-slate-200 mb-2">
               Nama Lengkap
             </label>
-            <input
-              type="text"
-              required
+            <Input
               value={formData.nama}
               onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
-              className="w-full px-4 py-3 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-base"
               placeholder="Masukkan nama lengkap"
+              className="w-full"
+              required
             />
           </div>
 
@@ -836,12 +561,13 @@ const RegisterHRD = () => {
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition disabled:opacity-50"
+              className="w-full py-3 rounded-xl font-semibold transition disabled:opacity-50 bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 hover:brightness-110 shadow-[0_20px_50px_rgba(99,102,241,0.22)]"
             >
               {loading ? 'Memproses...' : 'Daftarkan HRD'}
             </motion.button>
           )}
-        </form>
+          </form>
+        </Card>
       </motion.div>
     </div>
   );
@@ -913,17 +639,17 @@ const ManajemenAkun = () => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">Manajemen Akun</h2>
+      <h2 className="text-2xl font-bold text-white">Manajemen Akun</h2>
 
       {/* Tab Navigation */}
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="flex border-b">
+      <Card className="overflow-hidden">
+        <div className="flex border-b border-white/10">
           <button
             onClick={() => setActiveTab('profile')}
             className={`flex-1 px-6 py-4 font-semibold transition ${
               activeTab === 'profile'
-                ? 'bg-primary-600 text-white'
-                : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                ? 'bg-violet-600 text-white'
+                : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08]'
             }`}
           >
             Profil Saya
@@ -932,15 +658,15 @@ const ManajemenAkun = () => {
             onClick={() => setActiveTab('password')}
             className={`flex-1 px-6 py-4 font-semibold transition ${
               activeTab === 'password'
-                ? 'bg-primary-600 text-white'
-                : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                ? 'bg-violet-600 text-white'
+                : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08]'
             }`}
           >
             Ganti Password
           </button>
         </div>
 
-        <div className="p-8">
+        <div className="p-6 sm:p-8">
           {/* Tab Profil */}
           {activeTab === 'profile' && (
             <motion.div
@@ -948,35 +674,35 @@ const ManajemenAkun = () => {
               animate={{ opacity: 1, x: 0 }}
               className="max-w-2xl"
             >
-              <h3 className="text-xl font-bold text-gray-800 mb-6">Informasi Profil</h3>
+              <h3 className="text-xl font-bold text-white mb-6">Informasi Profil</h3>
               <form onSubmit={handleUpdateProfile} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-200 mb-2">
                     Username
                   </label>
                   <input
                     type="text"
                     disabled
                     value={profileData.username}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
+                    className="w-full px-4 py-3 border border-white/10 rounded-lg bg-white/[0.06] text-slate-300 cursor-not-allowed"
                   />
-                  <p className="text-sm text-gray-500 mt-1">Username tidak dapat diubah</p>
+                  <p className="text-sm text-slate-400 mt-1">Username tidak dapat diubah</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-200 mb-2">
                     Role
                   </label>
                   <input
                     type="text"
                     disabled
                     value={profileData.role.toUpperCase()}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
+                    className="w-full px-4 py-3 border border-white/10 rounded-lg bg-white/[0.06] text-slate-300 cursor-not-allowed"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-200 mb-2">
                     Nama Lengkap
                   </label>
                   <input
@@ -984,7 +710,7 @@ const ManajemenAkun = () => {
                     required
                     value={profileData.nama}
                     onChange={(e) => setProfileData({ ...profileData, nama: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
+                    className="w-full px-4 py-3 bg-white/10 border border-white/15 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400/40 transition outline-none"
                     placeholder="Masukkan nama lengkap"
                   />
                 </div>
@@ -994,7 +720,7 @@ const ManajemenAkun = () => {
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition disabled:opacity-50"
+                  className="w-full py-3 bg-violet-600 text-white rounded-lg font-semibold hover:bg-violet-700 transition disabled:opacity-50"
                 >
                   {loading ? 'Menyimpan...' : 'Simpan Perubahan'}
                 </motion.button>
@@ -1009,10 +735,10 @@ const ManajemenAkun = () => {
               animate={{ opacity: 1, x: 0 }}
               className="max-w-2xl"
             >
-              <h3 className="text-xl font-bold text-gray-800 mb-6">Ganti Password</h3>
+              <h3 className="text-xl font-bold text-white mb-6">Ganti Password</h3>
               <form onSubmit={handleChangePassword} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-200 mb-2">
                     Password Lama
                   </label>
                   <input
@@ -1020,13 +746,13 @@ const ManajemenAkun = () => {
                     required
                     value={passwordData.passwordLama}
                     onChange={(e) => setPasswordData({ ...passwordData, passwordLama: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
+                    className="w-full px-4 py-3 bg-white/10 border border-white/15 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400/40 transition outline-none"
                     placeholder="Masukkan password lama"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-200 mb-2">
                     Password Baru
                   </label>
                   <input
@@ -1034,13 +760,13 @@ const ManajemenAkun = () => {
                     required
                     value={passwordData.passwordBaru}
                     onChange={(e) => setPasswordData({ ...passwordData, passwordBaru: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
+                    className="w-full px-4 py-3 bg-white/10 border border-white/15 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400/40 transition outline-none"
                     placeholder="Masukkan password baru (minimal 6 karakter)"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-200 mb-2">
                     Konfirmasi Password Baru
                   </label>
                   <input
@@ -1048,13 +774,13 @@ const ManajemenAkun = () => {
                     required
                     value={passwordData.konfirmasiPassword}
                     onChange={(e) => setPasswordData({ ...passwordData, konfirmasiPassword: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
+                    className="w-full px-4 py-3 bg-white/10 border border-white/15 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400/40 transition outline-none"
                     placeholder="Konfirmasi password baru"
                   />
                 </div>
 
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <p className="text-sm text-yellow-800">
+                <div className="bg-amber-500/10 border border-amber-400/20 rounded-lg p-4">
+                  <p className="text-sm text-amber-100">
                     <strong>Perhatian:</strong> Setelah mengubah password, Anda akan tetap login dengan sesi saat ini. 
                     Gunakan password baru untuk login berikutnya.
                   </p>
@@ -1065,7 +791,7 @@ const ManajemenAkun = () => {
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition disabled:opacity-50"
+                  className="w-full py-3 bg-violet-600 text-white rounded-lg font-semibold hover:bg-violet-700 transition disabled:opacity-50"
                 >
                   {loading ? 'Mengubah Password...' : 'Ubah Password'}
                 </motion.button>
@@ -1073,7 +799,7 @@ const ManajemenAkun = () => {
             </motion.div>
           )}
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

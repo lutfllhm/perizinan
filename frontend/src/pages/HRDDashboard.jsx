@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
@@ -14,180 +14,106 @@ import {
 import LazyImage from '../components/LazyImage';
 import ImageModal from '../components/ImageModal';
 import { SkeletonTable } from '../components/SkeletonLoader';
+import PhotoBackground from '../components/layout/PhotoBackground';
+import DashboardShell from '../components/layout/DashboardShell';
+import Card from '../components/ui/Card';
+import Input from '../components/ui/Input';
 
 const HRDDashboard = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const navigate = useNavigate();
-  const nama = localStorage.getItem('nama');
+  const nama = localStorage.getItem('nama') || sessionStorage.getItem('nama');
+  const username = localStorage.getItem('username') || sessionStorage.getItem('username');
+  const [pendingCount, setPendingCount] = useState(0);
+  const prevPendingRef = useRef(null);
+  const pollRef = useRef(null);
 
   const handleLogout = () => {
     localStorage.clear();
+    sessionStorage.clear();
     toast.success('Logout berhasil');
     navigate('/');
   };
 
-  const Sidebar = () => {
-    const location = window.location.pathname;
-    
-    const menuItems = [
-      { path: '/hrd', icon: FiHome, label: 'Dashboard', exact: true },
-      { path: '/hrd/pengajuan', icon: FiFileText, label: 'Daftar Pengajuan' },
-      { path: '/hrd/karyawan', icon: FiUser, label: 'Daftar Karyawan' },
-      { path: '/hrd/quota', icon: FiClock, label: 'Quota Karyawan' },
-      { path: '/hrd/report', icon: FiBarChart2, label: 'Report' },
-      { path: '/hrd/profile', icon: FiSettings, label: 'Manajemen Akun' },
-    ];
+  useEffect(() => {
+    let mounted = true;
 
-    const isActive = (path, exact = false) => {
-      if (exact) return location === path;
-      return location.startsWith(path);
+    const tick = async (silent = false) => {
+      try {
+        const res = await pengajuanAPI.getStats();
+        const pending = Number(res?.data?.pending || 0);
+        if (!mounted) return;
+
+        setPendingCount(pending);
+
+        const prev = prevPendingRef.current;
+        if (prev === null) {
+          prevPendingRef.current = pending;
+          return;
+        }
+
+        if (!silent && pending > prev) {
+          const diff = pending - prev;
+          toast.info(`${diff} pengajuan baru masuk.`, { autoClose: 2500 });
+        }
+
+        prevPendingRef.current = pending;
+      } catch (e) {
+        // ignore polling errors
+      }
     };
 
-    return (
-      <motion.div
-        initial={{ x: -300 }}
-        animate={{ x: 0 }}
-        className={`${
-          sidebarOpen ? 'w-72' : 'w-20'
-        } bg-gradient-to-b from-gray-800 via-gray-700 to-gray-800 text-white min-h-screen fixed left-0 top-0 transition-all duration-300 z-40 shadow-2xl overflow-y-auto dark-scrollbar`}
-      >
-        <div className="p-3 pb-20">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6 pb-3 border-b border-gray-600">
-            {sidebarOpen && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex items-center space-x-2"
-              >
-                <div className="bg-gradient-to-br from-blue-500 to-cyan-600 p-2 rounded-lg">
-                  <FiFileText className="text-xl" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-bold">HRD Panel</h2>
-                  <p className="text-xs text-gray-400">Sistem Perizinan</p>
-                </div>
-              </motion.div>
-            )}
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 hover:bg-gray-600 rounded-lg transition-colors"
-            >
-              {sidebarOpen ? <FiX size={20} /> : <FiMenu size={20} />}
-            </button>
-          </div>
+    // initial fetch (silent, no toast)
+    tick(true);
+    pollRef.current = window.setInterval(() => {
+      if (document.hidden) return;
+      tick(false);
+    }, 25000);
 
-          {/* User Info */}
-          {sidebarOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-4 p-3 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 rounded-lg border border-blue-500/30"
-            >
-              <div className="flex items-center space-x-2">
-                <div className="bg-gradient-to-br from-blue-500 to-cyan-600 p-2 rounded-full">
-                  <FiUser className="text-lg" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold truncate">{nama}</p>
-                  <p className="text-xs text-gray-400">HRD Staff</p>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Navigation Menu */}
-          <nav className="space-y-1 mb-3">
-            {menuItems.map((item, index) => {
-              const Icon = item.icon;
-              const active = isActive(item.path, item.exact);
-              
-              return (
-                <Link key={item.path} to={item.path}>
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className={`flex items-center space-x-2 p-2.5 rounded-lg transition-all duration-200 ${
-                      active
-                        ? 'bg-gradient-to-r from-blue-600 to-cyan-600 shadow-lg shadow-blue-500/50'
-                        : 'hover:bg-gray-700 hover:translate-x-1'
-                    }`}
-                  >
-                    <Icon size={18} className={active ? 'text-white' : 'text-gray-400'} />
-                    {sidebarOpen && (
-                      <span className={`text-sm font-medium ${active ? 'text-white' : 'text-gray-300'}`}>
-                        {item.label}
-                      </span>
-                    )}
-                    {active && sidebarOpen && (
-                      <motion.div
-                        layoutId="activeIndicator"
-                        className="ml-auto w-1.5 h-1.5 bg-white rounded-full"
-                      />
-                    )}
-                  </motion.div>
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Divider */}
-          <div className="py-2">
-            <div className="border-t border-gray-600"></div>
-          </div>
-
-          {/* Logout Button */}
-          <motion.button
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
-            onClick={handleLogout}
-            className="w-full flex items-center space-x-2 p-2.5 rounded-lg hover:bg-red-600 hover:translate-x-1 transition-all duration-200 group"
-          >
-            <FiLogOut size={18} className="text-gray-400 group-hover:text-white" />
-            {sidebarOpen && <span className="text-sm font-medium text-gray-300 group-hover:text-white">Logout</span>}
-          </motion.button>
-
-          {/* Footer */}
-          {sidebarOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="mt-3"
-            >
-              <div className="p-2 bg-gray-700/50 rounded-lg border border-gray-600">
-                <p className="text-xs text-gray-400 text-center">
-                  © 2024 IWARE
-                </p>
-                <p className="text-xs text-gray-500 text-center mt-0.5">
-                  v1.0.0
-                </p>
-              </div>
-            </motion.div>
-          )}
-        </div>
-      </motion.div>
-    );
-  };
+    return () => {
+      mounted = false;
+      if (pollRef.current) window.clearInterval(pollRef.current);
+    };
+  }, []);
 
   return (
-    <div className="flex bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
-      <Sidebar />
-      <div className={`flex-1 ${sidebarOpen ? 'ml-72' : 'ml-20'} transition-all duration-300`}>
-        <div className="p-8">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/pengajuan" element={<DaftarPengajuan />} />
-            <Route path="/karyawan" element={<DaftarKaryawan />} />
-            <Route path="/quota" element={<QuotaKaryawan />} />
-            <Route path="/report" element={<Report />} />
-            <Route path="/profile" element={<ManajemenAkun />} />
-          </Routes>
-        </div>
-      </div>
-    </div>
+    <PhotoBackground>
+      <DashboardShell
+        logoSrc="/img/logo.png"
+        brandTitle="IWARE"
+        brandSubtitle="HRD Panel"
+        accent="cyan"
+        roleLabel="HRD"
+        user={{ name: nama, username }}
+        onLogout={handleLogout}
+        searchPlaceholder="Cari di dashboard…"
+        onSearchChange={() => {}}
+        notificationCount={pendingCount}
+        onNotificationsClick={() => navigate('/hrd/pengajuan')}
+        navItems={[
+          { path: '/hrd', icon: FiHome, label: 'Dashboard', exact: true },
+          { path: '/hrd/pengajuan', icon: FiFileText, label: 'Daftar Pengajuan' },
+          { path: '/hrd/karyawan', icon: FiUser, label: 'Daftar Karyawan' },
+          { path: '/hrd/quota', icon: FiClock, label: 'Quota Karyawan' },
+          { path: '/hrd/report', icon: FiBarChart2, label: 'Report' },
+          { path: '/hrd/profile', icon: FiSettings, label: 'Manajemen Akun' },
+        ]}
+        bottomNavItems={[
+          { path: '/hrd', icon: FiHome, label: 'Home', exact: true },
+          { path: '/hrd/pengajuan', icon: FiFileText, label: 'Pengajuan' },
+          { path: '/hrd/karyawan', icon: FiUser, label: 'Karyawan' },
+          { path: '/hrd/profile', icon: FiSettings, label: 'Profil' },
+        ]}
+      >
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/pengajuan" element={<DaftarPengajuan />} />
+          <Route path="/karyawan" element={<DaftarKaryawan />} />
+          <Route path="/quota" element={<QuotaKaryawan />} />
+          <Route path="/report" element={<Report />} />
+          <Route path="/profile" element={<ManajemenAkun />} />
+        </Routes>
+      </DashboardShell>
+    </PhotoBackground>
   );
 };
 
@@ -220,231 +146,158 @@ const Dashboard = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    );
-  }
+  const statCards = useMemo(
+    () => [
+      { label: 'Total Pengajuan', value: stats?.total || 0, icon: FiFileText, tint: 'from-sky-500/25 to-cyan-500/10' },
+      { label: 'Pending', value: stats?.pending || 0, icon: FiClock, tint: 'from-amber-500/25 to-orange-500/10' },
+      { label: 'Approved', value: stats?.approved || 0, icon: FiCheckCircle, tint: 'from-emerald-500/25 to-teal-500/10' },
+      { label: 'Rejected', value: stats?.rejected || 0, icon: FiXCircle, tint: 'from-rose-500/25 to-red-500/10' },
+    ],
+    [stats]
+  );
 
   return (
     <div className="space-y-8">
-      {/* Header dengan Gradient */}
+      {loading && (
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400"></div>
+        </div>
+      )}
+
+      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 rounded-2xl p-8 text-white shadow-2xl"
+        className="rounded-3xl border border-white/10 bg-white/[0.06] backdrop-blur-2xl p-6 md:p-8 shadow-[0_30px_80px_rgba(0,0,0,0.45)]"
       >
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold mb-2">Dashboard HRD</h2>
-            <p className="text-blue-100">Kelola dan monitor pengajuan perizinan</p>
+            <h2 className="text-2xl md:text-3xl font-semibold mb-2 text-white">Dashboard HRD</h2>
+            <p className="text-slate-300">Kelola dan monitor pengajuan perizinan</p>
           </div>
           <div className="hidden md:block">
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4">
-              <p className="text-sm text-blue-100">Tanggal Hari Ini</p>
-              <p className="text-xl font-bold">{new Date().toLocaleDateString('id-ID', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-              })}</p>
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+              <p className="text-xs text-slate-400">Tanggal</p>
+              <p className="text-sm font-semibold text-white">
+                {new Date().toLocaleDateString('id-ID', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </p>
             </div>
           </div>
         </div>
       </motion.div>
 
-      {/* Stats Cards dengan Icon */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.1 }}
-          whileHover={{ scale: 1.05, y: -5 }}
-          className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
-        >
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="bg-blue-100 p-3 rounded-xl">
-                <FiFileText className="text-3xl text-blue-600" />
-              </div>
-              <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
-                TOTAL
-              </span>
-            </div>
-            <h3 className="text-gray-600 text-sm font-medium mb-1">Total Pengajuan</h3>
-            <p className="text-4xl font-bold text-gray-800">{stats?.total || 0}</p>
-            <div className="mt-4 flex items-center text-sm text-gray-500">
-              <span className="text-green-500 font-semibold mr-1">↑ 100%</span>
-              dari semua data
-            </div>
-          </div>
-          <div className="h-2 bg-gradient-to-r from-blue-400 to-blue-600"></div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-          whileHover={{ scale: 1.05, y: -5 }}
-          className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
-        >
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="bg-yellow-100 p-3 rounded-xl">
-                <FiClock className="text-3xl text-yellow-600" />
-              </div>
-              <span className="text-xs font-semibold text-yellow-600 bg-yellow-50 px-3 py-1 rounded-full">
-                PENDING
-              </span>
-            </div>
-            <h3 className="text-gray-600 text-sm font-medium mb-1">Menunggu Persetujuan</h3>
-            <p className="text-4xl font-bold text-gray-800">{stats?.pending || 0}</p>
-            <div className="mt-4 flex items-center text-sm text-gray-500">
-              <span className="text-yellow-500 font-semibold mr-1">⏳</span>
-              perlu ditinjau
-            </div>
-          </div>
-          <div className="h-2 bg-gradient-to-r from-yellow-400 to-yellow-600"></div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3 }}
-          whileHover={{ scale: 1.05, y: -5 }}
-          className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
-        >
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="bg-green-100 p-3 rounded-xl">
-                <FiCheckCircle className="text-3xl text-green-600" />
-              </div>
-              <span className="text-xs font-semibold text-green-600 bg-green-50 px-3 py-1 rounded-full">
-                APPROVED
-              </span>
-            </div>
-            <h3 className="text-gray-600 text-sm font-medium mb-1">Disetujui</h3>
-            <p className="text-4xl font-bold text-gray-800">{stats?.approved || 0}</p>
-            <div className="mt-4 flex items-center text-sm text-gray-500">
-              <span className="text-green-500 font-semibold mr-1">✓</span>
-              telah disetujui
-            </div>
-          </div>
-          <div className="h-2 bg-gradient-to-r from-green-400 to-green-600"></div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.4 }}
-          whileHover={{ scale: 1.05, y: -5 }}
-          className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
-        >
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="bg-red-100 p-3 rounded-xl">
-                <FiXCircle className="text-3xl text-red-600" />
-              </div>
-              <span className="text-xs font-semibold text-red-600 bg-red-50 px-3 py-1 rounded-full">
-                REJECTED
-              </span>
-            </div>
-            <h3 className="text-gray-600 text-sm font-medium mb-1">Ditolak</h3>
-            <p className="text-4xl font-bold text-gray-800">{stats?.rejected || 0}</p>
-            <div className="mt-4 flex items-center text-sm text-gray-500">
-              <span className="text-red-500 font-semibold mr-1">✗</span>
-              tidak disetujui
-            </div>
-          </div>
-          <div className="h-2 bg-gradient-to-r from-red-400 to-red-600"></div>
-        </motion.div>
+        {statCards.map((c, i) => {
+          const Icon = c.icon;
+          return (
+            <motion.div
+              key={c.label}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.06 + i * 0.04, duration: 0.35 }}
+            >
+              <Card className="p-5">
+                <div className={`rounded-2xl border border-white/10 bg-gradient-to-br ${c.tint} p-3 flex items-center justify-between`}>
+                  <div className="h-10 w-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                    <Icon className="text-white" />
+                  </div>
+                  <div className="text-xs text-slate-200">Overview</div>
+                </div>
+                <div className="mt-4 text-xs text-slate-400">{c.label}</div>
+                <div className="mt-2 text-3xl font-semibold text-white">{c.value}</div>
+              </Card>
+            </motion.div>
+          );
+        })}
       </div>
 
       {/* Quick Actions */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="bg-white rounded-2xl shadow-lg p-6"
-      >
-        <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-          <span className="bg-primary-100 p-2 rounded-lg mr-3">
-            <FiFileText className="text-primary-600" />
-          </span>
-          Aksi Cepat
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Link to="/hrd/pengajuan">
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="p-4 border-2 border-gray-200 rounded-xl hover:border-primary-500 hover:bg-primary-50 transition-all cursor-pointer"
-            >
-              <FiFileText className="text-2xl text-primary-600 mb-2" />
-              <h4 className="font-semibold text-gray-800">Daftar Pengajuan</h4>
-              <p className="text-sm text-gray-600">Lihat semua pengajuan</p>
-            </motion.div>
-          </Link>
-          <Link to="/hrd/report">
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="p-4 border-2 border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all cursor-pointer"
-            >
-              <FiBarChart2 className="text-2xl text-green-600 mb-2" />
-              <h4 className="font-semibold text-gray-800">Report</h4>
-              <p className="text-sm text-gray-600">Lihat laporan lengkap</p>
-            </motion.div>
-          </Link>
-          <Link to="/hrd/profile">
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="p-4 border-2 border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all cursor-pointer"
-            >
-              <FiSettings className="text-2xl text-purple-600 mb-2" />
-              <h4 className="font-semibold text-gray-800">Pengaturan</h4>
-              <p className="text-sm text-gray-600">Kelola akun Anda</p>
-            </motion.div>
-          </Link>
-        </div>
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}>
+        <Card className="p-6">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl border border-white/10 bg-white/5 flex items-center justify-center">
+              <FiFileText className="text-white" />
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-white">Aksi cepat</div>
+              <div className="text-xs text-slate-400">Akses menu utama dengan sekali klik</div>
+            </div>
+          </div>
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+            <Link to="/hrd/pengajuan">
+              <div className="rounded-2xl border border-white/10 bg-white/5 hover:bg-white/[0.08] transition p-4">
+                <FiFileText className="text-white/90" />
+                <div className="mt-3 text-sm font-semibold text-white">Daftar Pengajuan</div>
+                <div className="mt-1 text-xs text-slate-400">Lihat semua pengajuan</div>
+              </div>
+            </Link>
+            <Link to="/hrd/report">
+              <div className="rounded-2xl border border-white/10 bg-white/5 hover:bg-white/[0.08] transition p-4">
+                <FiBarChart2 className="text-white/90" />
+                <div className="mt-3 text-sm font-semibold text-white">Report</div>
+                <div className="mt-1 text-xs text-slate-400">Laporan lengkap</div>
+              </div>
+            </Link>
+            <Link to="/hrd/profile">
+              <div className="rounded-2xl border border-white/10 bg-white/5 hover:bg-white/[0.08] transition p-4">
+                <FiSettings className="text-white/90" />
+                <div className="mt-3 text-sm font-semibold text-white">Pengaturan</div>
+                <div className="mt-1 text-xs text-slate-400">Kelola akun Anda</div>
+              </div>
+            </Link>
+          </div>
+        </Card>
       </motion.div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white p-6 rounded-xl shadow-lg"
-        >
-          <h3 className="text-xl font-bold text-gray-800 mb-4">Pengajuan per Bulan</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={stats?.byMonth || []}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="bulan" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="jumlah" fill="#3b82f6" name="Jumlah Pengajuan" />
-            </BarChart>
-          </ResponsiveContainer>
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }}>
+          <Card className="p-6">
+            <div className="text-sm font-semibold text-white mb-4">Pengajuan per Bulan</div>
+            <div className="h-[280px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={stats?.byMonth || []}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+                  <XAxis dataKey="bulan" stroke="rgba(148,163,184,0.7)" tick={{ fontSize: 12 }} />
+                  <YAxis stroke="rgba(148,163,184,0.7)" tick={{ fontSize: 12 }} />
+                  <Tooltip contentStyle={{ background: 'rgba(2,6,23,0.9)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                  <Legend />
+                  <Bar dataKey="jumlah" fill="#0ea5e9" name="Jumlah Pengajuan" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white p-6 rounded-xl shadow-lg"
-        >
-          <h3 className="text-xl font-bold text-gray-800 mb-4">Jenis Perizinan</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={stats?.byType || []}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="jenis_perizinan" angle={-45} textAnchor="end" height={100} />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="jumlah" fill="#10b981" name="Jumlah" />
-            </BarChart>
-          </ResponsiveContainer>
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.26 }}>
+          <Card className="p-6">
+            <div className="text-sm font-semibold text-white mb-4">Jenis Perizinan</div>
+            <div className="h-[280px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={stats?.byType || []}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+                  <XAxis
+                    dataKey="jenis_perizinan"
+                    stroke="rgba(148,163,184,0.7)"
+                    tick={{ fontSize: 10 }}
+                    angle={-30}
+                    textAnchor="end"
+                    height={70}
+                  />
+                  <YAxis stroke="rgba(148,163,184,0.7)" tick={{ fontSize: 12 }} />
+                  <Tooltip contentStyle={{ background: 'rgba(2,6,23,0.9)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                  <Legend />
+                  <Bar dataKey="jumlah" fill="#22c55e" name="Jumlah" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
         </motion.div>
       </div>
     </div>
@@ -655,7 +508,7 @@ _Sistem Perizinan IWARE_`;
 
   if (loading) return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">Daftar Pengajuan</h2>
+      <h2 className="text-2xl font-bold text-white">Daftar Pengajuan</h2>
       <SkeletonTable rows={8} />
     </div>
   );
@@ -667,9 +520,9 @@ _Sistem Perizinan IWARE_`;
         animate={{ opacity: 1, y: 0 }}
         className="flex items-center justify-between"
       >
-        <h2 className="text-2xl font-bold text-gray-800">Daftar Pengajuan</h2>
-        <div className="text-sm text-gray-600">
-          Total: <span className="font-bold text-primary-600">{pengajuan.length}</span> pengajuan
+        <h2 className="text-2xl font-bold text-white">Daftar Pengajuan</h2>
+        <div className="text-sm text-slate-300">
+          Total: <span className="font-bold text-cyan-400">{pengajuan.length}</span> pengajuan
         </div>
       </motion.div>
 
@@ -677,21 +530,21 @@ _Sistem Perizinan IWARE_`;
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-white rounded-xl shadow-lg overflow-hidden"
       >
+        <Card className="overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+          <table className="w-full table-fixed text-xs sm:text-sm">
+            <thead className="bg-slate-950/70 backdrop-blur border-b border-white/10 sticky top-0 z-10">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Nama</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">No. Telp</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Jenis</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Tanggal</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Aksi</th>
+                <th className="px-4 py-3 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider w-[22%]">Nama</th>
+                <th className="px-4 py-3 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider w-[16%]">No. Telp</th>
+                <th className="px-4 py-3 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider w-[20%]">Jenis</th>
+                <th className="px-4 py-3 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider w-[14%]">Tanggal</th>
+                <th className="px-4 py-3 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider w-[14%]">Status</th>
+                <th className="px-4 py-3 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider w-[14%]">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-white/10">
               <AnimatePresence>
                 {pengajuan.map((item, index) => (
                   <motion.tr
@@ -700,40 +553,46 @@ _Sistem Perizinan IWARE_`;
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
                     transition={{ delay: index * 0.05 }}
-                    className="hover:bg-blue-50 transition-colors duration-200"
+                    className="hover:bg-white/[0.05] transition-colors duration-200 odd:bg-white/[0.02]"
                   >
-                    <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{item.nama}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-600">{item.no_telp}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 py-3 align-top font-semibold text-slate-100 whitespace-normal break-words">
+                      {item.nama}
+                    </td>
+                    <td className="px-4 py-3 align-top text-slate-300 whitespace-nowrap">
+                      {item.no_telp}
+                    </td>
+                    <td className="px-4 py-3 align-top whitespace-normal break-words">
                       <motion.span
                         whileHover={{ scale: 1.05 }}
-                        className="px-3 py-1 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 rounded-full text-sm font-semibold"
+                        className="px-3 py-1 bg-sky-500/15 text-sky-200 border border-sky-400/20 rounded-full text-xs font-semibold"
                       >
                         {item.jenis_perizinan}
                       </motion.span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="px-4 py-3 align-top whitespace-nowrap text-slate-300">
                       {new Date(item.tanggal_mulai).toLocaleDateString('id-ID')}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 py-3 align-top whitespace-nowrap">
                       <motion.span
                         whileHover={{ scale: 1.05 }}
-                        className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                          item.status === 'approved' ? 'bg-gradient-to-r from-green-100 to-green-200 text-green-800' :
-                          item.status === 'rejected' ? 'bg-gradient-to-r from-red-100 to-red-200 text-red-800' :
-                          'bg-gradient-to-r from-yellow-100 to-yellow-200 text-yellow-800'
+                        className={`px-3 py-1 rounded-full text-xs font-semibold border ${
+                          item.status === 'approved'
+                            ? 'bg-emerald-500/15 text-emerald-200 border-emerald-400/20'
+                            : item.status === 'rejected'
+                            ? 'bg-rose-500/15 text-rose-200 border-rose-400/20'
+                            : 'bg-amber-500/15 text-amber-200 border-amber-400/20'
                         }`}
                       >
                         {item.status}
                       </motion.span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 py-3 align-top whitespace-nowrap">
                       <div className="flex flex-wrap gap-2">
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => handleShowDetail(item)}
-                          className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
+                          className="p-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition text-white"
                           title="Lihat Detail"
                         >
                           <FiEye size={16} />
@@ -744,7 +603,7 @@ _Sistem Perizinan IWARE_`;
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={() => handleUpdateStatus(item.id, 'approved')}
-                              className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all"
+                              className="p-2 rounded-lg border border-emerald-400/20 bg-emerald-500/15 hover:bg-emerald-500/20 transition text-emerald-100"
                               title="Setujui"
                             >
                               <FiCheckCircle size={16} />
@@ -753,7 +612,7 @@ _Sistem Perizinan IWARE_`;
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={() => handleUpdateStatus(item.id, 'rejected')}
-                              className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all"
+                              className="p-2 rounded-lg border border-rose-400/20 bg-rose-500/15 hover:bg-rose-500/20 transition text-rose-100"
                               title="Tolak"
                             >
                               <FiXCircle size={16} />
@@ -765,7 +624,7 @@ _Sistem Perizinan IWARE_`;
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => handleSendWhatsApp(item)}
-                            className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all"
+                            className="p-2 rounded-lg border border-emerald-400/20 bg-emerald-500/15 hover:bg-emerald-500/20 transition text-emerald-100"
                             title="Kirim Notifikasi WhatsApp"
                           >
                             <FiSend size={16} />
@@ -775,7 +634,7 @@ _Sistem Perizinan IWARE_`;
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => handleDelete(item.id)}
-                          className="p-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all"
+                          className="p-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition text-white"
                           title="Hapus"
                         >
                           <FiTrash2 size={16} />
@@ -788,6 +647,7 @@ _Sistem Perizinan IWARE_`;
             </tbody>
           </table>
         </div>
+        </Card>
       </motion.div>
 
       {/* Modal Detail Pengajuan */}
@@ -798,7 +658,7 @@ _Sistem Perizinan IWARE_`;
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: "spring", damping: 25 }}
-            className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+            className="rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-white/10 bg-slate-950/80 backdrop-blur-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-cyan-600 text-white p-6 rounded-t-2xl z-10">
@@ -824,9 +684,9 @@ _Sistem Perizinan IWARE_`;
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 }}
-                  className="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-xl border border-blue-200"
+                  className="bg-white/[0.06] p-4 rounded-xl border border-white/10"
                 >
-                  <label className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Status</label>
+                  <label className="text-xs font-semibold text-slate-300 uppercase tracking-wide">Status</label>
                   <p className="mt-2">
                     <span className={`inline-block px-4 py-2 rounded-lg text-sm font-bold ${
                       selectedItem.status === 'approved' ? 'bg-green-500 text-white' :
@@ -842,10 +702,10 @@ _Sistem Perizinan IWARE_`;
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.15 }}
-                  className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-xl border border-purple-200"
+                  className="bg-white/[0.06] p-4 rounded-xl border border-white/10"
                 >
-                  <label className="text-xs font-semibold text-purple-600 uppercase tracking-wide">Jenis Perizinan</label>
-                  <p className="text-lg font-bold text-gray-800 mt-2 capitalize">{selectedItem.jenis_perizinan}</p>
+                  <label className="text-xs font-semibold text-slate-300 uppercase tracking-wide">Jenis Perizinan</label>
+                  <p className="text-lg font-bold text-white mt-2 capitalize">{selectedItem.jenis_perizinan}</p>
                 </motion.div>
               </div>
 
@@ -855,14 +715,14 @@ _Sistem Perizinan IWARE_`;
                 transition={{ delay: 0.2 }}
                 className="space-y-4"
               >
-                <div className="bg-gray-50 p-4 rounded-xl">
-                  <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Nama Lengkap</label>
-                  <p className="text-lg font-semibold text-gray-800 mt-1">{selectedItem.nama}</p>
+                <div className="bg-white/[0.06] p-4 rounded-xl border border-white/10">
+                  <label className="text-xs font-semibold text-slate-300 uppercase tracking-wide">Nama Lengkap</label>
+                  <p className="text-lg font-semibold text-white mt-1">{selectedItem.nama}</p>
                 </div>
 
-                <div className="bg-gray-50 p-4 rounded-xl">
-                  <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">No. Telepon/WhatsApp</label>
-                  <p className="text-lg font-semibold text-gray-800 mt-1">{selectedItem.no_telp}</p>
+                <div className="bg-white/[0.06] p-4 rounded-xl border border-white/10">
+                  <label className="text-xs font-semibold text-slate-300 uppercase tracking-wide">No. Telepon/WhatsApp</label>
+                  <p className="text-lg font-semibold text-white mt-1">{selectedItem.no_telp}</p>
                 </div>
 
                 {/* Info Quota Karyawan */}
@@ -871,63 +731,63 @@ _Sistem Perizinan IWARE_`;
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.25 }}
-                    className="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-xl border-2 border-blue-200"
+                    className="bg-white/[0.06] p-4 rounded-xl border border-white/10"
                   >
-                    <label className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-3 block">
+                    <label className="text-xs font-semibold text-cyan-200 uppercase tracking-wide mb-3 block">
                       📊 Info Quota Karyawan
                     </label>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      <div className="bg-white p-3 rounded-lg border border-blue-100">
-                        <p className="text-xs text-gray-600 mb-1">Sisa Cuti</p>
+                      <div className="bg-white/5 p-3 rounded-lg border border-white/10">
+                        <p className="text-xs text-slate-300 mb-1">Sisa Cuti</p>
                         <p className={`text-2xl font-bold ${
                           quotaInfo.sisa_cuti > 5 ? 'text-green-600' : 
                           quotaInfo.sisa_cuti > 0 ? 'text-yellow-600' : 'text-red-600'
                         }`}>
                           {quotaInfo.sisa_cuti} hari
                         </p>
-                        <p className="text-xs text-gray-500 mt-1">dari {quotaInfo.jatah_cuti} hari</p>
+                        <p className="text-xs text-slate-400 mt-1">dari {quotaInfo.jatah_cuti} hari</p>
                       </div>
-                      <div className="bg-white p-3 rounded-lg border border-blue-100">
-                        <p className="text-xs text-gray-600 mb-1">Pulang Cepat</p>
+                      <div className="bg-white/5 p-3 rounded-lg border border-white/10">
+                        <p className="text-xs text-slate-300 mb-1">Pulang Cepat</p>
                         <p className={`text-2xl font-bold ${
                           quotaInfo.pulang_cepat < 3 ? 'text-green-600' : 'text-red-600'
                         }`}>
                           {quotaInfo.pulang_cepat}/3x
                         </p>
-                        <p className="text-xs text-gray-500 mt-1">bulan ini</p>
+                        <p className="text-xs text-slate-400 mt-1">bulan ini</p>
                       </div>
-                      <div className="bg-white p-3 rounded-lg border border-blue-100">
-                        <p className="text-xs text-gray-600 mb-1">Datang Terlambat</p>
+                      <div className="bg-white/5 p-3 rounded-lg border border-white/10">
+                        <p className="text-xs text-slate-300 mb-1">Datang Terlambat</p>
                         <p className={`text-2xl font-bold ${
                           quotaInfo.datang_terlambat < 3 ? 'text-green-600' : 'text-red-600'
                         }`}>
                           {quotaInfo.datang_terlambat}/3x
                         </p>
-                        <p className="text-xs text-gray-500 mt-1">bulan ini</p>
+                        <p className="text-xs text-slate-400 mt-1">bulan ini</p>
                       </div>
                     </div>
                   </motion.div>
                 )}
 
                 {loadingQuota && (
-                  <div className="bg-gray-50 p-4 rounded-xl text-center">
-                    <p className="text-sm text-gray-600">Memuat info quota...</p>
+                  <div className="bg-white/[0.06] p-4 rounded-xl text-center border border-white/10">
+                    <p className="text-sm text-slate-300">Memuat info quota...</p>
                   </div>
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-green-50 p-4 rounded-xl border border-green-200">
-                    <label className="text-xs font-semibold text-green-600 uppercase tracking-wide">Tanggal & Jam Mulai</label>
-                    <p className="text-sm font-semibold text-gray-800 mt-1">
+                  <div className="bg-emerald-500/10 p-4 rounded-xl border border-emerald-400/20">
+                    <label className="text-xs font-semibold text-emerald-200 uppercase tracking-wide">Tanggal & Jam Mulai</label>
+                    <p className="text-sm font-semibold text-white mt-1">
                       {new Date(selectedItem.tanggal_mulai).toLocaleString('id-ID', {
                         dateStyle: 'full',
                         timeStyle: 'short'
                       })}
                     </p>
                   </div>
-                  <div className="bg-red-50 p-4 rounded-xl border border-red-200">
-                    <label className="text-xs font-semibold text-red-600 uppercase tracking-wide">Tanggal & Jam Selesai</label>
-                    <p className="text-sm font-semibold text-gray-800 mt-1">
+                  <div className="bg-rose-500/10 p-4 rounded-xl border border-rose-400/20">
+                    <label className="text-xs font-semibold text-rose-200 uppercase tracking-wide">Tanggal & Jam Selesai</label>
+                    <p className="text-sm font-semibold text-white mt-1">
                       {new Date(selectedItem.tanggal_selesai).toLocaleString('id-ID', {
                         dateStyle: 'full',
                         timeStyle: 'short'
@@ -942,7 +802,7 @@ _Sistem Perizinan IWARE_`;
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
                   >
-                    <label className="text-sm font-semibold text-gray-700 mb-3 block">Bukti Foto</label>
+                    <label className="text-sm font-semibold text-slate-200 mb-3 block">Bukti Foto</label>
                     <div className="relative rounded-xl overflow-hidden border-4 border-gray-200 hover:border-blue-400 transition-all duration-300 shadow-lg hover:shadow-2xl">
                       <LazyImage
                         src={`${API_URL}/uploads/${selectedItem.bukti_foto}`}
@@ -952,20 +812,20 @@ _Sistem Perizinan IWARE_`;
                         onClick={() => handleShowImage(`${API_URL}/uploads/${selectedItem.bukti_foto}`, 'Bukti Foto')}
                       />
                     </div>
-                    <p className="text-xs text-gray-500 mt-2 text-center italic">💡 Klik gambar untuk memperbesar dan zoom</p>
+                    <p className="text-xs text-slate-400 mt-2 text-center italic">Klik gambar untuk memperbesar dan zoom</p>
                   </motion.div>
                 )}
 
                 {selectedItem.catatan && (
-                  <div className="bg-yellow-50 p-4 rounded-xl border border-yellow-200">
-                    <label className="text-xs font-semibold text-yellow-600 uppercase tracking-wide">Catatan</label>
-                    <p className="text-gray-800 mt-1">{selectedItem.catatan}</p>
+                  <div className="bg-amber-500/10 p-4 rounded-xl border border-amber-400/20">
+                    <label className="text-xs font-semibold text-amber-200 uppercase tracking-wide">Catatan</label>
+                    <p className="text-white mt-1">{selectedItem.catatan}</p>
                   </div>
                 )}
 
-                <div className="bg-gray-50 p-4 rounded-xl">
-                  <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Tanggal Pengajuan</label>
-                  <p className="text-sm text-gray-800 mt-1">
+                <div className="bg-white/[0.06] p-4 rounded-xl border border-white/10">
+                  <label className="text-xs font-semibold text-slate-300 uppercase tracking-wide">Tanggal Pengajuan</label>
+                  <p className="text-sm text-slate-200 mt-1">
                     {new Date(selectedItem.created_at).toLocaleString('id-ID', {
                       dateStyle: 'full',
                       timeStyle: 'short'
@@ -974,7 +834,7 @@ _Sistem Perizinan IWARE_`;
                 </div>
               </motion.div>
 
-              <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
+              <div className="flex flex-wrap gap-3 pt-4 border-t border-white/10">
                 {selectedItem.status === 'pending' && (
                   <>
                     <motion.button
@@ -1016,7 +876,7 @@ _Sistem Perizinan IWARE_`;
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setShowDetailModal(false)}
-                  className={`${selectedItem.status === 'pending' ? 'w-full' : 'flex-1'} px-6 py-3 bg-gray-300 text-gray-700 rounded-xl hover:bg-gray-400 font-semibold transition-all`}
+                  className={`${selectedItem.status === 'pending' ? 'w-full' : 'flex-1'} px-6 py-3 rounded-xl font-semibold transition-all border border-white/15 bg-white/10 text-white hover:bg-white/15`}
                 >
                   Tutup
                 </motion.button>
@@ -1061,16 +921,16 @@ const Report = () => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">Report Pengajuan</h2>
+      <h2 className="text-2xl font-bold text-white">Report Pengajuan</h2>
 
-      <div className="bg-white p-6 rounded-xl shadow-lg">
+      <Card className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Bulan</label>
+            <label className="block text-sm font-medium text-slate-200 mb-2">Bulan</label>
             <select
               value={filters.bulan}
               onChange={(e) => setFilters({ ...filters, bulan: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+              className="w-full h-11 px-4 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400/40"
             >
               <option value="">Semua Bulan</option>
               {[...Array(12)].map((_, i) => (
@@ -1080,37 +940,37 @@ const Report = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Tahun</label>
-            <input
+            <label className="block text-sm font-medium text-slate-200 mb-2">Tahun</label>
+            <Input
               type="number"
               value={filters.tahun}
               onChange={(e) => setFilters({ ...filters, tahun: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+              className="w-full"
             />
           </div>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-slate-950/40 border-b border-white/10">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jenis</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Nama</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Jenis</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Tanggal</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-white/10">
               {report.map((item) => (
-                <tr key={item.id}>
-                  <td className="px-6 py-4">{item.nama}</td>
-                  <td className="px-6 py-4">{item.jenis_perizinan}</td>
-                  <td className="px-6 py-4">{new Date(item.created_at).toLocaleDateString('id-ID')}</td>
+                <tr key={item.id} className="hover:bg-white/[0.04] transition-colors">
+                  <td className="px-6 py-4 text-slate-200">{item.nama}</td>
+                  <td className="px-6 py-4 text-slate-200">{item.jenis_perizinan}</td>
+                  <td className="px-6 py-4 text-slate-300">{new Date(item.created_at).toLocaleDateString('id-ID')}</td>
                   <td className="px-6 py-4">
                     <span className={`px-2 py-1 rounded-full text-sm ${
-                      item.status === 'approved' ? 'bg-green-100 text-green-800' :
-                      item.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                      'bg-yellow-100 text-yellow-800'
+                      item.status === 'approved' ? 'bg-emerald-500/15 text-emerald-200 border border-emerald-400/20' :
+                      item.status === 'rejected' ? 'bg-rose-500/15 text-rose-200 border border-rose-400/20' :
+                      'bg-amber-500/15 text-amber-200 border border-amber-400/20'
                     }`}>
                       {item.status}
                     </span>
@@ -1120,7 +980,7 @@ const Report = () => {
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
@@ -1191,17 +1051,17 @@ const ManajemenAkun = () => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">Manajemen Akun</h2>
+      <h2 className="text-2xl font-bold text-white">Manajemen Akun</h2>
 
       {/* Tab Navigation */}
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="flex border-b">
+      <Card className="overflow-hidden">
+        <div className="flex border-b border-white/10">
           <button
             onClick={() => setActiveTab('profile')}
             className={`flex-1 px-6 py-4 font-semibold transition ${
               activeTab === 'profile'
-                ? 'bg-primary-600 text-white'
-                : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                ? 'bg-cyan-500/20 text-white'
+                : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08]'
             }`}
           >
             Profil Saya
@@ -1210,15 +1070,15 @@ const ManajemenAkun = () => {
             onClick={() => setActiveTab('password')}
             className={`flex-1 px-6 py-4 font-semibold transition ${
               activeTab === 'password'
-                ? 'bg-primary-600 text-white'
-                : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                ? 'bg-cyan-500/20 text-white'
+                : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08]'
             }`}
           >
             Ganti Password
           </button>
         </div>
 
-        <div className="p-8">
+        <div className="p-6 sm:p-8">
           {/* Tab Profil */}
           {activeTab === 'profile' && (
             <motion.div
@@ -1226,44 +1086,43 @@ const ManajemenAkun = () => {
               animate={{ opacity: 1, x: 0 }}
               className="max-w-2xl"
             >
-              <h3 className="text-xl font-bold text-gray-800 mb-6">Informasi Profil</h3>
+              <h3 className="text-xl font-bold text-white mb-6">Informasi Profil</h3>
               <form onSubmit={handleUpdateProfile} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-200 mb-2">
                     Username
                   </label>
-                  <input
+                  <Input
                     type="text"
                     disabled
                     value={profileData.username}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
+                    className="w-full opacity-80"
                   />
-                  <p className="text-sm text-gray-500 mt-1">Username tidak dapat diubah</p>
+                  <p className="text-sm text-slate-400 mt-1">Username tidak dapat diubah</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-200 mb-2">
                     Role
                   </label>
-                  <input
+                  <Input
                     type="text"
                     disabled
                     value={profileData.role.toUpperCase()}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
+                    className="w-full opacity-80"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-200 mb-2">
                     Nama Lengkap
                   </label>
-                  <input
-                    type="text"
+                  <Input
                     required
                     value={profileData.nama}
                     onChange={(e) => setProfileData({ ...profileData, nama: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
                     placeholder="Masukkan nama lengkap"
+                    className="w-full"
                   />
                 </div>
 
@@ -1272,7 +1131,7 @@ const ManajemenAkun = () => {
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition disabled:opacity-50"
+                  className="w-full py-3 rounded-xl font-semibold transition disabled:opacity-50 bg-gradient-to-r from-sky-500 via-cyan-500 to-emerald-500 hover:brightness-110 shadow-[0_20px_50px_rgba(34,211,238,0.18)] text-white"
                 >
                   {loading ? 'Menyimpan...' : 'Simpan Perubahan'}
                 </motion.button>
@@ -1287,52 +1146,49 @@ const ManajemenAkun = () => {
               animate={{ opacity: 1, x: 0 }}
               className="max-w-2xl"
             >
-              <h3 className="text-xl font-bold text-gray-800 mb-6">Ganti Password</h3>
+              <h3 className="text-xl font-bold text-white mb-6">Ganti Password</h3>
               <form onSubmit={handleChangePassword} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-200 mb-2">
                     Password Lama
                   </label>
-                  <input
+                  <Input
                     type="password"
                     required
                     value={passwordData.passwordLama}
                     onChange={(e) => setPasswordData({ ...passwordData, passwordLama: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
                     placeholder="Masukkan password lama"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-200 mb-2">
                     Password Baru
                   </label>
-                  <input
+                  <Input
                     type="password"
                     required
                     value={passwordData.passwordBaru}
                     onChange={(e) => setPasswordData({ ...passwordData, passwordBaru: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
                     placeholder="Masukkan password baru (minimal 6 karakter)"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-200 mb-2">
                     Konfirmasi Password Baru
                   </label>
-                  <input
+                  <Input
                     type="password"
                     required
                     value={passwordData.konfirmasiPassword}
                     onChange={(e) => setPasswordData({ ...passwordData, konfirmasiPassword: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
                     placeholder="Konfirmasi password baru"
                   />
                 </div>
 
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <p className="text-sm text-yellow-800">
+                <div className="bg-amber-500/10 border border-amber-400/20 rounded-xl p-4">
+                  <p className="text-sm text-amber-100">
                     <strong>Perhatian:</strong> Setelah mengubah password, Anda akan tetap login dengan sesi saat ini. 
                     Gunakan password baru untuk login berikutnya.
                   </p>
@@ -1343,7 +1199,7 @@ const ManajemenAkun = () => {
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition disabled:opacity-50"
+                  className="w-full py-3 rounded-xl font-semibold transition disabled:opacity-50 bg-gradient-to-r from-sky-500 via-cyan-500 to-emerald-500 hover:brightness-110 shadow-[0_20px_50px_rgba(34,211,238,0.18)] text-white"
                 >
                   {loading ? 'Mengubah Password...' : 'Ubah Password'}
                 </motion.button>
@@ -1351,7 +1207,7 @@ const ManajemenAkun = () => {
             </motion.div>
           )}
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
@@ -1504,7 +1360,7 @@ const DaftarKaryawan = () => {
 
   if (loading) return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">Daftar Karyawan</h2>
+      <h2 className="text-2xl font-bold text-white">Daftar Karyawan</h2>
       <SkeletonTable rows={8} />
     </div>
   );
@@ -1517,9 +1373,9 @@ const DaftarKaryawan = () => {
         className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
       >
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Daftar Karyawan</h2>
-          <p className="text-sm text-gray-600 mt-1">
-            Total: <span className="font-bold text-primary-600">{filteredKaryawan.length}</span> karyawan
+          <h2 className="text-2xl font-bold text-white">Daftar Karyawan</h2>
+          <p className="text-sm text-slate-300 mt-1">
+            Total: <span className="font-bold text-cyan-400">{filteredKaryawan.length}</span> karyawan
             {searchTerm && ` (dari ${karyawan.length} total)`}
           </p>
         </div>
@@ -1545,20 +1401,20 @@ const DaftarKaryawan = () => {
       >
         <div className="flex-1">
           <div className="relative">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
             <input
               type="text"
               placeholder="Cari nama, jabatan, atau departemen..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full h-11 pl-10 pr-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400/40"
             />
           </div>
         </div>
         <select
           value={filterKantor}
           onChange={(e) => setFilterKantor(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+          className="h-11 px-4 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400/40"
         >
           <option value="">Semua Kantor</option>
           {daftarKantor.map(kantor => (
@@ -1571,23 +1427,24 @@ const DaftarKaryawan = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-white rounded-xl shadow-lg overflow-hidden"
+        className=""
       >
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+        <Card className="overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-slate-950/40 border-b border-white/10">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Kantor</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Nama</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Jabatan</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Departemen</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Sisa Cuti</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Status</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Aksi</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Kantor</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Nama</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Jabatan</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Departemen</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Sisa Cuti</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
-              <AnimatePresence>
+              <tbody className="divide-y divide-white/10">
+                <AnimatePresence>
                 {filteredKaryawan.length > 0 ? (
                   filteredKaryawan.map((item, index) => (
                   <motion.tr
@@ -1596,24 +1453,26 @@ const DaftarKaryawan = () => {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
                     transition={{ delay: index * 0.05 }}
-                    className="hover:bg-blue-50 transition-colors duration-200"
+                      className="hover:bg-white/[0.04] transition-colors duration-200"
                   >
-                    <td className="px-6 py-4 text-sm text-gray-600">{item.kantor}</td>
-                    <td className="px-6 py-4 font-medium text-gray-900">{item.nama}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{item.jabatan}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{item.departemen}</td>
+                    <td className="px-6 py-4 text-sm text-slate-300">{item.kantor}</td>
+                    <td className="px-6 py-4 font-medium text-slate-100">{item.nama}</td>
+                    <td className="px-6 py-4 text-sm text-slate-300">{item.jabatan}</td>
+                    <td className="px-6 py-4 text-sm text-slate-300">{item.departemen}</td>
                     <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                        item.sisa_cuti > 5 ? 'bg-green-100 text-green-800' :
-                        item.sisa_cuti > 0 ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold border ${
+                        item.sisa_cuti > 5 ? 'bg-emerald-500/15 text-emerald-200 border-emerald-400/20' :
+                        item.sisa_cuti > 0 ? 'bg-amber-500/15 text-amber-200 border-amber-400/20' :
+                        'bg-rose-500/15 text-rose-200 border-rose-400/20'
                       }`}>
                         {item.sisa_cuti}/{item.jatah_cuti} hari
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                        item.status === 'aktif' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold border ${
+                        item.status === 'aktif'
+                          ? 'bg-emerald-500/15 text-emerald-200 border-emerald-400/20'
+                          : 'bg-white/5 text-slate-200 border-white/10'
                       }`}>
                         {item.status}
                       </span>
@@ -1624,7 +1483,7 @@ const DaftarKaryawan = () => {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => handleOpenModal('edit', item)}
-                          className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                          className="p-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition text-white"
                           title="Edit"
                         >
                           <FiEdit size={16} />
@@ -1633,7 +1492,7 @@ const DaftarKaryawan = () => {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => handleResetCuti(item.id)}
-                          className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                          className="p-2 rounded-lg border border-emerald-400/20 bg-emerald-500/15 hover:bg-emerald-500/20 transition text-emerald-100"
                           title="Reset Cuti"
                         >
                           <FiRefreshCw size={16} />
@@ -1642,7 +1501,7 @@ const DaftarKaryawan = () => {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => handleDelete(item.id)}
-                          className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                          className="p-2 rounded-lg border border-rose-400/20 bg-rose-500/15 hover:bg-rose-500/20 transition text-rose-100"
                           title="Hapus"
                         >
                           <FiTrash2 size={16} />
@@ -1653,15 +1512,16 @@ const DaftarKaryawan = () => {
                 ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan="7" className="px-6 py-8 text-center text-slate-400">
                       {searchTerm || filterKantor ? 'Tidak ada karyawan yang sesuai dengan filter' : 'Belum ada data karyawan'}
                     </td>
                   </tr>
                 )}
               </AnimatePresence>
             </tbody>
-          </table>
-        </div>
+            </table>
+          </div>
+        </Card>
       </motion.div>
 
       {/* Modal Add/Edit Karyawan */}
@@ -1671,7 +1531,7 @@ const DaftarKaryawan = () => {
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            className="rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-white/10 bg-slate-950/80 backdrop-blur-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-cyan-600 text-white p-6 rounded-t-2xl z-10">
@@ -1692,12 +1552,12 @@ const DaftarKaryawan = () => {
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Kantor *</label>
+                <label className="block text-sm font-medium text-slate-200 mb-2">Kantor *</label>
                 <select
                   required
                   value={formData.kantor}
                   onChange={(e) => setFormData({ ...formData, kantor: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  className="w-full h-11 px-4 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400/40"
                 >
                   <option value="">-- Pilih Kantor --</option>
                   {daftarKantor.map(kantor => (
@@ -1707,79 +1567,54 @@ const DaftarKaryawan = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Nama *</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.nama}
-                  onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                />
+                <label className="block text-sm font-medium text-slate-200 mb-2">Nama *</label>
+                <Input required value={formData.nama} onChange={(e) => setFormData({ ...formData, nama: e.target.value })} />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Jabatan *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.jabatan}
-                    onChange={(e) => setFormData({ ...formData, jabatan: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                  />
+                  <label className="block text-sm font-medium text-slate-200 mb-2">Jabatan *</label>
+                  <Input required value={formData.jabatan} onChange={(e) => setFormData({ ...formData, jabatan: e.target.value })} />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Departemen *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.departemen}
-                    onChange={(e) => setFormData({ ...formData, departemen: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                  />
+                  <label className="block text-sm font-medium text-slate-200 mb-2">Departemen *</label>
+                  <Input required value={formData.departemen} onChange={(e) => setFormData({ ...formData, departemen: e.target.value })} />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">No. Telp</label>
-                <input
-                  type="tel"
-                  value={formData.no_telp}
-                  onChange={(e) => setFormData({ ...formData, no_telp: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                />
+                <label className="block text-sm font-medium text-slate-200 mb-2">No. Telp</label>
+                <Input type="tel" value={formData.no_telp} onChange={(e) => setFormData({ ...formData, no_telp: e.target.value })} />
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Jatah Cuti</label>
-                  <input
+                  <label className="block text-sm font-medium text-slate-200 mb-2">Jatah Cuti</label>
+                  <Input
                     type="number"
                     min="0"
                     value={formData.jatah_cuti}
                     onChange={(e) => setFormData({ ...formData, jatah_cuti: parseInt(e.target.value) })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Sisa Cuti</label>
-                  <input
+                  <label className="block text-sm font-medium text-slate-200 mb-2">Sisa Cuti</label>
+                  <Input
                     type="number"
                     min="0"
                     value={formData.sisa_cuti}
                     onChange={(e) => setFormData({ ...formData, sisa_cuti: parseInt(e.target.value) })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                  <label className="block text-sm font-medium text-slate-200 mb-2">Status</label>
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                    className="w-full h-11 px-4 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400/40"
                   >
                     <option value="aktif">Aktif</option>
                     <option value="nonaktif">Non-Aktif</option>
@@ -1792,14 +1627,14 @@ const DaftarKaryawan = () => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   type="submit"
-                  className="flex-1 py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition"
+                  className="flex-1 py-3 rounded-xl font-semibold transition bg-gradient-to-r from-sky-500 via-cyan-500 to-emerald-500 hover:brightness-110 text-white shadow-[0_20px_50px_rgba(34,211,238,0.18)]"
                 >
                   {modalMode === 'add' ? 'Tambah' : 'Simpan'}
                 </motion.button>
                 <button
                   type="button"
                   onClick={handleCloseModal}
-                  className="flex-1 py-3 bg-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-400 transition"
+                  className="flex-1 py-3 rounded-xl font-semibold transition border border-white/15 bg-white/10 text-white hover:bg-white/15"
                 >
                   Batal
                 </button>
@@ -1865,8 +1700,8 @@ const QuotaKaryawan = () => {
         animate={{ opacity: 1, y: 0 }}
         className="mb-6"
       >
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Quota Karyawan</h1>
-        <p className="text-gray-600">
+        <h1 className="text-3xl font-bold text-white mb-2">Quota Karyawan</h1>
+        <p className="text-slate-300">
           Lihat sisa cuti dan izin semua karyawan - Bulan {namaBulan[bulan - 1]} {tahun}
         </p>
       </motion.div>
@@ -1875,17 +1710,18 @@ const QuotaKaryawan = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-xl shadow-lg p-6 mb-6"
+        className="mb-6"
       >
+        <Card className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-slate-200 mb-2">
               Filter Kantor
             </label>
             <select
               value={filterKantor}
               onChange={(e) => setFilterKantor(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full h-11 px-4 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400/40"
             >
               <option value="">Semua Kantor</option>
               {kantorList.map(kantor => (
@@ -1895,142 +1731,190 @@ const QuotaKaryawan = () => {
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-slate-200 mb-2">
               Cari Karyawan
             </label>
-            <input
+            <Input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Cari nama, jabatan, atau departemen..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full"
             />
           </div>
         </div>
 
         <div className="mt-4 flex items-center justify-between">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-300">
             Menampilkan {filteredKaryawan.length} dari {karyawanList.length} karyawan
           </p>
           <button
             onClick={fetchKaryawanQuota}
-            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            className="flex items-center space-x-2 px-4 py-2 rounded-xl border border-white/15 bg-white/10 text-white hover:bg-white/15 transition"
           >
             <FiRefreshCw />
             <span>Refresh</span>
           </button>
         </div>
+        </Card>
       </motion.div>
 
       {/* Table */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-xl shadow-lg overflow-hidden"
+        className=""
       >
-        {loading ? (
-          <SkeletonTable rows={10} />
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white">
-                <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold">No</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold">Kantor</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold">Nama</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold">Jabatan</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold">Departemen</th>
-                  <th className="px-6 py-4 text-center text-sm font-semibold">Sisa Cuti</th>
-                  <th className="px-6 py-4 text-center text-sm font-semibold">Pulang Cepat</th>
-                  <th className="px-6 py-4 text-center text-sm font-semibold">Datang Terlambat</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {filteredKaryawan.length === 0 ? (
+        <Card className="overflow-hidden">
+          {loading ? (
+            <div className="p-4">
+              <SkeletonTable rows={10} />
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full table-fixed text-xs sm:text-sm">
+                <thead className="bg-slate-950/70 backdrop-blur border-b border-white/10 sticky top-0 z-10">
                   <tr>
-                    <td colSpan="8" className="px-6 py-8 text-center text-gray-500">
-                      Tidak ada data karyawan
-                    </td>
+                    <th className="px-4 py-3 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider w-[6%]">No</th>
+                    <th className="px-4 py-3 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider w-[20%]">Kantor</th>
+                    <th className="px-4 py-3 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider w-[16%]">Nama</th>
+                    <th className="px-4 py-3 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider w-[16%]">Jabatan</th>
+                    <th className="px-4 py-3 text-left text-[11px] font-semibold text-slate-300 uppercase tracking-wider w-[16%]">Departemen</th>
+                    <th className="px-4 py-3 text-center text-[11px] font-semibold text-slate-300 uppercase tracking-wider w-[9%]">Sisa Cuti</th>
+                    <th className="px-4 py-3 text-center text-[11px] font-semibold text-slate-300 uppercase tracking-wider w-[9%]">Pulang Cepat</th>
+                    <th className="px-4 py-3 text-center text-[11px] font-semibold text-slate-300 uppercase tracking-wider w-[8%]">Datang Terlambat</th>
                   </tr>
-                ) : (
-                  filteredKaryawan.map((karyawan, index) => (
-                    <tr key={karyawan.id} className="hover:bg-gray-50 transition">
-                      <td className="px-6 py-4 text-sm text-gray-900">{index + 1}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">{karyawan.kantor}</td>
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900">{karyawan.nama}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{karyawan.jabatan}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{karyawan.departemen}</td>
-                      <td className="px-6 py-4 text-center">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${
-                          karyawan.sisa_cuti > 5 
-                            ? 'bg-green-100 text-green-800' 
-                            : karyawan.sisa_cuti > 0 
-                            ? 'bg-yellow-100 text-yellow-800' 
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {karyawan.sisa_cuti} hari
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${
-                          karyawan.pulang_cepat < 3 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {karyawan.pulang_cepat}/3x
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${
-                          karyawan.datang_terlambat < 3 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {karyawan.datang_terlambat}/3x
-                        </span>
+                </thead>
+                <tbody className="divide-y divide-white/10">
+                  {filteredKaryawan.length === 0 ? (
+                    <tr>
+                      <td colSpan="8" className="px-6 py-8 text-center text-slate-400">
+                        Tidak ada data karyawan
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
+                  ) : (
+                    filteredKaryawan.map((karyawan, index) => (
+                      <tr key={karyawan.id} className="hover:bg-white/[0.05] transition odd:bg-white/[0.02]">
+                        <td className="px-4 py-3 align-top text-slate-200">{index + 1}</td>
+                        <td className="px-4 py-3 align-top text-slate-200 whitespace-normal break-words">{karyawan.kantor}</td>
+                        <td className="px-4 py-3 align-top font-semibold text-slate-100 whitespace-normal break-words">{karyawan.nama}</td>
+                        <td className="px-4 py-3 align-top text-slate-300 whitespace-normal break-words">{karyawan.jabatan}</td>
+                        <td className="px-4 py-3 align-top text-slate-300 whitespace-normal break-words">{karyawan.departemen}</td>
+                        <td className="px-4 py-3 align-top text-center">
+                          <span
+                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${
+                              karyawan.sisa_cuti > 5
+                                ? 'bg-emerald-500/15 text-emerald-200 border-emerald-400/20'
+                                : karyawan.sisa_cuti > 0
+                                ? 'bg-amber-500/15 text-amber-200 border-amber-400/20'
+                                : 'bg-rose-500/15 text-rose-200 border-rose-400/20'
+                            }`}
+                          >
+                            {karyawan.sisa_cuti} hari
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 align-top text-center">
+                          <span
+                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${
+                              karyawan.pulang_cepat < 3
+                                ? 'bg-emerald-500/15 text-emerald-200 border-emerald-400/20'
+                                : 'bg-rose-500/15 text-rose-200 border-rose-400/20'
+                            }`}
+                          >
+                            {karyawan.pulang_cepat}/3x
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 align-top text-center">
+                          <span
+                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${
+                              karyawan.datang_terlambat < 3
+                                ? 'bg-emerald-500/15 text-emerald-200 border-emerald-400/20'
+                                : 'bg-rose-500/15 text-rose-200 border-rose-400/20'
+                            }`}
+                          >
+                            {karyawan.datang_terlambat}/3x
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Card>
       </motion.div>
 
       {/* Legend */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-6"
+        className="mt-6"
       >
-        <h3 className="text-lg font-semibold text-blue-900 mb-4">Keterangan:</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-          <div>
-            <p className="font-semibold text-gray-700 mb-2">Sisa Cuti:</p>
-            <ul className="space-y-1 text-gray-600">
-              <li>• <span className="text-green-600 font-semibold">&gt; 5 hari</span> - Aman</li>
-              <li>• <span className="text-yellow-600 font-semibold">1-5 hari</span> - Perhatian</li>
-              <li>• <span className="text-red-600 font-semibold">0 hari</span> - Habis</li>
-            </ul>
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold text-white mb-4">Keterangan</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+              <p className="font-semibold text-slate-200 mb-2">Sisa Cuti</p>
+              <ul className="space-y-1 text-slate-300">
+                <li>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full border border-emerald-400/20 bg-emerald-500/15 text-emerald-200 text-xs font-semibold">
+                    &gt; 5 hari
+                  </span>{' '}
+                  Aman
+                </li>
+                <li>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full border border-amber-400/20 bg-amber-500/15 text-amber-200 text-xs font-semibold">
+                    1–5 hari
+                  </span>{' '}
+                  Perhatian
+                </li>
+                <li>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full border border-rose-400/20 bg-rose-500/15 text-rose-200 text-xs font-semibold">
+                    0 hari
+                  </span>{' '}
+                  Habis
+                </li>
+              </ul>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+              <p className="font-semibold text-slate-200 mb-2">Pulang Cepat</p>
+              <ul className="space-y-1 text-slate-300">
+                <li>Maksimal <span className="font-semibold text-white">3x</span> per bulan</li>
+                <li>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full border border-emerald-400/20 bg-emerald-500/15 text-emerald-200 text-xs font-semibold">
+                    &lt; 3x
+                  </span>{' '}
+                  Masih bisa
+                </li>
+                <li>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full border border-rose-400/20 bg-rose-500/15 text-rose-200 text-xs font-semibold">
+                    3x
+                  </span>{' '}
+                  Quota habis
+                </li>
+              </ul>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+              <p className="font-semibold text-slate-200 mb-2">Datang Terlambat</p>
+              <ul className="space-y-1 text-slate-300">
+                <li>Maksimal <span className="font-semibold text-white">3x</span> per bulan</li>
+                <li>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full border border-emerald-400/20 bg-emerald-500/15 text-emerald-200 text-xs font-semibold">
+                    &lt; 3x
+                  </span>{' '}
+                  Masih bisa
+                </li>
+                <li>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full border border-rose-400/20 bg-rose-500/15 text-rose-200 text-xs font-semibold">
+                    3x
+                  </span>{' '}
+                  Quota habis
+                </li>
+              </ul>
+            </div>
           </div>
-          <div>
-            <p className="font-semibold text-gray-700 mb-2">Pulang Cepat:</p>
-            <ul className="space-y-1 text-gray-600">
-              <li>• Maksimal <span className="font-semibold">3x per bulan</span></li>
-              <li>• <span className="text-green-600 font-semibold">&lt; 3x</span> - Masih bisa</li>
-              <li>• <span className="text-red-600 font-semibold">3x</span> - Quota habis</li>
-            </ul>
-          </div>
-          <div>
-            <p className="font-semibold text-gray-700 mb-2">Datang Terlambat:</p>
-            <ul className="space-y-1 text-gray-600">
-              <li>• Maksimal <span className="font-semibold">3x per bulan</span></li>
-              <li>• <span className="text-green-600 font-semibold">&lt; 3x</span> - Masih bisa</li>
-              <li>• <span className="text-red-600 font-semibold">3x</span> - Quota habis</li>
-            </ul>
-          </div>
-        </div>
+        </Card>
       </motion.div>
     </div>
   );

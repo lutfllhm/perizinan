@@ -9,6 +9,10 @@ import AdminDashboard from './pages/AdminDashboard.jsx';
 import HRDDashboard from './pages/HRDDashboard.jsx';
 import PengajuanForm from './pages/PengajuanForm.jsx';
 import PrivateRoute from './components/PrivateRoute.jsx';
+import TentangKami from './pages/TentangKami.jsx';
+import KebijakanPrivasi from './pages/KebijakanPrivasi.jsx';
+import SyaratKetentuan from './pages/SyaratKetentuan.jsx';
+import FAQ from './pages/FAQ.jsx';
 
 function App() {
   return (
@@ -16,12 +20,16 @@ function App() {
       <div className="App bg-slate-900 min-h-screen">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/tentang-kami" element={<TentangKami />} />
+          <Route path="/kebijakan-privasi" element={<KebijakanPrivasi />} />
+          <Route path="/syarat-ketentuan" element={<SyaratKetentuan />} />
+          <Route path="/faq" element={<FAQ />} />
           <Route path="/login" element={<Login />} />
           <Route path="/pengajuan-form" element={<PengajuanForm />} />
           <Route 
             path="/admin/*" 
             element={
-              <PrivateRoute role="admin">
+              <PrivateRoute role={['admin', 'superadmin']}>
                 <AdminDashboard />
               </PrivateRoute>
             } 

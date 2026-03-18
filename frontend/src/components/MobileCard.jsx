@@ -12,7 +12,7 @@ const MobileCard = ({ children, onClick, className = '' }) => {
       transition={{ duration: 0.15 }}
       whileTap={{ scale: 0.99 }}
       onClick={onClick}
-      className={`bg-white rounded-xl shadow-md p-4 mb-3 border border-gray-200 active:shadow-lg transition-shadow ${
+      className={`rounded-2xl p-4 mb-3 border border-white/10 bg-white/[0.06] backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.25)] active:shadow-[0_15px_40px_rgba(0,0,0,0.35)] transition-shadow ${
         onClick ? 'cursor-pointer' : ''
       } ${className}`}
     >
@@ -27,8 +27,8 @@ const MobileCard = ({ children, onClick, className = '' }) => {
 export const MobileCardRow = ({ label, value, className = '' }) => {
   return (
     <div className={`flex justify-between items-center py-2 ${className}`}>
-      <span className="text-sm text-gray-600 font-medium">{label}</span>
-      <span className="text-sm text-gray-900 font-semibold">{value}</span>
+      <span className="text-sm text-slate-300 font-medium">{label}</span>
+      <span className="text-sm text-white font-semibold">{value}</span>
     </div>
   );
 };
@@ -38,11 +38,11 @@ export const MobileCardRow = ({ label, value, className = '' }) => {
  */
 export const MobileCardBadge = ({ children, variant = 'default' }) => {
   const variants = {
-    default: 'bg-gray-100 text-gray-800',
-    success: 'bg-green-100 text-green-800',
-    warning: 'bg-yellow-100 text-yellow-800',
-    danger: 'bg-red-100 text-red-800',
-    info: 'bg-blue-100 text-blue-800',
+    default: 'bg-white/10 text-slate-200 border border-white/10',
+    success: 'bg-emerald-500/15 text-emerald-200 border border-emerald-400/20',
+    warning: 'bg-amber-500/15 text-amber-200 border border-amber-400/20',
+    danger: 'bg-rose-500/15 text-rose-200 border border-rose-400/20',
+    info: 'bg-sky-500/15 text-sky-200 border border-sky-400/20',
   };
 
   return (
@@ -57,7 +57,7 @@ export const MobileCardBadge = ({ children, variant = 'default' }) => {
  */
 export const MobileCardActions = ({ children }) => {
   return (
-    <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-200">
+    <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-white/10">
       {children}
     </div>
   );

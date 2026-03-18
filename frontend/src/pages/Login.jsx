@@ -5,6 +5,20 @@ import { toast } from 'react-toastify';
 import { authAPI } from '../utils/api';
 import { FiUser, FiLock, FiEye, FiEyeOff, FiArrowLeft } from 'react-icons/fi';
 import { LoadingDots } from '../components/LoadingSpinner';
+import Card from '../components/ui/Card';
+
+function decodeJwtPayload(token) {
+  try {
+    const part = token.split('.')[1];
+    if (!part) return null;
+    const base64 = part.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4);
+    const json = atob(padded);
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
 
 const Login = () => {
   const [dataForm, setDataForm] = useState({ username: '', password: '' });
@@ -21,17 +35,28 @@ const Login = () => {
       const respons = await authAPI.login(dataForm);
       const { token, user } = respons.data;
 
+      // Normalize role across different DB schemas:
+      // If role is missing in DB/token, default to 'hrd' so user can still access dashboard
+      const roleLower = (user?.role || '').trim().toLowerCase();
+      const payload = token ? decodeJwtPayload(token) : null;
+      const roleFromToken = (payload?.role || '').trim().toLowerCase();
+      const rawRole = roleLower || roleFromToken;
+      const fallbackRole = rawRole || 'hrd';
+      const normalizedRole = fallbackRole;
+
       localStorage.setItem('token', token);
-      localStorage.setItem('role', user.role);
+      localStorage.setItem('role', normalizedRole);
       localStorage.setItem('username', user.username);
       localStorage.setItem('nama', user.nama);
 
       toast.success(`Selamat datang, ${user.nama}!`);
 
-      if (user.role === 'admin') {
-        navigasi('/admin');
+      if (normalizedRole === 'admin' || normalizedRole === 'superadmin') {
+        navigasi('/admin', { replace: true });
+      } else if (normalizedRole === 'hrd') {
+        navigasi('/hrd', { replace: true });
       } else {
-        navigasi('/hrd');
+        navigasi('/', { replace: true });
       }
     } catch (error) {
       toast.error(error.response?.data?.message || 'Login gagal');
@@ -42,21 +67,26 @@ const Login = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Background - sama dengan homepage */}
-      <div 
+      {/* Background - konsisten dengan homepage */}
+      <div
         className="fixed inset-0 z-0 bg-cover bg-center"
-        style={{ 
+        style={{
           backgroundImage: 'url(/img/bg.jpeg)',
           backgroundSize: 'cover',
-          backgroundPosition: 'center'
+          backgroundPosition: 'center',
         }}
       >
-        <div className="absolute inset-0 bg-black/30" />
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-gray-900/40 to-slate-900/50" />
-        <div className="absolute inset-0 opacity-[0.02]" style={{
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-          backgroundSize: '50px 50px'
-        }} />
+        <div className="absolute inset-0 bg-black/45" />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950/70 via-gray-900/45 to-slate-950/70" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent" />
+        <div
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage:
+              'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+            backgroundSize: '50px 50px',
+          }}
+        />
       </div>
 
       {/* Content */}
@@ -79,14 +109,14 @@ const Login = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 sm:p-8"
           >
+            <Card className="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8">
             {/* Logo & Title */}
             <div className="text-center mb-8">
               <div className="flex items-center justify-center gap-3 mb-4">
                 <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-lg p-2">
                   <img 
-                    src="/img/lg.png" 
+                    src="/img/logo.png" 
                     alt="IWARE Logo" 
                     className="w-full h-full object-contain"
                     onError={(e) => {
@@ -98,8 +128,8 @@ const Login = () => {
                   IWARE
                 </h1>
               </div>
-              <h2 className="text-2xl font-bold text-white mb-2">Login Staff</h2>
-              <p className="text-slate-400">Masuk untuk mengakses dashboard</p>
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">Login Staff</h2>
+              <p className="text-sm sm:text-base text-slate-400">Masuk untuk mengakses dashboard perizinan</p>
             </div>
 
             {/* Form */}
@@ -178,6 +208,7 @@ const Login = () => {
                 </Link>
               </p>
             </div>
+            </Card>
           </motion.div>
         </div>
       </div>

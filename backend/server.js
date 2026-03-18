@@ -368,6 +368,35 @@ async function initializeTables() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
     `);
     console.log('✅ Table karyawan OK');
+
+    // Ensure karyawan columns exist (for older schemas)
+    const [karyawanCols] = await db.query(`
+      SELECT COLUMN_NAME
+      FROM INFORMATION_SCHEMA.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'karyawan'
+        AND COLUMN_NAME IN ('status', 'tahun_cuti', 'jatah_cuti', 'sisa_cuti')
+    `);
+    const existingKaryawanCols = new Set(karyawanCols.map((c) => c.COLUMN_NAME));
+
+    if (!existingKaryawanCols.has('jatah_cuti')) {
+      await db.query('ALTER TABLE karyawan ADD COLUMN jatah_cuti INT DEFAULT 12');
+      console.log('✅ Column karyawan.jatah_cuti added');
+    }
+    if (!existingKaryawanCols.has('sisa_cuti')) {
+      await db.query('ALTER TABLE karyawan ADD COLUMN sisa_cuti INT DEFAULT 12');
+      console.log('✅ Column karyawan.sisa_cuti added');
+    }
+    if (!existingKaryawanCols.has('tahun_cuti')) {
+      await db.query(`ALTER TABLE karyawan ADD COLUMN tahun_cuti INT DEFAULT ${currentYear}`);
+      console.log('✅ Column karyawan.tahun_cuti added');
+    }
+    if (!existingKaryawanCols.has('status')) {
+      await db.query(`ALTER TABLE karyawan ADD COLUMN status ENUM('aktif','nonaktif') DEFAULT 'aktif'`);
+      console.log('✅ Column karyawan.status added (default aktif)');
+    }
+    // Normalize old rows (some DBs store NULL/empty for older data)
+    await db.query(`UPDATE karyawan SET status = 'aktif' WHERE status IS NULL OR status = ''`);
     
     // Create quota_bulanan table
     await db.query(`
@@ -520,12 +549,16 @@ app.get('/api/karyawan', async (req, res) => {
     
     const { kantor } = req.query;
     
-    let query = 'SELECT * FROM karyawan WHERE status = "aktif"';
+    // Treat NULL/empty as active for backward compatibility
+    let query = 'SELECT * FROM karyawan WHERE (status = "aktif" OR status IS NULL OR status = "")';
     let params = [];
     
     if (kantor) {
-      query += ' AND kantor = ?';
-      params.push(kantor);
+      // Be tolerant to different kantor spellings (spaces/dashes) between Excel and UI.
+      // Compare using a whitespace-stripped version on both sides.
+      const kantorNormalized = String(kantor).replace(/\s+/g, '');
+      query += ' AND REPLACE(kantor, " ", "") = ?';
+      params.push(kantorNormalized);
     }
     
     query += ' ORDER BY nama ASC';

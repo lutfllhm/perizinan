@@ -59,18 +59,54 @@
 </div>
 <div id="root"></div>
 <script>
-  // Remove loading screen when React app loads
-  window.addEventListener('load', function() {
-    setTimeout(function() {
+  function showFatalError(message, details) {
+    try {
+      var root = document.getElementById('root');
+      if (!root) return;
+      root.innerHTML =
+        '<div style="min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:24px;background:#0f172a;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;">' +
+        '  <div style="max-width:960px;width:100%;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);backdrop-filter:blur(8px);border-radius:12px;padding:16px 18px;">' +
+        '    <div style="font-weight:700;font-size:16px;margin-bottom:8px;">Aplikasi gagal dimuat</div>' +
+        '    <div style="font-size:13px;line-height:1.5;color:rgba(226,232,240,0.9);white-space:pre-wrap;">' + String(message || 'Unknown error') + '</div>' +
+        (details ? ('<pre style="margin-top:12px;overflow:auto;padding:12px;border-radius:10px;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.10);font-size:12px;line-height:1.45;color:rgba(226,232,240,0.9);white-space:pre-wrap;">' +
+          String(details) +
+        '</pre>') : '') +
+        '    <div style="margin-top:12px;font-size:12px;color:rgba(148,163,184,0.9);">Buka DevTools Console untuk detail tambahan.</div>' +
+        '  </div>' +
+        '</div>';
+
+      // Ensure loading screen doesn't cover the error UI
       var loadingScreen = document.getElementById('loading-screen');
-      if (loadingScreen) {
-        loadingScreen.style.opacity = '0';
-        loadingScreen.style.transition = 'opacity 0.3s ease-out';
-        setTimeout(function() {
-          loadingScreen.style.display = 'none';
-        }, 300);
-      }
-    }, 500);
+      if (loadingScreen) loadingScreen.style.display = 'none';
+    } catch (e) {
+      // If even rendering fails, do nothing.
+    }
+  }
+
+  window.addEventListener('error', function (e) {
+    var err = e && (e.error || e.message);
+    var msg = err && err.message ? err.message : (e && e.message) || 'Runtime error';
+    var stack = err && err.stack ? err.stack : '';
+    showFatalError(msg, stack);
+  });
+
+  window.addEventListener('unhandledrejection', function (e) {
+    var reason = e && e.reason;
+    var msg = reason && reason.message ? reason.message : String(reason || 'Unhandled promise rejection');
+    var stack = reason && reason.stack ? reason.stack : '';
+    showFatalError(msg, stack);
+  });
+
+  // Only remove the loading screen once the React app has actually mounted.
+  // This prevents a blank page if React fails to render due to runtime errors.
+  window.addEventListener('react-app-mounted', function () {
+    var loadingScreen = document.getElementById('loading-screen');
+    if (!loadingScreen) return;
+    loadingScreen.style.opacity = '0';
+    loadingScreen.style.transition = 'opacity 0.3s ease-out';
+    setTimeout(function () {
+      loadingScreen.style.display = 'none';
+    }, 300);
   });
 </script>
 </body>

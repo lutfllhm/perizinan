@@ -1,15 +1,37 @@
 import axios from 'axios';
 
-// Gunakan environment variable untuk API URL
-// Development: http://localhost:5000
-// Production: Relative path untuk Hostinger
-const API_URL = process.env.REACT_APP_API_URL || '';
+function normalizeApiBaseUrl(input) {
+  if (!input) return '';
+  const trimmed = String(input).trim();
+  if (!trimmed) return '';
+  // Allow user to set either:
+  // - https://domain.com        -> will become https://domain.com/api
+  // - https://domain.com/api    -> kept as-is
+  // - /api                     -> becomes /api (no double /api/api)
+  // - /                        -> becomes '' (same-origin)
+  if (trimmed === '/') return '';
+  if (trimmed === '/api') return '/api';
+  if (trimmed.endsWith('/api')) return trimmed;
+  return trimmed;
+}
 
-console.log('🔗 API URL:', API_URL); // Debug log
+// Gunakan environment variable untuk API base URL
+// Development default: http://localhost:5000
+// Production default: same-origin (empty string) so Nginx can proxy /api
+const RAW_API_URL =
+  process.env.REACT_APP_API_URL ||
+  (typeof window !== 'undefined' && window.location?.hostname === 'localhost'
+    ? 'http://localhost:5000'
+    : '');
 
-const api = axios.create({
-  baseURL: `${API_URL}/api`,
-});
+const API_BASE = normalizeApiBaseUrl(RAW_API_URL);
+
+const baseURL =
+  API_BASE === '/api'
+    ? '/api'
+    : `${API_BASE}/api`;
+
+const api = axios.create({ baseURL });
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
@@ -50,7 +72,7 @@ export const karyawanAPI = {
   delete: (id) => api.delete(`/karyawan/${id}`),
 };
 
-// Export API_URL untuk digunakan di komponen lain (misal untuk image URL)
-export { API_URL };
+// Export API_BASE untuk digunakan di komponen lain (misal untuk image URL)
+export { API_BASE as API_URL };
 
 export default api;
