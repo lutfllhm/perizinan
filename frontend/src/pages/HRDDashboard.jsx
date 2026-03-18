@@ -1253,7 +1253,7 @@ const DaftarKaryawan = () => {
       const params = filterKantor ? { kantor: filterKantor } : {};
       const response = await karyawanAPI.getAll(params);
       console.log('Response karyawan:', response.data);
-      setKaryawan(Array.isArray(response.data) ? response.data : []);
+      setKaryawan(Array.isArray(response.data.data) ? response.data.data : []);
     } catch (error) {
       console.error('Error fetch karyawan:', error);
       toast.error(error.response?.data?.message || 'Gagal memuat data karyawan');

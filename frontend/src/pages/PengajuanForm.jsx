@@ -108,15 +108,7 @@ const PengajuanForm = () => {
   const fetchKaryawan = async (kantor) => {
     try {
       const response = await karyawanAPI.getAll({ kantor, status: 'aktif' });
-      // Be tolerant to different API response shapes:
-      // - array directly: []
-      // - wrapped: { data: [] } or { karyawan: [] }
-      const payload = response?.data;
-      const list =
-        Array.isArray(payload) ? payload :
-        Array.isArray(payload?.data) ? payload.data :
-        Array.isArray(payload?.karyawan) ? payload.karyawan :
-        [];
+      const list = response?.data?.data || [];
       setDaftarKaryawan(list);
     } catch (error) {
       console.error('Error fetching karyawan:', error);

@@ -23,7 +23,7 @@ router.get('/', auth, async (req, res) => {
     query += ' ORDER BY kantor, nama';
     
     const [baris] = await db.query(query, params);
-    res.json(baris);
+    res.json({ data: baris });
   } catch (error) {
     console.error('❌ Error ambil karyawan:', error);
     res.status(500).json({ 

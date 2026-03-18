@@ -564,7 +564,7 @@ app.get('/api/karyawan', async (req, res) => {
     query += ' ORDER BY nama ASC';
     
     const [rows] = await db.query(query, params);
-    res.json(rows);
+    res.json({ data: rows });
   } catch (error) {
     console.error('❌ Get karyawan error:', error);
     res.status(500).json({ message: error.message });
