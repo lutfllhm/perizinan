@@ -8,7 +8,7 @@ const { auth } = require('../middleware/auth');
  * GET /api/karyawan
  * Ambil semua data karyawan
  */
-router.get('/', auth, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const { kantor, status = 'aktif' } = req.query;
     
@@ -37,7 +37,7 @@ router.get('/', auth, async (req, res) => {
  * GET /api/karyawan/:id
  * Ambil data karyawan berdasarkan ID
  */
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const [baris] = await db.query(
       'SELECT * FROM karyawan WHERE id = ?',
@@ -62,7 +62,7 @@ router.get('/:id', auth, async (req, res) => {
  * GET /api/karyawan/:id/quota
  * Ambil informasi quota karyawan (cuti, pulang cepat, datang terlambat)
  */
-router.get('/:id/quota', auth, async (req, res) => {
+router.get('/:id/quota', async (req, res) => {
   try {
     const karyawanId = req.params.id;
     const bulan = new Date().getMonth() + 1;

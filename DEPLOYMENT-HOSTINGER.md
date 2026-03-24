@@ -376,33 +376,56 @@ docker-compose logs -f
 docker-compose ps
 
 # Pastikan semua services "Up" dan "healthy"
+
+# Monitor logs untuk memastikan database initialization selesai
+docker-compose logs -f backend
+
+# Tunggu hingga melihat pesan:
+# ✅ Database initialization complete!
+# ✅ Auto-imported 173 karyawan from 8 offices
+# 🚀 Server running on port 5000
+
+# Tekan Ctrl+C untuk keluar dari logs
 ```
 
 ---
 
-## 🗄️ LANGKAH 8: Setup Database
+## 🗄️ LANGKAH 8: Verifikasi Database (Otomatis)
 
-### 8.1 Initialize Database
+Database akan otomatis diinisialisasi saat backend container pertama kali start. Proses ini meliputi:
+
+✅ Pembuatan semua tabel (users, pengajuan, karyawan, quota_bulanan)
+✅ Pembuatan user admin default (username: admin, password: admin123)
+✅ Import otomatis 173 data karyawan dari 8 kantor
+
+### 8.1 Cek Status Database
 
 ```bash
-# Masuk ke backend container
-docker exec -it iware-backend bash
+# Lihat logs backend untuk memastikan database berhasil diinisialisasi
+docker-compose logs backend | grep "Database initialization complete"
 
-# Jalankan database initialization
-npm run init-db
-
-# Import data karyawan (jika ada)
-npm run import-karyawan
-
-# Exit container
-exit
+# Atau lihat semua logs backend
+docker-compose logs -f backend
 ```
 
-### 8.2 Create Super Admin
+Anda akan melihat output seperti ini jika berhasil:
+```
+✅ Database connected
+✅ Table users OK
+✅ Table pengajuan OK
+✅ Table karyawan OK
+✅ Table quota_bulanan OK
+✅ Default admin user created (admin/admin123)
+✅ Auto-imported 173 karyawan from 8 offices
+✅ Database initialization complete!
+```
+
+### 8.2 (Opsional) Reset Admin Password
+
+Jika perlu reset password admin:
 
 ```bash
-# Buat super admin user
-docker exec -it iware-backend node scripts/create-superadmin.js
+docker exec -it iware-backend node scripts/reset-admin-password.js
 ```
 
 ---
