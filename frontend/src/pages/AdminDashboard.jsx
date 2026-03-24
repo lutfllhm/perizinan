@@ -82,7 +82,7 @@ const AdminDashboard = () => {
         logoSrc="/img/logo.png"
         brandTitle="IWARE"
         brandSubtitle={isSuperadmin ? 'Superadmin Console' : 'Admin Panel'}
-        accent={isSuperadmin ? 'fuchsia' : 'violet'}
+        accent="rose"
         roleLabel={isSuperadmin ? 'Superadmin' : 'Admin/Pengelola'}
         user={{ name: nama, username }}
         onLogout={handleLogout}
@@ -152,7 +152,7 @@ const AdminHome = () => {
 
   const statCards = useMemo(
     () => [
-      { label: 'Total Pengajuan', value: stats?.total || 0, icon: FiFileText, tint: 'from-indigo-500/25 to-violet-500/10' },
+      { label: 'Total Pengajuan', value: stats?.total || 0, icon: FiFileText, tint: 'from-rose-500/25 to-red-500/10' },
       { label: 'Pending', value: stats?.pending || 0, icon: FiClock, tint: 'from-amber-500/25 to-orange-500/10' },
       { label: 'Approved', value: stats?.approved || 0, icon: FiCheckCircle, tint: 'from-emerald-500/25 to-teal-500/10' },
       { label: 'Rejected', value: stats?.rejected || 0, icon: FiXCircle, tint: 'from-rose-500/25 to-red-500/10' },
@@ -164,7 +164,7 @@ const AdminHome = () => {
     <div className="space-y-8">
       {loading && (
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-400"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-400"></div>
         </div>
       )}
       {/* Header */}
@@ -376,9 +376,9 @@ const UserManagement = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${
                           user.role === 'admin'
-                            ? 'bg-violet-500/15 text-violet-200 border-violet-400/20'
+                            ? 'bg-rose-500/15 text-rose-200 border-rose-400/20'
                             : user.role === 'superadmin'
-                            ? 'bg-fuchsia-500/15 text-fuchsia-200 border-fuchsia-400/20'
+                            ? 'bg-red-500/15 text-red-200 border-red-400/20'
                             : 'bg-sky-500/15 text-sky-200 border-sky-400/20'
                         }`}>
                           {user.role}
@@ -561,7 +561,7 @@ const RegisterHRD = () => {
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-xl font-semibold transition disabled:opacity-50 bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 hover:brightness-110 shadow-[0_20px_50px_rgba(99,102,241,0.22)]"
+              className="w-full py-3 rounded-xl font-semibold transition disabled:opacity-50 bg-gradient-to-r from-rose-500 to-red-600 hover:brightness-110 shadow-[0_20px_50px_rgba(244,63,94,0.22)]"
             >
               {loading ? 'Memproses...' : 'Daftarkan HRD'}
             </motion.button>
@@ -648,7 +648,7 @@ const ManajemenAkun = () => {
             onClick={() => setActiveTab('profile')}
             className={`flex-1 px-6 py-4 font-semibold transition ${
               activeTab === 'profile'
-                ? 'bg-violet-600 text-white'
+                ? 'bg-rose-600 text-white'
                 : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08]'
             }`}
           >
@@ -658,7 +658,7 @@ const ManajemenAkun = () => {
             onClick={() => setActiveTab('password')}
             className={`flex-1 px-6 py-4 font-semibold transition ${
               activeTab === 'password'
-                ? 'bg-violet-600 text-white'
+                ? 'bg-rose-600 text-white'
                 : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08]'
             }`}
           >
@@ -710,7 +710,7 @@ const ManajemenAkun = () => {
                     required
                     value={profileData.nama}
                     onChange={(e) => setProfileData({ ...profileData, nama: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/15 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400/40 transition outline-none"
+                    className="w-full px-4 py-3 bg-white/10 border border-white/15 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-rose-500/30 focus:border-rose-400/40 transition outline-none"
                     placeholder="Masukkan nama lengkap"
                   />
                 </div>
@@ -720,7 +720,7 @@ const ManajemenAkun = () => {
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 bg-violet-600 text-white rounded-lg font-semibold hover:bg-violet-700 transition disabled:opacity-50"
+                  className="w-full py-3 bg-rose-600 text-white rounded-lg font-semibold hover:bg-rose-700 transition disabled:opacity-50"
                 >
                   {loading ? 'Menyimpan...' : 'Simpan Perubahan'}
                 </motion.button>
@@ -746,7 +746,7 @@ const ManajemenAkun = () => {
                     required
                     value={passwordData.passwordLama}
                     onChange={(e) => setPasswordData({ ...passwordData, passwordLama: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/15 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400/40 transition outline-none"
+                    className="w-full px-4 py-3 bg-white/10 border border-white/15 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-rose-500/30 focus:border-rose-400/40 transition outline-none"
                     placeholder="Masukkan password lama"
                   />
                 </div>
@@ -760,7 +760,7 @@ const ManajemenAkun = () => {
                     required
                     value={passwordData.passwordBaru}
                     onChange={(e) => setPasswordData({ ...passwordData, passwordBaru: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/15 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400/40 transition outline-none"
+                    className="w-full px-4 py-3 bg-white/10 border border-white/15 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-rose-500/30 focus:border-rose-400/40 transition outline-none"
                     placeholder="Masukkan password baru (minimal 6 karakter)"
                   />
                 </div>
@@ -774,7 +774,7 @@ const ManajemenAkun = () => {
                     required
                     value={passwordData.konfirmasiPassword}
                     onChange={(e) => setPasswordData({ ...passwordData, konfirmasiPassword: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/15 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400/40 transition outline-none"
+                    className="w-full px-4 py-3 bg-white/10 border border-white/15 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-rose-500/30 focus:border-rose-400/40 transition outline-none"
                     placeholder="Konfirmasi password baru"
                   />
                 </div>
@@ -791,7 +791,7 @@ const ManajemenAkun = () => {
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 bg-violet-600 text-white rounded-lg font-semibold hover:bg-violet-700 transition disabled:opacity-50"
+                  className="w-full py-3 bg-rose-600 text-white rounded-lg font-semibold hover:bg-rose-700 transition disabled:opacity-50"
                 >
                   {loading ? 'Mengubah Password...' : 'Ubah Password'}
                 </motion.button>

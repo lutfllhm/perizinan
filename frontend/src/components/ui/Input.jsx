@@ -14,7 +14,7 @@ export default function Input({ className, leftIcon: LeftIcon, right, ...props }
           'h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 text-sm text-white placeholder:text-slate-500',
           'shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl',
           'transition-all duration-200',
-          'focus:border-violet-400/40 focus:ring-2 focus:ring-violet-500/20 focus:outline-none',
+          'focus:border-rose-400/40 focus:ring-2 focus:ring-rose-500/20 focus:outline-none',
           LeftIcon ? 'pl-10' : '',
           right ? 'pr-10' : ''
         )}

@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar.jsx';
 import FloatingParticles from '../components/FloatingParticles.jsx';
 import ScrollProgress from '../components/ScrollProgress.jsx';
 import Card from '../components/ui/Card.jsx';
+import Button from '../components/ui/Button.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
 
 const Home = () => {
@@ -170,22 +171,22 @@ const Home = () => {
                 className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center"
               >
                 <Link to="/pengajuan-form" className="w-full sm:w-auto">
-                  <button
-                    className={`w-full sm:w-auto px-8 py-3.5 bg-red-600 text-white rounded-xl font-semibold text-[15px] sm:text-base transition-all duration-200 shadow-sm shadow-red-600/20 ${
-                      !isMobile ? 'hover:bg-red-700 hover:shadow-md hover:shadow-red-600/25' : ''
-                    }`}
+                  <Button
+                    variant="danger"
+                    size="lg"
+                    className="w-full sm:w-auto px-8"
                   >
                     Buat Pengajuan
-                  </button>
+                  </Button>
                 </Link>
                 <Link to="/login" className="w-full sm:w-auto">
-                  <button
-                    className={`w-full sm:w-auto px-8 py-3.5 bg-white/5 border border-white/20 text-white rounded-xl font-semibold text-[15px] sm:text-base transition-all duration-200 ${
-                      !isMobile ? 'hover:bg-white/10 hover:border-white/30' : ''
-                    }`}
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    className="w-full sm:w-auto px-8"
                   >
                     Masuk Portal
-                  </button>
+                  </Button>
                 </Link>
               </motion.div>
 
@@ -487,14 +488,14 @@ const Home = () => {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
               <Link to="/pengajuan-form" className="w-full sm:w-auto">
-                <button className={`w-full sm:w-auto px-8 py-3.5 bg-red-600 text-white rounded-xl font-semibold text-[15px] sm:text-base transition-all duration-200 shadow-sm shadow-red-600/20 ${!isMobile ? 'hover:bg-red-700 hover:shadow-md hover:shadow-red-600/25' : ''}`}>
+                <Button variant="danger" size="lg" className="w-full sm:w-auto px-8">
                   Ajukan Perizinan
-                </button>
+                </Button>
               </Link>
               <Link to="/login" className="w-full sm:w-auto">
-                <button className={`w-full sm:w-auto px-8 py-3.5 bg-white/5 border border-white/15 text-white rounded-xl font-semibold text-[15px] sm:text-base transition-all duration-200 ${!isMobile ? 'hover:bg-white/10 hover:border-white/25' : ''}`}>
+                <Button variant="secondary" size="lg" className="w-full sm:w-auto px-8">
                   Masuk Dashboard
-                </button>
+                </Button>
               </Link>
             </div>
           </Card>

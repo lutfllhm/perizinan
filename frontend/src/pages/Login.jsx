@@ -6,6 +6,7 @@ import { authAPI } from '../utils/api';
 import { FiUser, FiLock, FiEye, FiEyeOff, FiArrowLeft } from 'react-icons/fi';
 import { LoadingDots } from '../components/LoadingSpinner';
 import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
 
 function decodeJwtPayload(token) {
   try {
@@ -94,14 +95,15 @@ const Login = () => {
         <div className="w-full max-w-md">
           {/* Back Button */}
           <Link to="/" className="inline-block mb-6">
-            <motion.button
+            <motion.div
               whileHover={{ scale: 1.05, x: -5 }}
               whileTap={{ scale: 0.95 }}
-              className="flex items-center space-x-2 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all duration-300"
             >
-              <FiArrowLeft />
-              <span>Kembali</span>
-            </motion.button>
+              <Button variant="secondary" size="sm" className="rounded-xl px-4">
+                <FiArrowLeft />
+                <span>Kembali</span>
+              </Button>
+            </motion.div>
           </Link>
 
           {/* Login Card */}
@@ -152,7 +154,7 @@ const Login = () => {
                     onChange={(e) => setDataForm({ ...dataForm, username: e.target.value })}
                     onFocus={() => setFocusedField('username')}
                     onBlur={() => setFocusedField(null)}
-                    className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all duration-300 outline-none"
+                    className="w-full pl-12 pr-4 py-3 bg-white/12 border border-white/25 rounded-lg text-white placeholder-slate-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/25 transition-all duration-200 outline-none"
                     placeholder="Masukkan username"
                   />
                 </div>
@@ -176,7 +178,7 @@ const Login = () => {
                     onChange={(e) => setDataForm({ ...dataForm, password: e.target.value })}
                     onFocus={() => setFocusedField('password')}
                     onBlur={() => setFocusedField(null)}
-                    className="w-full pl-12 pr-12 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all duration-300 outline-none"
+                    className="w-full pl-12 pr-12 py-3 bg-white/12 border border-white/25 rounded-lg text-white placeholder-slate-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/25 transition-all duration-200 outline-none"
                     placeholder="Masukkan password"
                   />
                   <button
@@ -190,19 +192,21 @@ const Login = () => {
               </div>
 
               {/* Submit Button */}
-              <button
+              <Button
                 type="submit"
                 disabled={sedangMemuat}
-                className="w-full py-3.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-red-600/20"
+                variant="danger"
+                size="lg"
+                className="w-full rounded-xl"
               >
                 {sedangMemuat ? <LoadingDots text="Memproses" /> : 'Masuk'}
-              </button>
+              </Button>
             </form>
 
             {/* Info */}
             <div className="mt-6 text-center">
               <p className="text-sm text-slate-400">
-                Belum punya akun?{' '}
+                Belum punya akses?{' '}
                 <Link to="/pengajuan-form" className="text-red-400 hover:text-red-300 font-medium transition-colors duration-300">
                   Ajukan Perizinan
                 </Link>

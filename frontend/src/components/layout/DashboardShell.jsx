@@ -18,7 +18,7 @@ export default function DashboardShell({
   onLogout,
   searchPlaceholder = 'Search…',
   onSearchChange,
-  accent = 'violet',
+  accent = 'rose',
   notificationCount = 0,
   onNotificationsClick,
 }) {
@@ -55,7 +55,7 @@ export default function DashboardShell({
       ? 'bg-emerald-300'
       : accent === 'fuchsia'
       ? 'bg-fuchsia-300'
-      : 'bg-violet-300';
+      : 'bg-rose-300';
 
   return (
     <div className="flex min-h-screen">
@@ -141,7 +141,7 @@ export default function DashboardShell({
                       initial={{ opacity: 0, x: -16 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: idx * 0.04 }}
-                      className={`flex items-center space-x-2 p-2.5 rounded-lg transition-all duration-200 ${
+                      className={`flex items-center space-x-2 p-2.5 rounded-xl transition-all duration-200 ${
                         active
                           ? 'bg-white/10 border border-white/15 shadow-[0_10px_30px_rgba(0,0,0,0.35)]'
                           : 'hover:bg-white/5 hover:translate-x-1'

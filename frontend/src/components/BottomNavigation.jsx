@@ -17,7 +17,7 @@ const BottomNavigation = ({ items, variant = 'light' }) => {
             'md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-950/55 backdrop-blur-2xl border-t border-white/10 shadow-[0_-20px_60px_rgba(0,0,0,0.45)]',
           active: 'text-white',
           inactive: 'text-slate-400',
-          indicator: 'bg-violet-300',
+          indicator: 'bg-rose-300',
         }
       : {
           wrap: 'md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-40',

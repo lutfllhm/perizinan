@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiMenu, FiX, FiLogIn, FiFileText } from 'react-icons/fi';
+import { FiMenu, FiX, FiLogIn } from 'react-icons/fi';
+import Button from './ui/Button';
 
 const Navbar = ({ isLoggedIn, onLogout }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -45,26 +46,22 @@ const Navbar = ({ isLoggedIn, onLogout }) => {
           <div className="hidden md:flex items-center space-x-3">
             {!isLoggedIn ? (
               <>
-                <Link to="/pengajuan-form">
-                  <button className="flex items-center space-x-2 px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200">
-                    <FiFileText size={18} />
-                    <span className="font-medium">Ajukan Pengajuan</span>
-                  </button>
-                </Link>
                 <Link to="/login">
-                  <button className="flex items-center space-x-2 px-5 py-2 bg-white/5 border border-white/20 text-white rounded-lg hover:bg-white/10 hover:border-white/30 transition-all duration-200">
+                  <Button variant="secondary" size="md" className="rounded-xl">
                     <FiLogIn size={18} />
                     <span className="font-medium">Login</span>
-                  </button>
+                  </Button>
                 </Link>
               </>
             ) : (
-              <button
+              <Button
                 onClick={handleLogout}
-                className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium"
+                variant="danger"
+                size="md"
+                className="rounded-xl"
               >
                 Logout
-              </button>
+              </Button>
             )}
           </div>
 
@@ -87,29 +84,25 @@ const Navbar = ({ isLoggedIn, onLogout }) => {
           <div className="px-4 pt-2 pb-4 space-y-2">
             {!isLoggedIn ? (
               <>
-                <Link to="/pengajuan-form" onClick={() => setIsOpen(false)}>
-                  <button className="w-full flex items-center space-x-2 px-4 py-2.5 bg-red-600 text-white rounded-lg font-medium">
-                    <FiFileText size={18} />
-                    <span>Ajukan Pengajuan</span>
-                  </button>
-                </Link>
                 <Link to="/login" onClick={() => setIsOpen(false)}>
-                  <button className="w-full flex items-center space-x-2 px-4 py-2.5 bg-white/5 border border-white/20 text-white rounded-lg font-medium">
+                  <Button variant="secondary" size="md" className="w-full rounded-xl">
                     <FiLogIn size={18} />
                     <span>Login</span>
-                  </button>
+                  </Button>
                 </Link>
               </>
             ) : (
-              <button
+              <Button
+                variant="danger"
+                size="md"
                 onClick={() => {
                   handleLogout();
                   setIsOpen(false);
                 }}
-                className="w-full px-4 py-2.5 bg-red-600 text-white rounded-lg font-medium"
+                className="w-full rounded-xl"
               >
                 Logout
-              </button>
+              </Button>
             )}
           </div>
         </motion.div>

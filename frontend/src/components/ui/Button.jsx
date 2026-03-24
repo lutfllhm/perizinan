@@ -53,7 +53,7 @@ export default function Button({
 
   const variants = {
     primary:
-      'bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-[0_10px_30px_rgba(99,102,241,0.25)] hover:brightness-110',
+      'bg-gradient-to-r from-rose-500 to-red-600 text-white shadow-[0_10px_30px_rgba(244,63,94,0.18)] hover:brightness-110',
     secondary:
       'bg-white/10 text-white border border-white/15 hover:bg-white/15 hover:border-white/25',
     ghost: 'bg-transparent text-white hover:bg-white/10',
@@ -64,7 +64,7 @@ export default function Button({
   const sizes = {
     sm: 'h-9 px-3 text-sm rounded-xl',
     md: 'h-11 px-4 text-sm rounded-xl',
-    lg: 'h-12 px-5 text-base rounded-2xl',
+    lg: 'h-12 px-5 text-base rounded-xl',
   };
 
   return (
@@ -74,7 +74,7 @@ export default function Button({
       onClick={handleClick}
       className={cn(
         'relative overflow-hidden inline-flex items-center justify-center gap-2 font-medium transition-all duration-200 active:translate-y-[1px] disabled:opacity-50 disabled:cursor-not-allowed',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950',
         variants[variant],
         sizes[size],
         className
