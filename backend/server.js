@@ -1393,6 +1393,8 @@ connectDB().then(() => {
     console.log('');
     console.log('Available routes:');
     console.log('  POST   /api/auth/login');
+    console.log('  PUT    /api/auth/profile');
+    console.log('  PUT    /api/auth/change-password');
     console.log('  GET    /api/health');
     console.log('  GET    /api/karyawan');
     console.log('  GET    /api/pengajuan');
