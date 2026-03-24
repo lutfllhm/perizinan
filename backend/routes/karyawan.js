@@ -10,14 +10,29 @@ const { auth } = require('../middleware/auth');
  */
 router.get('/', async (req, res) => {
   try {
-    const { kantor, status = 'aktif' } = req.query;
+    const { kantor, status } = req.query;
     
-    let query = 'SELECT * FROM karyawan WHERE status = ?';
-    const params = [status];
+    // Treat NULL/empty as active for backward compatibility
+    let query = 'SELECT * FROM karyawan WHERE (status = "aktif" OR status IS NULL OR status = "")';
+    const params = [];
     
     if (kantor) {
-      query += ' AND kantor = ?';
-      params.push(kantor);
+      // Be tolerant to different kantor spellings (spaces/dashes) between Excel and UI.
+      // Compare using a whitespace-stripped version on both sides.
+      const kantorNormalized = String(kantor).replace(/\s+/g, '');
+      query += ' AND REPLACE(kantor, " ", "") = ?';
+      params.push(kantorNormalized);
+    }
+    
+    // Allow explicit status filter if provided
+    if (status) {
+      query = 'SELECT * FROM karyawan WHERE status = ?';
+      params.unshift(status);
+      if (kantor) {
+        const kantorNormalized = String(kantor).replace(/\s+/g, '');
+        query += ' AND REPLACE(kantor, " ", "") = ?';
+        params.push(kantorNormalized);
+      }
     }
     
     query += ' ORDER BY kantor, nama';
