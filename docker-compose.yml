@@ -38,7 +38,7 @@ services:
       DB_PASSWORD: ${MYSQLPASSWORD:-IwareDB2026!@#}
       DB_NAME: ${MYSQLDATABASE:-iware_perizinan}
       JWT_SECRET: ${JWT_SECRET:-d73d71a47452c7af78f6bd888005afee23adba5f936da33d67ce5baed764db62}
-      FRONTEND_URL: https://iwareid.com
+      FRONTEND_URL: https://license.iwareid.com
     volumes:
       - ./backend/uploads:/app/uploads
     ports:
@@ -60,7 +60,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        REACT_APP_API_URL: https://iwareid.com
+        REACT_APP_API_URL: https://license.iwareid.com
     container_name: iware-frontend
     restart: always
     ports:
