@@ -116,7 +116,7 @@ const Login = () => {
             {/* Logo & Title */}
             <div className="text-center mb-8">
               <div className="flex items-center justify-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-lg p-2">
+                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-lg p-2">
                   <img 
                     src="/img/logo.png" 
                     alt="IWARE Logo" 
@@ -154,7 +154,7 @@ const Login = () => {
                     onChange={(e) => setDataForm({ ...dataForm, username: e.target.value })}
                     onFocus={() => setFocusedField('username')}
                     onBlur={() => setFocusedField(null)}
-                    className="w-full pl-12 pr-4 py-3 bg-white/12 border border-white/25 rounded-lg text-white placeholder-slate-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/25 transition-all duration-200 outline-none"
+                    className="login-input w-full pl-12 pr-4 py-3 bg-white/95 border border-white/40 rounded-xl text-slate-900 placeholder-slate-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/25 transition-all duration-200 outline-none"
                     placeholder="Masukkan username"
                   />
                 </div>
@@ -178,7 +178,7 @@ const Login = () => {
                     onChange={(e) => setDataForm({ ...dataForm, password: e.target.value })}
                     onFocus={() => setFocusedField('password')}
                     onBlur={() => setFocusedField(null)}
-                    className="w-full pl-12 pr-12 py-3 bg-white/12 border border-white/25 rounded-lg text-white placeholder-slate-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/25 transition-all duration-200 outline-none"
+                    className="login-input w-full pl-12 pr-12 py-3 bg-white/95 border border-white/40 rounded-xl text-slate-900 placeholder-slate-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/25 transition-all duration-200 outline-none"
                     placeholder="Masukkan password"
                   />
                   <button
