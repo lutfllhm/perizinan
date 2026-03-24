@@ -18,11 +18,34 @@ function normalizeApiBaseUrl(input) {
 // Gunakan environment variable untuk API base URL
 // Development default: http://localhost:5000
 // Production default: same-origin (empty string) so Nginx can proxy /api
-const RAW_API_URL =
-  process.env.REACT_APP_API_URL ||
-  (typeof window !== 'undefined' && window.location?.hostname === 'localhost'
-    ? 'http://localhost:5000'
-    : '');
+const ENV_API_URL = process.env.REACT_APP_API_URL || '';
+
+function resolveRawApiUrl() {
+  if (typeof window === 'undefined') return ENV_API_URL;
+
+  const host = window.location?.hostname || '';
+  if (host === 'localhost') {
+    return ENV_API_URL || 'http://localhost:5000';
+  }
+
+  // Di production, jika env mengarah ke origin berbeda dengan website saat ini,
+  // fallback ke same-origin untuk menghindari masalah CORS antar domain.
+  if (ENV_API_URL) {
+    try {
+      const parsed = new URL(ENV_API_URL, window.location.origin);
+      if (parsed.origin !== window.location.origin) {
+        return '';
+      }
+    } catch {
+      // Jika format URL env tidak valid, fallback ke same-origin.
+      return '';
+    }
+  }
+
+  return ENV_API_URL || '';
+}
+
+const RAW_API_URL = resolveRawApiUrl();
 
 const API_BASE = normalizeApiBaseUrl(RAW_API_URL);
 
