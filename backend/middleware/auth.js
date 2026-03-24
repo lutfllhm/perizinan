@@ -18,17 +18,17 @@ const auth = (req, res, next) => {
   }
 };
 
-// Middleware untuk memeriksa role Admin
+// Middleware untuk memeriksa role Admin atau Superadmin
 const isAdmin = (req, res, next) => {
-  if (req.user.role !== 'admin') {
+  if (req.user.role !== 'superadmin' && req.user.role !== 'admin') {
     return res.status(403).json({ message: 'Akses ditolak. Hanya admin yang diizinkan.' });
   }
   next();
 };
 
-// Middleware untuk memeriksa role HRD atau Admin
+// Middleware untuk memeriksa role HRD, Admin, atau Superadmin
 const isHRD = (req, res, next) => {
-  if (req.user.role !== 'hrd' && req.user.role !== 'admin') {
+  if (req.user.role !== 'superadmin' && req.user.role !== 'hrd' && req.user.role !== 'admin') {
     return res.status(403).json({ message: 'Akses ditolak. Hanya HRD yang diizinkan.' });
   }
   next();

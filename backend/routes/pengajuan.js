@@ -40,7 +40,7 @@ const upload = multer({
 router.get('/stats/dashboard', auth, async (req, res) => {
   try {
     // Cek role user
-    if (req.user.role !== 'admin' && req.user.role !== 'hrd') {
+    if (req.user.role !== 'superadmin' && req.user.role !== 'admin' && req.user.role !== 'hrd') {
       return res.status(403).json({ 
         message: 'Anda tidak memiliki akses ke statistik' 
       });
@@ -105,7 +105,7 @@ router.get('/stats/dashboard', auth, async (req, res) => {
 router.get('/report', auth, async (req, res) => {
   try {
     // Cek role user
-    if (req.user.role !== 'admin' && req.user.role !== 'hrd') {
+    if (req.user.role !== 'superadmin' && req.user.role !== 'admin' && req.user.role !== 'hrd') {
       return res.status(403).json({ 
         message: 'Anda tidak memiliki akses ke report' 
       });
@@ -306,7 +306,7 @@ router.put('/:id', auth, async (req, res) => {
     }
 
     // Cek role user
-    if (req.user.role !== 'admin' && req.user.role !== 'hrd') {
+    if (req.user.role !== 'superadmin' && req.user.role !== 'admin' && req.user.role !== 'hrd') {
       return res.status(403).json({ 
         message: 'Anda tidak memiliki akses untuk mengubah status' 
       });
@@ -389,7 +389,7 @@ router.patch('/:id/status', auth, async (req, res) => {
     }
 
     // Cek role user
-    if (req.user.role !== 'admin' && req.user.role !== 'hrd') {
+    if (req.user.role !== 'superadmin' && req.user.role !== 'admin' && req.user.role !== 'hrd') {
       return res.status(403).json({ 
         message: 'Anda tidak memiliki akses untuk mengubah status' 
       });
@@ -435,7 +435,7 @@ router.patch('/:id/status', auth, async (req, res) => {
 router.delete('/:id', auth, async (req, res) => {
   try {
     // Cek role user - HRD juga bisa menghapus
-    if (req.user.role !== 'admin' && req.user.role !== 'hrd') {
+    if (req.user.role !== 'superadmin' && req.user.role !== 'admin' && req.user.role !== 'hrd') {
       return res.status(403).json({ 
         message: 'Anda tidak memiliki akses untuk menghapus pengajuan' 
       });

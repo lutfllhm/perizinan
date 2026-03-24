@@ -129,7 +129,7 @@ router.get('/:id/quota', async (req, res) => {
  */
 router.post('/', auth, async (req, res) => {
   try {
-    if (req.user.role !== 'admin' && req.user.role !== 'hrd') {
+    if (req.user.role !== 'superadmin' && req.user.role !== 'admin' && req.user.role !== 'hrd') {
       return res.status(403).json({ 
         message: 'Anda tidak memiliki akses untuk menambah karyawan' 
       });
@@ -175,7 +175,7 @@ router.post('/', auth, async (req, res) => {
  */
 router.put('/:id', auth, async (req, res) => {
   try {
-    if (req.user.role !== 'admin' && req.user.role !== 'hrd') {
+    if (req.user.role !== 'superadmin' && req.user.role !== 'admin' && req.user.role !== 'hrd') {
       return res.status(403).json({ 
         message: 'Anda tidak memiliki akses untuk mengubah data karyawan' 
       });
@@ -209,7 +209,7 @@ router.put('/:id', auth, async (req, res) => {
  */
 router.post('/:id/reset-cuti', auth, async (req, res) => {
   try {
-    if (req.user.role !== 'admin' && req.user.role !== 'hrd') {
+    if (req.user.role !== 'superadmin' && req.user.role !== 'admin' && req.user.role !== 'hrd') {
       return res.status(403).json({ 
         message: 'Anda tidak memiliki akses untuk reset cuti' 
       });
@@ -242,7 +242,7 @@ router.post('/:id/reset-cuti', auth, async (req, res) => {
  */
 router.delete('/:id', auth, async (req, res) => {
   try {
-    if (req.user.role !== 'admin' && req.user.role !== 'hrd') {
+    if (req.user.role !== 'superadmin' && req.user.role !== 'admin' && req.user.role !== 'hrd') {
       return res.status(403).json({ 
         message: 'Anda tidak memiliki akses untuk menghapus karyawan' 
       });
