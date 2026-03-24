@@ -542,6 +542,98 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
+// Update profile
+app.put('/api/auth/profile', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({ message: 'Token tidak ditemukan' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default-secret-key');
+    const { nama } = req.body;
+
+    if (!nama) {
+      return res.status(400).json({ message: 'Nama harus diisi' });
+    }
+
+    if (!db) await connectDB();
+
+    await db.query(
+      'UPDATE users SET nama = ? WHERE id = ?',
+      [nama, decoded.id]
+    );
+
+    console.log('✅ Profile updated successfully for user:', decoded.id);
+
+    res.json({ message: 'Profil berhasil diperbarui' });
+
+  } catch (error) {
+    console.error('❌ Update profile error:', error);
+    res.status(500).json({ 
+      message: 'Terjadi kesalahan saat memperbarui profil',
+      error: error.message 
+    });
+  }
+});
+
+// Change password
+app.put('/api/auth/change-password', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({ message: 'Token tidak ditemukan' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default-secret-key');
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ message: 'Password lama dan baru harus diisi' });
+    }
+
+    if (!db) await connectDB();
+
+    // Get current user
+    const [users] = await db.query('SELECT * FROM users WHERE id = ?', [decoded.id]);
+    
+    if (users.length === 0) {
+      return res.status(404).json({ message: 'User tidak ditemukan' });
+    }
+
+    const user = users[0];
+
+    // Verify old password
+    const isValidPassword = await bcrypt.compare(oldPassword, user.password);
+
+    if (!isValidPassword) {
+      return res.status(401).json({ message: 'Password lama tidak sesuai' });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password
+    await db.query(
+      'UPDATE users SET password = ? WHERE id = ?',
+      [hashedPassword, decoded.id]
+    );
+
+    console.log('✅ Password changed successfully for user:', decoded.id);
+
+    res.json({ message: 'Password berhasil diubah' });
+
+  } catch (error) {
+    console.error('❌ Change password error:', error);
+    res.status(500).json({ 
+      message: 'Terjadi kesalahan saat mengubah password',
+      error: error.message 
+    });
+  }
+});
+
 // Get karyawan
 app.get('/api/karyawan', async (req, res) => {
   try {
