@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from './cn';
 
-export default function Input({ className, leftIcon: LeftIcon, right, ...props }) {
+export default function Input({ className, inputClassName, leftIcon: LeftIcon, right, ...props }) {
   return (
     <div className={cn('relative', className)}>
       {LeftIcon && (
@@ -16,7 +16,8 @@ export default function Input({ className, leftIcon: LeftIcon, right, ...props }
           'transition-all duration-200',
           'focus:border-rose-400/40 focus:ring-2 focus:ring-rose-500/20 focus:outline-none',
           LeftIcon ? 'pl-10' : '',
-          right ? 'pr-10' : ''
+          right ? 'pr-10' : '',
+          inputClassName
         )}
         {...props}
       />

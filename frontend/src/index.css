@@ -331,6 +331,18 @@ select:focus {
   box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.95) inset;
 }
 
+/* Keep admin form autofill/autocomplete text readable */
+.admin-input:-webkit-autofill,
+.admin-input:-webkit-autofill:hover,
+.admin-input:-webkit-autofill:focus,
+.admin-input:-webkit-autofill:active {
+  -webkit-text-fill-color: #0f172a;
+  caret-color: #0f172a;
+  transition: background-color 9999s ease-in-out 0s;
+  -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.95) inset;
+  box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.95) inset;
+}
+
 /* Loading spinner animation */
 @keyframes spin {
   to {

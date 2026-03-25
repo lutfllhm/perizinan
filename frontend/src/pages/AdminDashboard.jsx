@@ -513,6 +513,7 @@ const RegisterHRD = () => {
               onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               placeholder="Masukkan username"
               className="w-full"
+              inputClassName="admin-input bg-white/95 border-white/40 text-slate-900 placeholder:text-slate-500"
               required
             />
           </div>
@@ -527,6 +528,7 @@ const RegisterHRD = () => {
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               placeholder="Masukkan password"
               className="w-full"
+              inputClassName="admin-input bg-white/95 border-white/40 text-slate-900 placeholder:text-slate-500"
               required
             />
           </div>
@@ -540,6 +542,7 @@ const RegisterHRD = () => {
               onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
               placeholder="Masukkan nama lengkap"
               className="w-full"
+              inputClassName="admin-input bg-white/95 border-white/40 text-slate-900 placeholder:text-slate-500"
               required
             />
           </div>
@@ -710,7 +713,7 @@ const ManajemenAkun = () => {
                     required
                     value={profileData.nama}
                     onChange={(e) => setProfileData({ ...profileData, nama: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/15 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-rose-500/30 focus:border-rose-400/40 transition outline-none"
+                    className="admin-input w-full px-4 py-3 bg-white/95 border border-white/40 rounded-xl text-slate-900 placeholder-slate-500 focus:ring-2 focus:ring-rose-500/30 focus:border-rose-400/40 transition outline-none"
                     placeholder="Masukkan nama lengkap"
                   />
                 </div>
@@ -746,7 +749,7 @@ const ManajemenAkun = () => {
                     required
                     value={passwordData.passwordLama}
                     onChange={(e) => setPasswordData({ ...passwordData, passwordLama: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/15 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-rose-500/30 focus:border-rose-400/40 transition outline-none"
+                    className="admin-input w-full px-4 py-3 bg-white/95 border border-white/40 rounded-xl text-slate-900 placeholder-slate-500 focus:ring-2 focus:ring-rose-500/30 focus:border-rose-400/40 transition outline-none"
                     placeholder="Masukkan password lama"
                   />
                 </div>
@@ -760,7 +763,7 @@ const ManajemenAkun = () => {
                     required
                     value={passwordData.passwordBaru}
                     onChange={(e) => setPasswordData({ ...passwordData, passwordBaru: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/15 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-rose-500/30 focus:border-rose-400/40 transition outline-none"
+                    className="admin-input w-full px-4 py-3 bg-white/95 border border-white/40 rounded-xl text-slate-900 placeholder-slate-500 focus:ring-2 focus:ring-rose-500/30 focus:border-rose-400/40 transition outline-none"
                     placeholder="Masukkan password baru (minimal 6 karakter)"
                   />
                 </div>
@@ -774,7 +777,7 @@ const ManajemenAkun = () => {
                     required
                     value={passwordData.konfirmasiPassword}
                     onChange={(e) => setPasswordData({ ...passwordData, konfirmasiPassword: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/15 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-rose-500/30 focus:border-rose-400/40 transition outline-none"
+                    className="admin-input w-full px-4 py-3 bg-white/95 border border-white/40 rounded-xl text-slate-900 placeholder-slate-500 focus:ring-2 focus:ring-rose-500/30 focus:border-rose-400/40 transition outline-none"
                     placeholder="Konfirmasi password baru"
                   />
                 </div>
