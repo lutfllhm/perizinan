@@ -109,9 +109,9 @@ const Home = () => {
               >
                 <div className="inline-flex items-center gap-2 rounded-full bg-white/8 border border-white/12 px-3 py-1.5 text-xs sm:text-sm text-slate-200 backdrop-blur-sm">
                   <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="font-medium">Portal perizinan internal IWARE</span>
+                  <span className="font-medium">Portal Perizinan Iware</span>
                   <span className="hidden sm:inline text-slate-400">•</span>
-                  <span className="hidden sm:inline text-slate-300">Untuk karyawan IWARE</span>
+                  <span className="hidden sm:inline text-slate-300">Portal internal karyawan</span>
                 </div>
               </motion.div>
 
@@ -121,7 +121,7 @@ const Home = () => {
                 transition={{ delay: 0.3, duration: 0.8 }}
               >
                 <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold text-white mb-4 leading-[1.05] tracking-tight">
-                  Perizinan internal
+                  Portal Perizinan Iware
                   <motion.span
                     className="block font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-red-500 to-orange-300 animate-gradient-shift"
                     initial="hidden"
@@ -158,8 +158,7 @@ const Home = () => {
                   </motion.span>
                 </h1>
                 <p className="text-sm sm:text-base md:text-lg text-slate-300 max-w-[44rem] leading-relaxed mx-auto">
-                  Aplikasi ini dibuat khusus untuk kebutuhan operasional internal IWARE. Ajukan cuti/izin/sakit/lembur/dinas,
-                  pantau status persetujuan, dan simpan riwayat secara terstruktur untuk kebutuhan rekap HR.
+                  Portal internal untuk pengajuan cuti, izin, sakit, lembur, dan dinas. Pantau status persetujuan dan simpan riwayat pengajuan secara terpusat untuk kebutuhan HR/GA.
                 </p>
               </motion.div>
 
@@ -199,7 +198,7 @@ const Home = () => {
               >
                 {[
                   { k: 'Tertib', v: 'Alur & status jelas' },
-                  { k: 'Terkontrol', v: 'Sesuai kebijakan IWARE' },
+                  { k: 'Terkontrol', v: 'Sesuai kebijakan internal' },
                   { k: 'Terdokumentasi', v: 'Riwayat siap rekap' },
                 ].map((it) => (
                   <div key={it.k} className="rounded-2xl bg-white/5 border border-white/10 px-4 py-3 backdrop-blur-sm">
@@ -216,10 +215,10 @@ const Home = () => {
             <Card className="px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white/5">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 mb-1">
-                  Standar internal IWARE
+                  Standar operasional internal
                 </p>
                 <p className="text-sm text-slate-300">
-                  HR/GA memantau seluruh pengajuan cuti, izin, lembur, dan dinas dalam satu dashboard internal yang terpusat.
+                  HR/GA memantau seluruh pengajuan cuti, izin, lembur, dan dinas melalui satu dashboard terpusat.
                 </p>
               </div>
               <div className="flex flex-wrap gap-2 text-xs text-slate-400">
@@ -246,10 +245,10 @@ const Home = () => {
         <div className="max-w-7xl mx-auto">
           <div className={`text-center mb-14 sm:mb-16 transition-all duration-1000 ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
-              Ringkas, jelas, dan sesuai kebutuhan internal
+              Ringkas, jelas, dan terstruktur
             </h2>
             <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto">
-              Dibuat untuk membantu karyawan mengajukan perizinan dengan cepat, dan membantu HR/GA melakukan rekap dengan akurat.
+              Portal Perizinan Iware membantu karyawan mengajukan perizinan dengan cepat dan membantu HR/GA melakukan rekap dengan lebih rapi dan akurat.
             </p>
           </div>
 
@@ -290,10 +289,10 @@ const Home = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
-              Kenapa pakai portal ini
+              Kenapa menggunakan Portal Perizinan Iware
             </h2>
             <p className="text-sm sm:text-base md:text-lg text-slate-400 max-w-2xl mx-auto">
-              Karena alurnya dibuat sesuai proses internal IWARE: lebih jelas, terdokumentasi, dan mudah dipantau.
+              Karena alurnya dibuat sesuai proses operasional internal: lebih jelas, terdokumentasi, dan mudah dipantau.
             </p>
           </div>
 
@@ -376,9 +375,9 @@ const Home = () => {
             
             {[
               { step: '01', title: 'Masuk Portal', desc: 'Gunakan akun internal untuk mengakses sistem' },
-              { step: '02', title: 'Buat Pengajuan', desc: 'Isi jenis perizinan, tanggal, dan alasan dengan jelas' },
-              { step: '03', title: 'Review & Approval', desc: 'Atasan/HR meninjau sesuai kebijakan yang berlaku' },
-              { step: '04', title: 'Arsip & Rekap', desc: 'Riwayat tersimpan untuk kebutuhan rekap internal' }
+              { step: '02', title: 'Buat Pengajuan', desc: 'Pilih jenis perizinan, isi tanggal, dan alasan secara lengkap' },
+              { step: '03', title: 'Review & Persetujuan', desc: 'Atasan/HR meninjau pengajuan sesuai kebijakan yang berlaku' },
+              { step: '04', title: 'Arsip & Rekap', desc: 'Riwayat tersimpan rapi untuk kebutuhan rekap berkala' }
             ].map((item, index) => (
               <motion.div
                 key={index}
@@ -418,7 +417,7 @@ const Home = () => {
               Pertanyaan yang sering ditanyakan
             </h2>
             <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto">
-              Jawaban singkat untuk penggunaan portal internal IWARE.
+              Jawaban singkat terkait penggunaan Portal Perizinan Iware.
             </p>
           </div>
 
@@ -426,7 +425,7 @@ const Home = () => {
             {[
               {
                 q: 'Siapa yang bisa menggunakan portal ini?',
-                a: 'Portal ini khusus untuk karyawan/pegawai IWARE dan pihak internal terkait (atasan, HR/GA, admin).'
+                a: 'Portal Perizinan Iware ditujukan untuk karyawan dan pihak internal terkait (atasan, HR/GA, admin).'
               },
               {
                 q: 'Bagaimana cara mengajukan cuti/izin?',
@@ -483,13 +482,13 @@ const Home = () => {
                 Siap digunakan untuk operasional internal
               </h2>
               <p className="text-base sm:text-lg text-slate-400 max-w-2xl">
-                Mulai dari pengajuan hingga arsip. Dibuat agar alur perizinan IWARE lebih tertib dan mudah dipantau.
+                Mulai dari pengajuan hingga arsip. Portal Perizinan Iware membantu memastikan alur lebih tertib, transparan, dan mudah dipantau.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
               <Link to="/pengajuan-form" className="w-full sm:w-auto">
                 <Button variant="danger" size="lg" className="w-full sm:w-auto px-8">
-                  Ajukan Perizinan
+                  Buat Pengajuan
                 </Button>
               </Link>
               <Link to="/login" className="w-full sm:w-auto">
