@@ -895,11 +895,12 @@ const Report = () => {
             <select
               value={filters.bulan}
               onChange={(e) => setFilters({ ...filters, bulan: e.target.value })}
-              className="w-full h-11 px-4 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400/40"
+              className="admin-select w-full h-11 px-4 bg-white/95 border border-white/40 rounded-xl !text-slate-900 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400/40 font-medium"
+              style={{ color: '#0f172a' }}
             >
-              <option value="">Semua Bulan</option>
+              <option value="" style={{ color: '#0f172a' }}>Semua Bulan</option>
               {[...Array(12)].map((_, i) => (
-                <option key={i + 1} value={i + 1}>{i + 1}</option>
+                <option key={i + 1} value={i + 1} style={{ color: '#0f172a' }}>{i + 1}</option>
               ))}
             </select>
           </div>
@@ -1379,11 +1380,12 @@ const DaftarKaryawan = () => {
         <select
           value={filterKantor}
           onChange={(e) => setFilterKantor(e.target.value)}
-          className="h-11 px-4 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400/40"
+          className="admin-select h-11 px-4 bg-white/95 border border-white/40 rounded-xl !text-slate-900 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400/40 font-medium"
+          style={{ color: '#0f172a' }}
         >
-          <option value="">Semua Kantor</option>
+          <option value="" style={{ color: '#0f172a' }}>Semua Kantor</option>
           {daftarKantor.map(kantor => (
-            <option key={kantor} value={kantor}>{kantor}</option>
+            <option key={kantor} value={kantor} style={{ color: '#0f172a' }}>{kantor}</option>
           ))}
         </select>
       </motion.div>
@@ -1522,11 +1524,12 @@ const DaftarKaryawan = () => {
                   required
                   value={formData.kantor}
                   onChange={(e) => setFormData({ ...formData, kantor: e.target.value })}
-                  className="w-full h-11 px-4 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400/40"
+                  className="admin-select w-full h-11 px-4 bg-white/95 border border-white/40 rounded-xl !text-slate-900 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400/40 font-medium"
+                  style={{ color: '#0f172a' }}
                 >
-                  <option value="">-- Pilih Kantor --</option>
+                  <option value="" style={{ color: '#0f172a' }}>-- Pilih Kantor --</option>
                   {daftarKantor.map(kantor => (
-                    <option key={kantor} value={kantor}>{kantor}</option>
+                    <option key={kantor} value={kantor} style={{ color: '#0f172a' }}>{kantor}</option>
                   ))}
                 </select>
               </div>
@@ -1579,10 +1582,11 @@ const DaftarKaryawan = () => {
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full h-11 px-4 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400/40"
+                    className="admin-select w-full h-11 px-4 bg-white/95 border border-white/40 rounded-xl !text-slate-900 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400/40 font-medium"
+                    style={{ color: '#0f172a' }}
                   >
-                    <option value="aktif">Aktif</option>
-                    <option value="nonaktif">Non-Aktif</option>
+                    <option value="aktif" style={{ color: '#0f172a' }}>Aktif</option>
+                    <option value="nonaktif" style={{ color: '#0f172a' }}>Non-Aktif</option>
                   </select>
                 </div>
               </div>
@@ -1686,11 +1690,12 @@ const QuotaKaryawan = () => {
             <select
               value={filterKantor}
               onChange={(e) => setFilterKantor(e.target.value)}
-              className="w-full h-11 px-4 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400/40"
+              className="admin-select w-full h-11 px-4 bg-white/95 border border-white/40 rounded-xl !text-slate-900 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400/40 font-medium"
+              style={{ color: '#0f172a' }}
             >
-              <option value="">Semua Kantor</option>
+              <option value="" style={{ color: '#0f172a' }}>Semua Kantor</option>
               {kantorList.map(kantor => (
-                <option key={kantor} value={kantor}>{kantor}</option>
+                <option key={kantor} value={kantor} style={{ color: '#0f172a' }}>{kantor}</option>
               ))}
             </select>
           </div>
