@@ -513,7 +513,8 @@ const RegisterHRD = () => {
               onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               placeholder="Masukkan username"
               className="w-full"
-              inputClassName="admin-input bg-white/95 border-white/40 text-slate-900 placeholder:text-slate-500"
+              inputClassName="admin-input bg-white/95 border-white/40 !text-slate-900 placeholder:text-slate-500 font-medium"
+              style={{ color: '#0f172a' }}
               required
             />
           </div>
@@ -528,7 +529,8 @@ const RegisterHRD = () => {
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               placeholder="Masukkan password"
               className="w-full"
-              inputClassName="admin-input bg-white/95 border-white/40 text-slate-900 placeholder:text-slate-500"
+              inputClassName="admin-input bg-white/95 border-white/40 !text-slate-900 placeholder:text-slate-500 font-medium"
+              style={{ color: '#0f172a' }}
               required
             />
           </div>
@@ -542,7 +544,8 @@ const RegisterHRD = () => {
               onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
               placeholder="Masukkan nama lengkap"
               className="w-full"
-              inputClassName="admin-input bg-white/95 border-white/40 text-slate-900 placeholder:text-slate-500"
+              inputClassName="admin-input bg-white/95 border-white/40 !text-slate-900 placeholder:text-slate-500 font-medium"
+              style={{ color: '#0f172a' }}
               required
             />
           </div>

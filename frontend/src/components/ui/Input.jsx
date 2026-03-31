@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from './cn';
 
-export default function Input({ className, inputClassName, leftIcon: LeftIcon, right, ...props }) {
+export default function Input({ className, inputClassName, leftIcon: LeftIcon, right, style, ...props }) {
   return (
     <div className={cn('relative', className)}>
       {LeftIcon && (
@@ -19,6 +19,7 @@ export default function Input({ className, inputClassName, leftIcon: LeftIcon, r
           right ? 'pr-10' : '',
           inputClassName
         )}
+        style={style}
         {...props}
       />
       {right && <div className="absolute inset-y-0 right-0 flex items-center pr-3">{right}</div>}
