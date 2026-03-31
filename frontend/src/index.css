@@ -320,12 +320,17 @@ select:focus {
 }
 
 /* Keep login autofill readable (avoid white text issue) */
+.login-input {
+  color: #0f172a !important;
+  caret-color: #0f172a !important;
+}
+
 .login-input:-webkit-autofill,
 .login-input:-webkit-autofill:hover,
 .login-input:-webkit-autofill:focus,
 .login-input:-webkit-autofill:active {
-  -webkit-text-fill-color: #0f172a;
-  caret-color: #0f172a;
+  -webkit-text-fill-color: #0f172a !important;
+  caret-color: #0f172a !important;
   transition: background-color 9999s ease-in-out 0s;
   -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.95) inset;
   box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.95) inset;

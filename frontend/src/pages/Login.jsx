@@ -154,8 +154,9 @@ const Login = () => {
                     onChange={(e) => setDataForm({ ...dataForm, username: e.target.value })}
                     onFocus={() => setFocusedField('username')}
                     onBlur={() => setFocusedField(null)}
-                    className="login-input w-full pl-12 pr-4 py-3 bg-white/95 border border-white/40 rounded-xl text-slate-900 placeholder-slate-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/25 transition-all duration-200 outline-none"
+                    className="login-input w-full pl-12 pr-4 py-3 bg-white/95 border border-white/40 rounded-xl !text-slate-900 placeholder-slate-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/25 transition-all duration-200 outline-none font-medium"
                     placeholder="Masukkan username"
+                    style={{ color: '#0f172a' }}
                   />
                 </div>
               </div>
@@ -178,8 +179,9 @@ const Login = () => {
                     onChange={(e) => setDataForm({ ...dataForm, password: e.target.value })}
                     onFocus={() => setFocusedField('password')}
                     onBlur={() => setFocusedField(null)}
-                    className="login-input w-full pl-12 pr-12 py-3 bg-white/95 border border-white/40 rounded-xl text-slate-900 placeholder-slate-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/25 transition-all duration-200 outline-none"
+                    className="login-input w-full pl-12 pr-12 py-3 bg-white/95 border border-white/40 rounded-xl !text-slate-900 placeholder-slate-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/25 transition-all duration-200 outline-none font-medium"
                     placeholder="Masukkan password"
+                    style={{ color: '#0f172a' }}
                   />
                   <button
                     type="button"
