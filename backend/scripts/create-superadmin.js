@@ -25,19 +25,18 @@ async function createSuperadmin() {
 
     // Buat superadmin baru
     await connection.execute(`
-      INSERT INTO users (username, password, email, nama, role) 
-      VALUES (?, ?, ?, ?, ?)
-    `, ['superadmin', hashedPassword, 'admin@iware.com', 'Super Administrator', 'superadmin']);
+      INSERT INTO users (username, password, nama, role) 
+      VALUES (?, ?, ?, ?)
+    `, ['superadmin', hashedPassword, 'Super Administrator', 'superadmin']);
     
     console.log('✅ Superadmin berhasil dibuat');
 
     // Verifikasi
-    const [rows] = await connection.execute('SELECT username, nama, role, email FROM users');
+    const [rows] = await connection.execute('SELECT username, nama, role FROM users');
     console.log('\n📊 Data users:');
     rows.forEach(r => {
       console.log(`   - ${r.username} (${r.role})`);
       console.log(`     Nama: ${r.nama}`);
-      console.log(`     Email: ${r.email}`);
     });
 
     console.log('\n✅ Setup selesai!');
