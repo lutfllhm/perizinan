@@ -1,4 +1,4 @@
-# 🚀 Panduan Deploy ke VPS Hostinger - license.iwareid.com
+  # 🚀 Panduan Deploy ke VPS Hostinger - license.iwareid.com
 
 Panduan lengkap deployment aplikasi IWARE Perizinan ke VPS Hostinger menggunakan domain **license.iwareid.com**
 
@@ -458,7 +458,7 @@ sudo ufw status
 
 ```bash
 # Test backend API
-curl https://license.iwareid.com/api/health
+c1
 
 # Test frontend
 curl https://license.iwareid.com

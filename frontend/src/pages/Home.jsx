@@ -139,7 +139,7 @@ const Home = () => {
                       },
                     }}
                   >
-                    {['cepat,', 'rapi,', 'dan', 'terukur'].map((word, idx) => (
+                    {['Bikin', 'izin', 'jadi', 'gampang'].map((word, idx) => (
                       <motion.span
                         key={word + idx}
                         className="inline-block mr-1"
@@ -158,7 +158,7 @@ const Home = () => {
                   </motion.span>
                 </h1>
                 <p className="text-sm sm:text-base md:text-lg text-slate-300 max-w-[44rem] leading-relaxed mx-auto">
-                  Portal internal untuk pengajuan cuti, izin, sakit, lembur, dan dinas. Pantau status persetujuan dan simpan riwayat pengajuan secara terpusat untuk kebutuhan HR/GA.
+                  Mau cuti, izin sakit, lembur, atau dinas? Tinggal ajukan di sini. Nggak perlu ribet chat sana-sini, semua bisa dipantau statusnya dan tersimpan rapi buat keperluan HR.
                 </p>
               </motion.div>
 
@@ -218,7 +218,7 @@ const Home = () => {
                   Standar operasional internal
                 </p>
                 <p className="text-sm text-slate-300">
-                  HR/GA memantau seluruh pengajuan cuti, izin, lembur, dan dinas melalui satu dashboard terpusat.
+                  Semua pengajuan cuti, izin, lembur, dan dinas bisa dipantau HR/GA dari satu tempat. Jadi lebih gampang ngecek dan ngerekap.
                 </p>
               </div>
               <div className="flex flex-wrap gap-2 text-xs text-slate-400">
@@ -245,19 +245,19 @@ const Home = () => {
         <div className="max-w-7xl mx-auto">
           <div className={`text-center mb-14 sm:mb-16 transition-all duration-1000 ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
-              Ringkas, jelas, dan terstruktur
+              Simpel, jelas, nggak bikin bingung
             </h2>
             <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto">
-              Portal Perizinan Iware membantu karyawan mengajukan perizinan dengan cepat dan membantu HR/GA melakukan rekap dengan lebih rapi dan akurat.
+              Karyawan bisa ngajuin izin dengan cepat, HR/GA juga lebih gampang ngerekap. Semua jadi lebih rapi dan nggak ada yang kelewat.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { title: 'Pengajuan Cepat', desc: 'Buat pengajuan cuti/izin/lembur/dinas dengan format yang terstandar.', delay: 0 },
-              { title: 'Status Jelas', desc: 'Pantau status (menunggu, disetujui, ditolak) beserta catatan bila ada.', delay: 0.1 },
-              { title: 'Riwayat Terpusat', desc: 'Semua pengajuan tersimpan rapi dan mudah ditelusuri kembali.', delay: 0.2 },
-              { title: 'Rekap HR/GA', desc: 'Mempermudah rekap periodik untuk kebutuhan administrasi internal.', delay: 0.3 }
+              { title: 'Ngajuin Cepat', desc: 'Isi form cuti, izin, lembur, atau dinas dengan format yang udah jelas. Nggak perlu mikir lama.', delay: 0 },
+              { title: 'Status Jelas', desc: 'Bisa langsung cek statusnya: lagi diproses, udah disetujui, atau ditolak. Ada catatannya juga kalau perlu.', delay: 0.1 },
+              { title: 'Riwayat Tersimpan', desc: 'Semua pengajuan kamu tersimpan rapi. Kapan aja butuh, tinggal buka lagi.', delay: 0.2 },
+              { title: 'Rekap Gampang', desc: 'HR/GA bisa langsung rekap data periodik tanpa harus ngumpulin manual satu-satu.', delay: 0.3 }
             ].map((feature, index) => (
               <motion.div
                 key={index}
@@ -289,10 +289,10 @@ const Home = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
-              Kenapa menggunakan Portal Perizinan Iware
+              Kenapa pakai Portal Perizinan Iware?
             </h2>
             <p className="text-sm sm:text-base md:text-lg text-slate-400 max-w-2xl mx-auto">
-              Karena alurnya dibuat sesuai proses operasional internal: lebih jelas, terdokumentasi, dan mudah dipantau.
+              Soalnya alurnya udah disesuaikan sama kebutuhan internal kita. Jadi lebih jelas, tercatat, dan gampang dipantau.
             </p>
           </div>
 
@@ -304,8 +304,8 @@ const Home = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 ),
-                title: 'Lebih ringkas',
-                desc: 'Format pengajuan konsisten, tidak perlu bolak-balik chat untuk detail yang sama.'
+                title: 'Nggak ribet',
+                desc: 'Formatnya udah jelas dan konsisten. Nggak perlu bolak-balik nanya atau chat buat hal yang sama.'
               },
               {
                 icon: (
@@ -313,8 +313,8 @@ const Home = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                 ),
-                title: 'Akses terkontrol',
-                desc: 'Hak akses mengikuti role internal (karyawan, atasan, HR/GA, admin).'
+                title: 'Aman dan terkontrol',
+                desc: 'Setiap orang punya akses sesuai perannya: karyawan, atasan, HR/GA, atau admin.'
               },
               {
                 icon: (
@@ -322,8 +322,8 @@ const Home = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
                 ),
-                title: 'Lebih mudah direkap',
-                desc: 'Riwayat tersimpan rapi untuk kebutuhan rekap bulanan dan audit internal.'
+                title: 'Gampang direkap',
+                desc: 'Semua data tersimpan rapi. Mau rekap bulanan atau audit? Tinggal tarik data aja.'
               }
             ].map((item, index) => (
               <motion.div
@@ -360,10 +360,10 @@ const Home = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14 sm:mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
-              Cara Kerja
+              Gimana cara pakainya?
             </h2>
             <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto">
-              Proses sederhana sesuai alur internal
+              Prosesnya simpel kok, sesuai alur yang udah biasa kita pakai
             </p>
           </div>
 
@@ -374,10 +374,10 @@ const Home = () => {
             )}
             
             {[
-              { step: '01', title: 'Masuk Portal', desc: 'Gunakan akun internal untuk mengakses sistem' },
-              { step: '02', title: 'Buat Pengajuan', desc: 'Pilih jenis perizinan, isi tanggal, dan alasan secara lengkap' },
-              { step: '03', title: 'Review & Persetujuan', desc: 'Atasan/HR meninjau pengajuan sesuai kebijakan yang berlaku' },
-              { step: '04', title: 'Arsip & Rekap', desc: 'Riwayat tersimpan rapi untuk kebutuhan rekap berkala' }
+              { step: '01', title: 'Login dulu', desc: 'Pakai akun internal kamu buat masuk ke sistem' },
+              { step: '02', title: 'Bikin pengajuan', desc: 'Pilih mau izin apa, isi tanggal sama alasannya. Lengkap ya biar cepat diproses' },
+              { step: '03', title: 'Tunggu persetujuan', desc: 'Atasan atau HR bakal review pengajuan kamu sesuai kebijakan perusahaan' },
+              { step: '04', title: 'Selesai & tersimpan', desc: 'Riwayat pengajuan kamu otomatis tersimpan. Kapan aja butuh, bisa dicek lagi' }
             ].map((item, index) => (
               <motion.div
                 key={index}
@@ -414,30 +414,30 @@ const Home = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12 sm:mb-14">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
-              Pertanyaan yang sering ditanyakan
+              Ada pertanyaan?
             </h2>
             <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto">
-              Jawaban singkat terkait penggunaan Portal Perizinan Iware.
+              Ini beberapa pertanyaan yang sering ditanyain soal Portal Perizinan Iware
             </p>
           </div>
 
           <div className="space-y-3 max-w-5xl mx-auto">
             {[
               {
-                q: 'Siapa yang bisa menggunakan portal ini?',
-                a: 'Portal Perizinan Iware ditujukan untuk karyawan dan pihak internal terkait (atasan, HR/GA, admin).'
+                q: 'Siapa aja yang bisa pakai portal ini?',
+                a: 'Portal ini khusus buat karyawan internal dan pihak terkait kayak atasan, HR/GA, sama admin.'
               },
               {
-                q: 'Bagaimana cara mengajukan cuti/izin?',
-                a: 'Buka menu pengajuan, pilih jenis perizinan, isi tanggal dan alasan. Jika diperlukan, lampirkan bukti sesuai ketentuan.'
+                q: 'Gimana caranya ngajuin cuti atau izin?',
+                a: 'Gampang kok. Tinggal buka menu pengajuan, pilih jenis izinnya, isi tanggal sama alasannya. Kalau perlu lampiran, tinggal upload aja.'
               },
               {
-                q: 'Kenapa pengajuan saya belum diproses?',
-                a: 'Pastikan data sudah lengkap. Setelah itu, pengajuan menunggu review sesuai alur internal (atasan/HR).'
+                q: 'Kok pengajuan saya belum diproses ya?',
+                a: 'Coba cek lagi datanya udah lengkap belum. Kalau udah, tinggal tunggu aja. Nanti atasan atau HR yang bakal review sesuai prosedur.'
               },
               {
-                q: 'Apakah lampiran (foto/surat) wajib?',
-                a: 'Untuk jenis tertentu (mis. sakit/dinas luar) lampiran bisa diwajibkan agar verifikasi lebih cepat dan sesuai kebijakan.'
+                q: 'Harus lampirin foto atau surat nggak?',
+                a: 'Tergantung jenis izinnya. Kalau sakit atau dinas luar biasanya perlu lampiran biar proses verifikasinya lebih cepat.'
               }
             ].map((item, idx) => {
               const open = faqOpen === idx;
@@ -479,10 +479,10 @@ const Home = () => {
           <Card className="rounded-3xl bg-white/5 p-8 sm:p-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
             <div>
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
-                Siap digunakan untuk operasional internal
+                Yuk, mulai pakai sekarang!
               </h2>
               <p className="text-base sm:text-lg text-slate-400 max-w-2xl">
-                Mulai dari pengajuan hingga arsip. Portal Perizinan Iware membantu memastikan alur lebih tertib, transparan, dan mudah dipantau.
+                Dari ngajuin sampai arsip, semua jadi lebih tertib dan gampang dipantau. Portal Perizinan Iware bikin urusan izin jadi lebih simpel.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
