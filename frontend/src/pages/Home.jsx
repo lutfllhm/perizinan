@@ -139,7 +139,7 @@ const Home = () => {
                       },
                     }}
                   >
-                    {['Bikin', 'izin', 'jadi', 'gampang'].map((word, idx) => (
+                    {['Bikin ', 'izin ', 'jadi ', 'gampang'].map((word, idx) => (
                       <motion.span
                         key={word + idx}
                         className="inline-block mr-1"
